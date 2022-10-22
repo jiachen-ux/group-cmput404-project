@@ -19,4 +19,6 @@ from authors import views as user_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("register", user_view.register_page),
+    path("login", user_view.login_page)
 ]
