@@ -139,4 +139,4 @@ dmypy.json
 cython_debug/
 
 # react modules
-SocialDistribution/frontend/node_modules/
+SocialDistribution/frontend/node_modules
