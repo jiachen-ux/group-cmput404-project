@@ -20,5 +20,6 @@ from authors import views as author_view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("register", author_view.register_page),
-    path("login", author_view.login_page)
+    path("login", author_view.login_page),
+    path('', include('frontend.urls'))
 ]
