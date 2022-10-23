@@ -4,6 +4,9 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from .forms import UserRegisterForm
 from django.contrib.auth.forms import AuthenticationForm
+from rest_framework import generics
+from .models import Author 
+from .serializers import AuthorSerializer
 
 def login_page(request):
     if request.method == "POST":
@@ -38,3 +41,9 @@ def register_page(request):
     context = {'register_form': form}
 
     return render(request, 'authors/register.html', context)
+
+
+class AuthorView (generics.ListAPIView):
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
+    
