@@ -174,3 +174,5 @@ class Inbox(models.Model):
     @property
     def type(self):
         return 'inbox'
+
+
