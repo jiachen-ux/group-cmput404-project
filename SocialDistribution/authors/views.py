@@ -2,8 +2,11 @@
 from django.shortcuts import  render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
-from .forms import NewUserForm
+from .forms import UserRegisterForm
 from django.contrib.auth.forms import AuthenticationForm
+from rest_framework import generics
+from .models import Author 
+from .serializers import AuthorSerializer
 
 def login_page(request):
     if request.method == "POST":
@@ -27,14 +30,20 @@ def login_page(request):
 
 def register_page(request):
     if request.method == 'POST':
-        form = NewUserForm(request.POST)
+        form = UserRegisterForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Registration successful." )
-            return redirect('authors/login')
+            return redirect('/login')
         messages.error(request, "Unsuccessful registration. Invalid information.")
 
-    form = NewUserForm()
+    form = UserRegisterForm()
     context = {'register_form': form}
 
     return render(request, 'authors/register.html', context)
+
+
+class AuthorView (generics.ListAPIView):
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
+    
