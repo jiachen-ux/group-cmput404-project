@@ -1,10 +1,9 @@
+from django.conf import settings
 from tkinter.tix import TCL_WINDOW_EVENTS
 from django import forms
-from django import forms
-
-
 from .models import Post
-max_post_length = 200
+MAX_POST_LENGTH  = settings.MAX_POST_LENGTH
+
 class PostForm(forms.ModelForm):
 
     class Meta:

@@ -10,22 +10,71 @@ this is amazing
     </div>
 </div>
 
+<div class='row mb-3'>
+    <div class='col-md-4 mx-auto col-10'>
+      <form class='form' id='post-create-form' method='POST' action='/create-post'>
+        {% csrf_token %}
+        <input type='hidden' value='/' name='next' />
+        <textarea required='required' class='form-control' name='content' placeholder='Your post...'></textarea>
+        <button type='submit' class='btn btn-primary'>Post</button>
+      </form>
+    </div>
+  </div>
+
 
 <div class='row' id ='posts'>
     loading...
 </div>
-<script>
-    const postsElement = document.getElementById("posts")//get an htlml element
-    postsElement.innerHTML = 'Loading ...' //set html
 
-    
-    const xhr = new XMLHttpRequest() //xhr =some class
-    const method = 'GET' //Post
-    const url = "/posts" 
-    const responseType = "json"
+<script>
+    function handlePostCreateForDidSubmit(event){
+        event.preventDefault()
+        const myForm = event.target
+        const myFormData = new FormData(myForm) //for images
+        const url = myForm.getAttribute("action")
+        const method = myForm.getAttribute("method")
+        const xhr = new XMLHttpRequest() //xhr =some class
+        xhr.open(method, url)
+        xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest")
+        xhr.setRequestHeader("X-Requested_With", "XMLHttpRequest")
+        xhr.onload = function(){
+            const serverResponse = xhr.response
+            //console.log(serverResponse)
+            formatpostElement()
+        }
+        xhr.send(myFormData)
+    }
+    const postCreateFormEl = document.getElementById("post-create-form")
+    postCreateFormEl.addEventListener("submit", handlePostCreateForDidSubmit)
+
+    const postsEl = document.getElementById("posts")//get an htlml element
+
+    function loadPosts(postsElement) {
+        const xhr = new XMLHttpRequest() //xhr =some class
+        const method = 'GET' //Post
+        const url = "/posts" 
+        const responseType = "json"
+        xhr.responseType = responseType   
+        xhr.open(method, url)
+        xhr.onload = function(){ 
+            const serverResponse = xhr.response
+            var listedItems = serverResponse
+            var finalposts = "" 
+            var i;
+            for (i=0; i<listedItems.length; i++){
+                var postobj = listedItems[i]
+                var currentItem = formatpostElement(postobj)
+                finalposts += currentItem
+            }
+            postsElement.innerHTML = finalposts
+        }
+        xhr.send()
+    }
+
+    loadPosts(postsEl)
 
     function handleDidLike(post_id, courrentCount){
-        console.log(post.id, courrentCount)
+        console.log(post_id, courrentCount)
     }
     function LikeBtn(post){
         return "<button class='btn btn-primary btn-sm' onclick=handleDidLike(" +post.id +"," +post.likes+")>"+ post.likes+ "Likes</button>"
@@ -36,21 +85,7 @@ this is amazing
         return formattedposts
     }
 
-    xhr.responseType = responseType   
-    xhr.open(method, url)
-    xhr.onload = function(){ 
-        const serverResponse = xhr.response
-        var listedItems = serverResponse.response
-        var finalposts = "" 
-        var i;
-        for (i=0; i<listedItems.length; i++){
-            var postobj = listedItems[i]
-            var currentItem = formatpostElement(postobj)
-                finalposts += currentItem
-        }
-        postsElement.innerHTML = finalposts
-    }
-    xhr.send()
+    
 
 </script>
 {% endblock content%} 

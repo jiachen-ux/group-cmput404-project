@@ -7,11 +7,13 @@ from django.contrib.auth.models import BaseUserManager, PermissionsMixin
 from django.db.models import (CASCADE, BooleanField, CharField, DateTimeField,
                               ForeignKey, IntegerField, JSONField,
                               ManyToManyField, Model, OneToOneField, URLField, ImageField)
+import random
 #from django.utils.timezone import now
 #we need node
 url_max = 200
 char_max = 200
 
+User = settings.AUTH_USER_MODEL
 class Node(Model): 
     api_domain = URLField(primary_key=True)
     api_prefix = CharField(max_length=200, blank=True, null=True)
@@ -61,12 +63,10 @@ class Author(models.Model):
     
     url = models.CharField(max_length=char_max, blank=True)
     host = models.CharField(max_length=char_max, blank=True)
-    displayName = models.CharField(max_length=char_max, blank =False)
     github = models.CharField(max_length=char_max, blank=True)
     profileImage = models.URLField(max_length=url_max, null=True, blank=True)
     #user = ForeignKey(NodeUser, on_delete=CASCADE, null=True)
     followers = ManyToManyField('self', symmetrical=False)
-
 
     @property
     def type(self):
@@ -74,9 +74,6 @@ class Author(models.Model):
     
     def get_absolute_url(self):
         return self.userId
-
-    def __str__(self):
-        return self.displayName
 
     def to_dict(self):
         return {
@@ -122,20 +119,36 @@ class FollowRequest(models.Model):
             'object': self.object.username,
         }
 class Post(models.Model):
-    id = URLField(primary_key=True, blank=True)
+    id = CharField(primary_key=True, blank=True, max_length= char_max)
     title = CharField(max_length=50, blank=True)
     source = URLField(blank=True)
     origin = URLField(blank=True)
     description = CharField(max_length=50, blank=True)
     content_type = CharField(blank=True, max_length=255, null=True)
     content = CharField(blank=True, max_length=5000, null=True)
-    author = ForeignKey(Author, on_delete=CASCADE, null=True)
+    likes = models.ManyToManyField(User, related_name='post_user', blank=True)
+    #author = ForeignKey(Author, on_delete=CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=CASCADE, null=True)
     #image = ImageField(upload_to=path, blank=True, null=True)
     image_id = URLField(blank=True)
     categories = CharField(max_length=255, blank=True, null=True)
     count = IntegerField(default=0)
     comments = URLField(blank=True)
     comments_src = URLField(blank=True, null=True)
+    def __str__(self):
+        return self.content
+    class Meta:
+        ordering = ['-id']
+    
+    
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'content': self.content,
+            'likes': random.randint(0,10)
+        }
 
 class Comment(models.Model):
     author = ForeignKey(Author, on_delete=CASCADE)
@@ -159,6 +172,7 @@ class Follow(models.Model):
 class Like(models.Model):
     object = URLField(blank=True)
     author = ForeignKey(Author, on_delete=CASCADE, null=True)
+    post = models.ForeignKey("Post", on_delete=models.CASCADE)
 
     @property
     def type(self):

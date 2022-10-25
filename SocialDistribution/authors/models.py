@@ -174,3 +174,4 @@ class Inbox(models.Model):
     def type(self):
         return 'inbox'
 
+
