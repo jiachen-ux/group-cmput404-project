@@ -7,6 +7,11 @@ POST_ACTION_OPTIONS = settings.POST_ACTION_OPTIONS
 class PostActionSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     action= serializers.CharField()
+    def validate_action(self, value):
+        value = value.lower().strip()
+        if value not in POST_ACTION_OPTIONS:
+            raise serializers.ValidationError('Invalid action')
+        return value
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
@@ -17,5 +22,3 @@ class PostSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("This Post is too long")
         return value
 
-
-##############
