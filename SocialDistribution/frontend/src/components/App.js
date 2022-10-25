@@ -3,14 +3,19 @@ import {render} from "react-dom";
 
 import { Button } from "@mui/material";
 
+import Signup from './components/Login/Signup';
+import { Routes, Route } from 'react-router-dom';
+
 export default class App extends Component {
+
     constructor(props) {
         super(props);
     }
     render(){
         return (
-        <><h1>If you see this, the React is working</h1>
-        <Button variant="contained">Contained</Button></>
+        <Routes>
+            <Route path="/signup" element={<Signup />} />
+        </Routes>
         )
     }
 }
