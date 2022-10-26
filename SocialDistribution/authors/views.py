@@ -72,6 +72,12 @@ def register_page(request):
     return render(request, 'authors/register.html', context)
 
 
+def home(request):
+    return render (request, 'authors/home.html', {})
+
+
+
+
 @login_required
 def display_author_profile(request, userId):
     # get author's info
@@ -82,4 +88,22 @@ def display_author_profile(request, userId):
     return render(request, 'profile.html', context) # this won't work because the front end is not defined
     
 
+@login_required
+def get_author(request):
+    # assume author exist and user name is correct
+    #username = request.GET['username']
+    #author = Author.objects.get(username=username)
+    #id = author.userId
 
+    if 'q' in request.GET:
+        q = request.GET['q']
+        data =  Author.objects.filter(username__icontains = q)
+
+    else:
+        data = Author.objects.all()
+    
+    context = {
+        'data': data
+    }
+    
+    return render(request, 'authors/listUsers.html', context)

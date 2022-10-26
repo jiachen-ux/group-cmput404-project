@@ -1,0 +1,23 @@
+<!doctype html>
+
+{% extends 'authors\base.html' %}
+
+{% block content %}
+
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Username</th>
+      </tr>
+    </thead>
+
+    {% for data in data %}
+    <tbody>
+      <tr>
+        <td>{{ data.username }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock %}
