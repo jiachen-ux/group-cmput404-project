@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+#from SocialDistribution.authors.views import temp
 from authors import views as author_view
 from post import views as post_view
 
@@ -26,5 +27,5 @@ urlpatterns = [
     path("author/<str:author_id>/posts/", post_view.PostApiView.as_view(), name="author-posts"),
     path("author/<str:author_id>/posts/<str:post_id>", post_view.PostApiView.as_view(), name="post-detail"),
     path('', include('frontend.urls')),
-    path('', include('authors.urls'))
+    path('', include('authors.urls')),
 ]
