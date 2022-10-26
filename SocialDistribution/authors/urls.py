@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import AuthorView
+from .views import AuthorListView
 
 urlpatterns = [
-    path('author', AuthorView.as_view()),
+    path('author', AuthorListView.as_view()),
 ]
