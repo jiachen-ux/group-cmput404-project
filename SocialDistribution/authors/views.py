@@ -18,7 +18,7 @@ def login_page(request):
             if user is not None:
                 login(request, user)
                 messages.info(request, f"You are now logged in as {username}.")
-                # return redirect("authors:homepage") <- this should redirect to a page that show's user's main page
+                return redirect("/home") 
             else:
                 messages.error(request,"Invalid username or password.")
         else:
@@ -42,6 +42,8 @@ def register_page(request):
 
     return render(request, 'authors/register.html', context)
 
+def home(request):
+    return render (request, 'authors/home.html', {})
 
 class AuthorView (generics.ListAPIView):
     queryset = Author.objects.all()
