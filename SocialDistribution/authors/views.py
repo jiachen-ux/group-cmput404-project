@@ -80,30 +80,36 @@ def home(request):
 
 @login_required
 def display_author_profile(request, userId):
-    # get author's info
-    author = get_object_or_404(Author, userId = userId)
+    try:
+        author = get_object_or_404(Author, userId = userId)
+
+    except Author.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
     context = {
         "author":author
     }
-    return render(request, 'profile.html', context) # this won't work because the front end is not defined
+    return render(request, 'authors/profile.html', context) 
+
+def check(request):
+    # get author's info
+    
+    return render(request, 'authors/profile.html', {}) 
     
 
 @login_required
-def get_author(request):
+def searched_author(request):
     # assume author exist and user name is correct
     #username = request.GET['username']
     #author = Author.objects.get(username=username)
     #id = author.userId
 
-    if 'q' in request.GET:
-        q = request.GET['q']
-        data =  Author.objects.filter(username__icontains = q)
-
+    if request.method == "POST":
+        q = request.POST['q']
+        results = Author.objects.filter(username__contains = q)
+        print(results)
+        return render(request, 'authors/listUsers.html', {'q':  q, 'results':results})
+    
     else:
-        data = Author.objects.all()
-    
-    context = {
-        'data': data
-    }
-    
-    return render(request, 'authors/listUsers.html', context)
+        results = Author.objects.all()
+        return render(request, 'authors/listUsers.html', {'results':results})

@@ -23,10 +23,11 @@ urlpatterns = [
     path("register", author_view.register_page),
     path("login", author_view.login_page),
     path("home", author_view.home),
-    path("search", author_view.get_author),
+    path("search", author_view.searched_author, name='search'),
     path("posts/", post_view.PostApiView.as_view(), name="posts-list"),
     path("author/<str:author_id>/posts/", post_view.PostApiView.as_view(), name="author-posts"),
     path("author/<str:author_id>/posts/<str:post_id>", post_view.PostApiView.as_view(), name="post-detail"),
     path('', include('frontend.urls')),
-    path('', include('authors.urls'))
+    path('', include('authors.urls')),
+    path('profile', author_view.check, name='profile'),
 ]
