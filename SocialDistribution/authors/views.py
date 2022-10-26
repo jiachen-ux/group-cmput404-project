@@ -11,8 +11,6 @@ from .serializers import AuthorSerializer
 from django.contrib.auth.decorators import login_required
 from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly
 
-from SocialDistribution.authors import serializers
-
 class AuthorView(generics.RetrieveAPIView):
     # https://www.django-rest-framework.org/api-guide/generic-views/ for reference
     serializer_class = AuthorSerializer
@@ -81,10 +79,8 @@ def display_author_profile(request, userId):
     context = {
         "author":author
     }
-    return render(request, 'profile.html', context)
+    return render(request, 'profile.html', context) # this won't work because the front end is not defined
     
-    
-
 
 @login_required
 def get_author(request):
