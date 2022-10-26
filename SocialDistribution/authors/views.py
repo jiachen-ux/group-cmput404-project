@@ -43,7 +43,13 @@ def register_page(request):
     return render(request, 'authors/register.html', context)
 
 
-class AuthorView (generics.ListAPIView):
+
+# class AuthorView(generics.RetrieveAPIView):
+    
+
+
+class AuthorListView (generics.ListAPIView):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
+
     
