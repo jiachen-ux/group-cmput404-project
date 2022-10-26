@@ -9,8 +9,8 @@ class Author(models.Model):
     userId = models.UUIDField(unique=True, default=uuid.uuid4, editable=True)
     url = models.CharField(max_length=200)
     host = models.CharField(max_length=200)
-    displayName = models.CharField(max_length=200, null=True)
-    github = models.CharField(max_length=200, null=True)
+    displayName = models.CharField(max_length=200, null=True, blank=True)
+    github = models.CharField(max_length=200, null=True, blank=True)
     profileImage = models.CharField(max_length=500, null=True, blank=True)
 
     def __str__(self):
