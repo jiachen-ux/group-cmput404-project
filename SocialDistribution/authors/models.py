@@ -2,6 +2,8 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.conf import settings
 import uuid
+from django.db.models import DateTimeField
+from django.contrib.auth.models import User
 
 class Author(models.Model):
     username = models.CharField(unique=True, max_length=200, primary_key=True)
@@ -59,3 +61,43 @@ class FollowRequest(models.Model):
             'actor': self.actor.username,
             'object': self.object.username,
         }
+ 
+class POST(models.Model): 
+
+    CONTENT_TYPE = (
+        ('text/markdown', 'text/markdown'),
+        ('text/plain','text/plain'),
+        ('application/base64', 'application/base64'),
+        ('image/png;base64','image/png;base64'),
+        ('image/jpeg;base64','image/jpeg;base64')
+    )
+
+    VISIBILITY_CHOICES = (
+        ('PUBLIC','PUBLIC'),
+        ("FRIENDS","FRIENDS")
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=255, blank=True, null=True)
+    source = models.URLField(null=True, blank=True)
+    origin = models.URLField(null=True, blank=True)
+    content = models.CharField(max_length=500, blank=True, null=True)
+    contentType = models.CharField(max_length=255, choices=CONTENT_TYPE, default='text/plain')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    image_url = models.URLField(null=True, blank=True)
+    image = models.ImageField(null=True, blank=True)
+    comment_count = models.IntegerField(default=0)
+    published = models.DateTimeField(auto_now=True)
+    visibility = models.CharField(max_length=15, choices=VISIBILITY_CHOICES, default="PUBLIC")
+    unlisted = models.BooleanField(default=False)
+
+
+    class Meta:
+        ordering = ['-published']
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def type(self):
+        return 'post'
