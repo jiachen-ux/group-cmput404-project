@@ -10,6 +10,8 @@ from .models import Author
 from .serializers import AuthorSerializer
 from django.contrib.auth.decorators import login_required
 from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly
+from django.contrib.auth.models import User
+
 
 class AuthorView(generics.RetrieveAPIView):
     # https://www.django-rest-framework.org/api-guide/generic-views/ for reference
@@ -106,10 +108,11 @@ def searched_author(request):
 
     if request.method == "POST":
         q = request.POST['q']
-        results = Author.objects.filter(username__contains = q)
-        print(results)
+        print(q)
+        results = User.objects.filter(username__contains = q)
+    
         return render(request, 'authors/listUsers.html', {'q':  q, 'results':results})
     
     else:
-        results = Author.objects.all()
+        results = User.objects.all()
         return render(request, 'authors/listUsers.html', {'results':results})
