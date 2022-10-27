@@ -19,8 +19,6 @@ class PostActionSerializer(serializers.Serializer):
     action= serializers.CharField()
     def validate_action(self, value):
         value = value.lower().strip()
-        # if value not in POST_ACTION_OPTIONS:
-        #     raise serializers.ValidationError('Invalid action')
         return value
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
