@@ -15,12 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+<<<<<<< HEAD
 <<<<<<< HEAD:SocialDist/urls.py
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('author.urls'))
 =======
+=======
+>>>>>>> parent of 407ea186 (new)
 from authors import views as author_view
 from post import views as post_view
 
@@ -33,5 +36,8 @@ urlpatterns = [
     path("author/<str:author_id>/posts/<str:post_id>", post_view.PostApiView.as_view(), name="post-detail"),
     path('', include('frontend.urls')),
     path('', include('authors.urls'))
+<<<<<<< HEAD
 >>>>>>> parent of 407ea186 (new):SocialDistribution/SocialDistribution/urls.py
+=======
+>>>>>>> parent of 407ea186 (new)
 ]
