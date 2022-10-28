@@ -16,12 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:SocialDist/urls.py
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('author.urls'))
 =======
+=======
+>>>>>>> parent of 407ea186 (new)
 =======
 >>>>>>> parent of 407ea186 (new)
 from authors import views as author_view
@@ -37,7 +40,10 @@ urlpatterns = [
     path('', include('frontend.urls')),
     path('', include('authors.urls'))
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> parent of 407ea186 (new):SocialDistribution/SocialDistribution/urls.py
+=======
+>>>>>>> parent of 407ea186 (new)
 =======
 >>>>>>> parent of 407ea186 (new)
 ]

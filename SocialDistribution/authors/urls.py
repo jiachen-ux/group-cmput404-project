@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:author/urls.py
  
 from django.urls import path
@@ -9,13 +10,18 @@ urlpatterns = [
 =======
 =======
 >>>>>>> parent of 407ea186 (new)
+=======
+>>>>>>> parent of 407ea186 (new)
 from django.urls import path
 from .views import AuthorView
 
 urlpatterns = [
     path('author', AuthorView.as_view()),
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> parent of 407ea186 (new):SocialDistribution/authors/urls.py
+=======
+>>>>>>> parent of 407ea186 (new)
 =======
 >>>>>>> parent of 407ea186 (new)
 ]

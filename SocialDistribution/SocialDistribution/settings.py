@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:SocialDist/settings.py
     'author',
     'rest_framework',
@@ -51,6 +52,9 @@ INSTALLED_APPS = [
 =======
     'rest_framework',
 >>>>>>> parent of 407ea186 (new):SocialDistribution/SocialDistribution/settings.py
+=======
+    'rest_framework',
+>>>>>>> parent of 407ea186 (new)
 =======
     'rest_framework',
 >>>>>>> parent of 407ea186 (new)
@@ -148,6 +152,7 @@ REGISTER_URL = 'register'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:SocialDist/settings.py
 
 AUTH_USER_MODEL = "author.Author"
@@ -167,6 +172,9 @@ CORS_ALLOWED_ORIGINS = [
 =======
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 >>>>>>> parent of 407ea186 (new):SocialDistribution/SocialDistribution/settings.py
+=======
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+>>>>>>> parent of 407ea186 (new)
 =======
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 >>>>>>> parent of 407ea186 (new)
