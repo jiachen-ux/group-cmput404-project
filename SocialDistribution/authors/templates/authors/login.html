@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Page Title</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+    {% load crispy_forms_tags %}         
+
+    <!--Login--> 
+    <div class="container py-5">
+        <h1>Login</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {{ login_form|crispy }}
+            <button class="btn btn-primary" type="submit">Login</button>
+        </form>
+        <p class="text-center">Don't have an account? <a href="/register">Create an account</a>.</p>
+    </div>
+
+</body>
+</html>
