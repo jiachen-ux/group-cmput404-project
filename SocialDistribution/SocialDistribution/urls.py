@@ -26,6 +26,6 @@ urlpatterns = [
     path("posts/", post_view.PostApiView.as_view(), name="posts-list"),
     path("author/<str:author_id>/posts/", post_view.PostApiView.as_view(), name="author-posts"),
     path("author/<str:author_id>/posts/<str:post_id>", post_view.PostApiView.as_view(), name="post-detail"),
-    path('', include('frontend.urls')),
+    #path('', include('frontend.urls')),
     path('', include('authors.urls')),
 ]
