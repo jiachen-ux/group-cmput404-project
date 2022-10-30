@@ -43,11 +43,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD:SocialDist/settings.py
     'author',
     'rest_framework',
     'corsheaders',
+=======
     'rest_framework',
-
+>>>>>>> parent of 407ea186 (new):SocialDistribution/SocialDistribution/settings.py
+=======
+    'rest_framework',
+>>>>>>> parent of 407ea186 (new)
+=======
+    'rest_framework',
+>>>>>>> parent of 407ea186 (new)
 ]
 
 MIDDLEWARE = [
@@ -141,6 +151,9 @@ REGISTER_URL = 'register'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD:SocialDist/settings.py
 
 AUTH_USER_MODEL = "author.Author"
 
@@ -156,6 +169,12 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'frontend', 'build', 'static')]
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]
-
+=======
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
+>>>>>>> parent of 407ea186 (new):SocialDistribution/SocialDistribution/settings.py
+=======
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+>>>>>>> parent of 407ea186 (new)
+=======
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+>>>>>>> parent of 407ea186 (new)

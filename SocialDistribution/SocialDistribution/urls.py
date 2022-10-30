@@ -15,18 +15,35 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD:SocialDist/urls.py
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('user/', include('author.urls'))
+=======
+=======
+>>>>>>> parent of 407ea186 (new)
+=======
+>>>>>>> parent of 407ea186 (new)
 from authors import views as author_view
 from post import views as post_view
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('user/', include('author.urls')),
     path('admin/', admin.site.urls),
     path("register", author_view.register_page),
     path("login", author_view.login_page),
     path("posts/", post_view.PostApiView.as_view(), name="posts-list"),
     path("author/<str:author_id>/posts/", post_view.PostApiView.as_view(), name="author-posts"),
     path("author/<str:author_id>/posts/<str:post_id>", post_view.PostApiView.as_view(), name="post-detail"),
-    path('', include('authors.urls')),
-
+    path('', include('frontend.urls')),
+    path('', include('authors.urls'))
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 407ea186 (new):SocialDistribution/SocialDistribution/urls.py
+=======
+>>>>>>> parent of 407ea186 (new)
+=======
+>>>>>>> parent of 407ea186 (new)
 ]
