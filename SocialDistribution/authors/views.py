@@ -1,7 +1,11 @@
 # Create your views here.
+import imp
+from django.dispatch import receiver
 from django.shortcuts import  render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
+from follower.follower_status import FollowRequestStatus
+
 from .forms import UserRegisterForm
 from django.contrib.auth.forms import AuthenticationForm
 from rest_framework import generics, response, status
@@ -11,6 +15,8 @@ from .serializers import AuthorSerializer
 from django.contrib.auth.decorators import login_required
 from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly
 from django.contrib.auth.models import User
+from follower.utils import get_follow_request_or_false
+from follower.models import Follower,FollowRequest
 
 
 class AuthorView(generics.RetrieveAPIView):
@@ -81,6 +87,55 @@ def home(request):
 @login_required
 def display_author_profile(request, user_id):
     author = User.objects.get(pk=user_id)
+
+    try:
+        friend_list = Follower.objects.get(user=author)
+    except Follower.DoesNotExist:
+        friend_list = Follower(user=author)
+        friend_list.save()
+
+    friends = friend_list.friends.all()
+    context['friends'] = friends
+
+    is_self = True
+    is_friend = False
+    user = request.user
+    request_sent= FollowRequestStatus.NO_REQUEST_SENT.value
+    friend_request = None
+
+    if user.is_authenticated and user != author:
+        is_self = False
+        if friends.filter(pk=user.id):
+            is_friend = True
+        else:
+            is_friend = False
+            # CASE1: request has been sent to you
+            if get_follow_request_or_false(sender=author, reciever=user) != False:
+                request_sent = FollowRequestStatus.THEY_SENT_YOU.value
+                context['pending_friend_request_id'] = get_follow_request_or_false(sender=author, reciever=user).id
+
+            # CASE 2: request has been sent to them from you
+            elif get_follow_request_or_false(sender=author, reciever=user) != False:
+                request_sent = FollowRequestStatus.YOU_SENT_THEM.value
+
+            #case 3: no request sent 
+            else:
+                request_sent = FollowRequestStatus.NO_REQUEST_SENT.values
+
+
+    elif not user.is_authenticated:
+        is_self = False
+    
+    else:
+        try:
+            friend_request = FollowRequest.objects.filter(receiver=user, is_active=True)
+        except:
+            pass
+
+    context['is_self'] = is_self
+    context['is_friend'] = is_friend
+    context['request_sent'] = request_sent
+    context['friend_request'] = friend_request
 
     context = {
         "author":author

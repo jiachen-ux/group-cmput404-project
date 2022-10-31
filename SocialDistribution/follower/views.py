@@ -18,7 +18,7 @@ def send_friend_request(request):
         if user_id:
             receiver = Author.objects.get(pk=user_id)
             try:
-                # get any friend requests (active and non-active)
+                # get any follow requests (active and non-active)
                 friend_request = FollowRequest.objects.filter(sender=user, receiver=receiver)
 
                 #find is any of them are active
@@ -33,7 +33,7 @@ def send_friend_request(request):
                 except Exception as e:
                     payload['response'] = str(e)
             except FollowRequest.DoesNotExist:
-                # there are no friend requests so create one.
+                # there are no follow requests so create one.
 
                 friend_request = FollowRequest(sender=user, receiver=receiver)
                 friend_request.save()

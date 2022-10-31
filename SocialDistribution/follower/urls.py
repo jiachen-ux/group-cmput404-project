@@ -7,5 +7,5 @@ from follower.views import(
 app_name = "follower"
 
 urlpatterns = [
-    path('friend_request/', send_friend_request, name="friend-request"),
+    path('friend_request/', send_friend_request, name="follow-request"),
 ]
