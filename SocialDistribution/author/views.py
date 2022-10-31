@@ -121,3 +121,7 @@ def searched_author(request):
     else:
         results = Author.objects.all()
         return render(request, 'author/listUsers.html', {'results':results})
+
+    
+def home(request):
+    return render (request, 'author/home.html', {})
