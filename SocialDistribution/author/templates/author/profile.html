@@ -1,0 +1,30 @@
+<!doctype html>
+
+{% extends 'author\base.html' %}
+
+
+{% block content %}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="card" style="width: 50rem">
+            <div class="card-body">
+                <a class="btn btn-info float-right mr-2" id="followBtn" >Follow</a>
+                <h2>Profile</h2>
+                <hr>
+                <h5 class="card-text">Username</h5>
+                {{ author.username }}
+                <p class="card-text"></p>
+                <h5 class="card-text">Email</h5>
+                {{ author.email }}
+                <p class="card-text"></p>
+                <hr>
+                <div>
+                
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

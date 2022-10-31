@@ -1,0 +1,37 @@
+<!doctype html>
+
+{% extends 'author\base.html' %}
+
+{% block content %}
+
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Username</th>
+      </tr>
+    </thead>
+
+    <tbody>
+        {% if q %}
+
+        {% for result in results %}
+
+      <tr>
+        <td>
+          <a href="{% url 'view-profile' result.userId %}">
+          {{ result.username }}
+          </a>
+        </td>
+        {% endfor %}
+      </tr>
+      {% else %}
+
+      <tr>
+        <td>Hey! You Forgot To Search</td>
+      </tr>
+
+      {% endif %}
+    </tbody>
+  </table>
+
+{% endblock %}

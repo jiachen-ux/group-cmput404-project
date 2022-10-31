@@ -24,4 +24,5 @@ urlpatterns = [
     path("home", author_views.home),
     path("search", author_views.searched_author, name='search'),
     path("register/", author_views.register, name="register"),
+    path('profile/<user_id>', author_views.display_author_profile, name='view-profile'),
 ]
