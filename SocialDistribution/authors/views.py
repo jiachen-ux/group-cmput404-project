@@ -78,26 +78,14 @@ def home(request):
     return render (request, 'authors/home.html', {})
 
 
-
-
 @login_required
-def display_author_profile(request, userId):
-    try:
-        author = get_object_or_404(Author, userId = userId)
-
-    except Author.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+def display_author_profile(request, user_id):
+    author = User.objects.get(pk=user_id)
 
     context = {
         "author":author
     }
     return render(request, 'authors/profile.html', context) 
-
-def check(request):
-    # get author's info
-    
-    return render(request, 'authors/profile.html', {}) 
-    
 
 @login_required
 def searched_author(request):
@@ -108,7 +96,6 @@ def searched_author(request):
 
     if request.method == "POST":
         q = request.POST['q']
-        print(q)
         results = User.objects.filter(username__contains = q)
     
         return render(request, 'authors/listUsers.html', {'q':  q, 'results':results})

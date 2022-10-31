@@ -17,7 +17,11 @@
         {% for result in results %}
 
       <tr>
-        <td>{{ result.username }}</td>
+        <td>
+          <a href="{% url 'view-profile' result.id %}">
+          {{ result.username }}
+          </a>
+        </td>
         {% endfor %}
       </tr>
       {% else %}

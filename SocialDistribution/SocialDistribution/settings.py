@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'authors.apps.AuthorsConfig',
     'post.apps.PostConfig',
     'frontend.apps.FrontendConfig',
+    'follower',
     'crispy_forms',
     'django.contrib.admin',
     'django.contrib.auth',

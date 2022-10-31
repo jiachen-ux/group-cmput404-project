@@ -1,4 +1,4 @@
-"""SocialDistribution URL Configuration
+"""SocialDist URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.1/topics/http/urls/
@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+#from SocialDistribution.authors.views import temp
 from authors import views as author_view
 from post import views as post_view
 
@@ -22,14 +23,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("register", author_view.register_page),
     path("login", author_view.login_page),
-    path("home", author_view.home),
-    path("search", author_view.searched_author, name='search'),
     path("posts/", post_view.PostApiView.as_view(), name="posts-list"),
     path("author/<str:author_id>/posts/", post_view.PostApiView.as_view(), name="author-posts"),
     path("author/<str:author_id>/posts/<str:post_id>", post_view.PostApiView.as_view(), name="post-detail"),
     path('', include('frontend.urls')),
     path('', include('authors.urls')),
-    path('profile/<user_id>', author_view.display_author_profile, name='view-profile'),
-    path("friend/", include('follower.urls', namespace='friend')),
-
 ]
