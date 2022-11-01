@@ -4,34 +4,42 @@
 
 {% block content %}
 
-<table class="table">
-    <thead>
-      <tr>
-        <th scope="col">Username</th>
-      </tr>
-    </thead>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="card" style="width: 50rem">
+        <div class="card-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Username</th>
+              </tr>
+            </thead>
 
-    <tbody>
-        {% if q %}
+            <tbody>
+                {% if q %}
 
-        {% for result in results %}
+                {% for result in results %}
 
-      <tr>
-        <td>
-          <a href="{% url 'view-profile' result.userid %}">
-          {{ result.username }}
-          </a>
-        </td>
-        {% endfor %}
-      </tr>
-      {% else %}
+              <tr>
+                <td>
+                  <a href="{% url 'view-profile' result.userid %}">
+                  {{ result.username }}
+                  </a>
+                </td>
+                {% endfor %}
+              </tr>
+              {% else %}
 
-      <tr>
-        <td>Hey! You Forgot To Search</td>
-      </tr>
+              <tr>
+                <td>Hey! You Forgot To Search</td>
+              </tr>
 
-      {% endif %}
-    </tbody>
-  </table>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}

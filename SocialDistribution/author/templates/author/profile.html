@@ -52,16 +52,16 @@
 .material-icons:hover{
     cursor: pointer;
 }
-.confirm-friend-request{
+.confirm-follow-request{
     color: green;
 }
-.confirm-friend-request:hover {
+.confirm-follow-request:hover {
     opacity: 0.3;
 }
-.decline-friend-request:hover {
+.decline-follow-request:hover {
     opacity: 0.3;
 }
-.decline-friend-request{
+.decline-follow-request{
     color: red;
 }
 .message-btn-text{
@@ -104,9 +104,9 @@
 			{% if request_sent == 0 %}
 			<div class="card m-2 p-4">
 				<div class="d-flex flex-row align-items-center">
-					<span class="friend-text align-items-center mr-2">Accept Friend Request</span>
-					<span id="id_cancel_{{userid}}" class="decline-friend-request material-icons p-1" onclick='triggerDeclineFriendRequest("{{pending_follow_request_id}}")'>cancel</span>
-  					<span id="id_confirm_{{userid}}" class="confirm-friend-request material-icons p-1" onclick='triggerAcceptFriendRequest("{{pending_follow_request_id}}")'>check</span>
+					<span class="friend-text align-items-center mr-2">Accept Follow Request</span>
+					<span id="id_cancel_{{userid}}" class="decline-follow-request material-icons p-1" onclick='triggerDeclineFollowRequest("{{pending_follow_request_id}}")'>cancel</span>
+  					<span id="id_confirm_{{userid}}" class="confirm-follow-request material-icons p-1" onclick='triggerAcceptFollowRequest("{{pending_follow_request_id}}")'>check</span>
 				</div>
 			</div>
 			{% endif %}
@@ -117,7 +117,7 @@
 						<!-- You sent them a request -->
 						{% if request_sent == 1 %}
 						<div class="d-flex flex-column align-items-center pt-4">
-							<button class="btn btn-danger" id="id_cancel_friend_request_btn">
+							<button class="btn btn-danger" id="id_cancel_follow_request_btn">
 								Cancel Follow Request
 							</button>
 						</div>
@@ -125,7 +125,7 @@
 						<!-- No requests have been sent -->
 						{% if request_sent == -1 %}
 						<div class="d-flex flex-column align-items-center pt-4">
-							<button class="btn btn-primary" id="id_send_friend_request_btn">
+							<button class="btn btn-primary" id="id_send_follow_request_btn">
 								Send Follow Request
 							</button>
 						</div>
@@ -135,17 +135,17 @@
 					
 				{% if is_follower %}
 					<div class="dropdown pt-4 m-auto">
-						<button class="btn btn-secondary dropdown-toggle friends-btn" type="button" id="id_friends_toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<button class="btn btn-secondary dropdown-toggle friends-btn" type="button" id="id_follow_toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						Following
 						</button>
-						<div class="dropdown-menu" aria-labelledby="id_friends_toggle">
-							<a class="dropdown-item" href="#" onclick="removeFriend('{{userid}}', onFriendRemoved)">Unfollow</a>
+						<div class="dropdown-menu" aria-labelledby="id_follow_toggle">
+							<a class="dropdown-item" href="#" onclick="removeFollower('{{userid}}', onFollowRemoved)">Unfollow</a>
 						</div>
 					</div>
 				{% endif %}
 				
 				<!-- TODO -->
-				<!-- Friend list link -->
+				<!-- Follower list link -->
 		  		<div class="d-flex flex-column pt-4">
 					<a href="#">
 						<div class="d-flex flex-row align-items-center justify-content-center icon-container">
@@ -159,7 +159,7 @@
 			<!-- TODO -->
 			{% if follow_requests %}
 			<div class="card m-2 px-4 pb-4">
-				<!-- Friend requests -->
+				<!-- Follow requests -->
 		  		<div class="d-flex flex-column pt-4">
 					<a href="#">
 						<div class="d-flex flex-row align-items-center justify-content-center icon-container">
@@ -181,55 +181,55 @@
 
 <script>
 	
-	function onFriendRequestSent(){
+	function onFollowRequestSent(){
 		console.log("senddddd")
 		location.reload();
 	}
 
-	function onFriendRequestCancelled(){
+	function onFollowRequestCancelled(){
 		location.reload();
 	}
 
-	function onFriendRemoved(){
+	function onFollowRemoved(){
 		location.reload();
 	}
 
-	function onFriendRequestAccepted(){
+	function onFollowRequestAccepted(){
 		location.reload();
 	}
 
-	function onFriendRequestDeclined(){
+	function onFollowRequestDeclined(){
 		location.reload();
 	}
 
 
-	var sendFriendRequestBtn = document.getElementById("id_send_friend_request_btn")
-	if (sendFriendRequestBtn != null){
-		sendFriendRequestBtn.addEventListener("click", function(){
-			sendFriendRequest("{{userid}}", onFriendRequestSent)
+	var sendFollowRequestBtn = document.getElementById("id_send_follow_request_btn")
+	if (sendFollowRequestBtn != null){
+		sendFollowRequestBtn.addEventListener("click", function(){
+			sendFollowRequest("{{userid}}", onFollowRequestSent)
 		})
 	}
 
-	var cancelFriendRequestBtn = document.getElementById("id_cancel_friend_request_btn")
-	if(cancelFriendRequestBtn != null){
-		cancelFriendRequestBtn.addEventListener("click", function(){
-			//cancelFriendRequest("{{id}}", onFriendRequestCancelled)
+	var cancelFollowRequestBtn = document.getElementById("id_cancel_follow_request_btn")
+	if(cancelFollowRequestBtn != null){
+		cancelFollowRequestBtn.addEventListener("click", function(){
+			//cancelFollowRequest("{{id}}", onFollowRequestCancelled)
 		})
 	}
 
-	var removeFriendBtn = document.getElementById("id_unfriend_btn")
-	if (removeFriendBtn != null){
-		removeFriendBtn.addEventListener("click", function(){
-			//removeFriend("{{id}}", onFriendRemoved)
+	var removeFollowerBtn = document.getElementById("id_unfollow_btn")
+	if (removeFollowerBtn != null){
+		removeFollowerBtn.addEventListener("click", function(){
+			//removeFollower("{{id}}", onFollowRemoved)
 		})
 	}
 
-	function triggerAcceptFriendRequest(friend_request_id){
-		//acceptFriendRequest(friend_request_id, onFriendRequestAccepted)
+	function triggerAcceptFollowRequest(follow_request_id){
+		//acceptFollowRequest(follow_request_id, onFollowRequestAccepted)
 	}
 
-	function triggerDeclineFriendRequest(friend_request_id){
-		//declineFriendRequest(friend_request_id, onFriendRequestDeclined)
+	function triggerDeclineFollowRequest(follow_request_id){
+		//declineFollowRequest(follow_request_id, onFollowRequestDeclined)
 	}
 
 
