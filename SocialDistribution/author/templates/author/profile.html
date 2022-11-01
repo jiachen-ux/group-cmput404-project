@@ -5,26 +5,245 @@
 
 {% block content %}
 
+<style>
+
+.image-container{
+    max-width: 250px;
+    height: auto;
+}
+.field-heading{
+    color: var(--secondary-text-color);
+}
+.icon-container:hover {
+    opacity: 0.3;
+    cursor: pointer;
+}
+.friends-icon{
+    color: #4287f5;
+    font-size: 40px;
+}
+.person-add-icon{
+    color: #4287f5;
+    font-size: 40px;
+}
+.friend-text{
+    font-weight: 500;
+    color: black;
+}
+.friends-btn{
+    background-color: #cccccc;
+    border-color: #cccccc;
+    color: #000;
+    font-weight: 500;
+}
+.friends-btn:hover {
+    background-color: #bfbfbf;
+    border-color: #bfbfbf;
+}
+.dropdown-toggle::after { 
+    content: none; 
+}
+.card{
+    border-radius: 12px;
+}
+.material-icons{
+    font-size: 30px;
+}
+.material-icons:hover{
+    cursor: pointer;
+}
+.confirm-friend-request{
+    color: green;
+}
+.confirm-friend-request:hover {
+    opacity: 0.3;
+}
+.decline-friend-request:hover {
+    opacity: 0.3;
+}
+.decline-friend-request{
+    color: red;
+}
+.message-btn-text{
+    font-weight: 500;
+}
+
+
+</style>
+
 <div class="container">
     <div class="row justify-content-center">
-        <div class="card" style="width: 50rem">
+        <div class="card" style="width: 30rem">
             <div class="card-body">
-                <a class="btn btn-info float-right mr-2" id="followBtn" >Follow</a>
                 <h2>Profile</h2>
                 <hr>
                 <h5 class="card-text">Username</h5>
-                {{ author.username }}
+                {{ username }}
                 <p class="card-text"></p>
                 <h5 class="card-text">Email</h5>
-                {{ author.email }}
+                {{ github }}
                 <p class="card-text"></p>
                 <hr>
                 <div>
+
+                <!-- If Auth user is viewing their own profile -->
+		  		{% if is_self %}
+		  		<a  class="btn btn-info float-right mr-2" href="#">Update</a>
+				<div class="d-flex flex-column mt-4">
+				</div>
+		  		{% endif %}
                 
             </div>
             </div>
         </div>
+
+        {% if request.user.is_authenticated %}
+		<div class="d-flex flex-column mb-4">
+
+			<!-- THEM to YOU -->
+			{% if request_sent == 0 %}
+			<div class="card m-2 p-4">
+				<div class="d-flex flex-row align-items-center">
+					<span class="friend-text align-items-center mr-2">Accept Friend Request</span>
+					<span id="id_cancel_{{userid}}" class="decline-friend-request material-icons p-1" onclick='triggerDeclineFriendRequest("{{pending_follow_request_id}}")'>cancel</span>
+  					<span id="id_confirm_{{userid}}" class="confirm-friend-request material-icons p-1" onclick='triggerAcceptFriendRequest("{{pending_follow_request_id}}")'>check</span>
+				</div>
+			</div>
+			{% endif %}
+
+			<div class="card m-2 px-4 pb-4">
+				<!-- Cancel follow Request / Send follow Request / Remove follow -->
+				{% if is_follower == False and is_self == False %}
+						<!-- You sent them a request -->
+						{% if request_sent == 1 %}
+						<div class="d-flex flex-column align-items-center pt-4">
+							<button class="btn btn-danger" id="id_cancel_friend_request_btn">
+								Cancel Follow Request
+							</button>
+						</div>
+						{% endif %}
+						<!-- No requests have been sent -->
+						{% if request_sent == -1 %}
+						<div class="d-flex flex-column align-items-center pt-4">
+							<button class="btn btn-primary" id="id_send_friend_request_btn">
+								Send Follow Request
+							</button>
+						</div>
+						{% endif %}
+				{% endif %}
+					
+					
+				{% if is_follower %}
+					<div class="dropdown pt-4 m-auto">
+						<button class="btn btn-secondary dropdown-toggle friends-btn" type="button" id="id_friends_toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Following
+						</button>
+						<div class="dropdown-menu" aria-labelledby="id_friends_toggle">
+							<a class="dropdown-item" href="#" onclick="removeFriend('{{userid}}', onFriendRemoved)">Unfollow</a>
+						</div>
+					</div>
+				{% endif %}
+				
+				<!-- TODO -->
+				<!-- Friend list link -->
+		  		<div class="d-flex flex-column pt-4">
+					<a href="#">
+						<div class="d-flex flex-row align-items-center justify-content-center icon-container">
+							<span class="material-icons mr-2 friends-icon"></span><span class="friend-text">Followers (0)</span>
+						</div>
+					</a>
+				</div>
+
+			</div>
+
+			<!-- TODO -->
+			{% if follow_requests %}
+			<div class="card m-2 px-4 pb-4">
+				<!-- Friend requests -->
+		  		<div class="d-flex flex-column pt-4">
+					<a href="#">
+						<div class="d-flex flex-row align-items-center justify-content-center icon-container">
+							<span class="fas fa-user-plus mr-2"></span><span class="friend-text">Following Requests (0)</span>
+						</div>
+					</a>
+				</div>
+			</div>
+			{% endif %}
+
+
+		</div>
+		{% endif %}
+
+		
+	</div>
     </div>
 </div>
 
+<script>
+	
+	function onFriendRequestSent(){
+		console.log("senddddd")
+		location.reload();
+	}
+
+	function onFriendRequestCancelled(){
+		location.reload();
+	}
+
+	function onFriendRemoved(){
+		location.reload();
+	}
+
+	function onFriendRequestAccepted(){
+		location.reload();
+	}
+
+	function onFriendRequestDeclined(){
+		location.reload();
+	}
+
+
+	var sendFriendRequestBtn = document.getElementById("id_send_friend_request_btn")
+	if (sendFriendRequestBtn != null){
+		sendFriendRequestBtn.addEventListener("click", function(){
+			sendFriendRequest("{{userid}}", onFriendRequestSent)
+		})
+	}
+
+	var cancelFriendRequestBtn = document.getElementById("id_cancel_friend_request_btn")
+	if(cancelFriendRequestBtn != null){
+		cancelFriendRequestBtn.addEventListener("click", function(){
+			//cancelFriendRequest("{{id}}", onFriendRequestCancelled)
+		})
+	}
+
+	var removeFriendBtn = document.getElementById("id_unfriend_btn")
+	if (removeFriendBtn != null){
+		removeFriendBtn.addEventListener("click", function(){
+			//removeFriend("{{id}}", onFriendRemoved)
+		})
+	}
+
+	function triggerAcceptFriendRequest(friend_request_id){
+		//acceptFriendRequest(friend_request_id, onFriendRequestAccepted)
+	}
+
+	function triggerDeclineFriendRequest(friend_request_id){
+		//declineFriendRequest(friend_request_id, onFriendRequestDeclined)
+	}
+
+
+	
+	
+</script>
+
+{% include 'follower\snippets\send_follow_request.html' %}
+{#% include 'follower\snippets\accept_follow_request.html' %#}
+{#% include 'snippets/decline_follow_request.html' %#}
+{#% include 'snippets/cancel_follow_request.html' %#}
+{#% include 'snippets/remove_follow.html' %#}
+
+
 {% endblock %}
+
+
