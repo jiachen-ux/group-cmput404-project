@@ -1,0 +1,204 @@
+<!doctype html>
+
+{% extends 'author\base.html' %}
+
+
+{% block content %}
+
+<style>
+
+.image-container{
+    max-width: 250px;
+    height: auto;
+}
+.field-heading{
+    color: var(--secondary-text-color);
+}
+.icon-container:hover {
+    opacity: 0.3;
+    cursor: pointer;
+}
+.friends-icon{
+    color: #4287f5;
+    font-size: 40px;
+}
+.person-add-icon{
+    color: #4287f5;
+    font-size: 40px;
+}
+.friend-text{
+    font-weight: 500;
+    color: black;
+}
+.friends-btn{
+    background-color: #cccccc;
+    border-color: #cccccc;
+    color: #000;
+    font-weight: 500;
+}
+.friends-btn:hover {
+    background-color: #bfbfbf;
+    border-color: #bfbfbf;
+}
+.dropdown-toggle::after { 
+    content: none; 
+}
+.card{
+    border-radius: 12px;
+}
+.material-icons{
+    font-size: 30px;
+}
+.material-icons:hover{
+    cursor: pointer;
+}
+.confirm-follow-request{
+    color: green;
+}
+.confirm-follow-request:hover {
+    opacity: 0.3;
+}
+.decline-follow-request:hover {
+    opacity: 0.3;
+}
+.decline-follow-request{
+    color: red;
+}
+.message-btn-text{
+    font-weight: 500;
+}
+
+
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="card" style="width: 30rem">
+            <div class="card-body">
+                <h2>Profile</h2>
+                <hr>
+                <h5 class="card-text">Username</h5>
+                {{ username }}
+                <p class="card-text"></p>
+                <h5 class="card-text">Email</h5>
+                {{ github }}
+                <p class="card-text"></p>
+                <hr>
+                <div>
+
+                <!-- If Auth user is viewing their own profile -->
+		  		{% if is_self %}
+		  		<a  class="btn btn-info float-right mr-2" href="#">Update</a>
+				<div class="d-flex flex-column mt-4">
+				</div>
+		  		{% endif %}
+                
+            </div>
+            </div>
+        </div>
+
+        {% if request.user.is_authenticated %}
+		<div class="d-flex flex-column mb-4">
+
+			<!-- THEM to YOU -->
+			{% if request_sent == 0 %}
+			<div class="card m-2 p-4">
+				<div class="d-flex flex-row align-items-center">
+					<span class="friend-text align-items-center mr-2">Accept Follow Request</span>
+					<span id="id_cancel_{{userid}}" class="decline-follow-request material-icons p-1" onclick='triggerDeclineFollowRequest("{{pending_follow_request_id}}")'>cancel</span>
+  					<span id="id_confirm_{{userid}}" class="confirm-follow-request material-icons p-1" onclick='triggerAcceptFollowRequest("{{pending_follow_request_id}}")'>check</span>
+				</div>
+			</div>
+			{% endif %}
+
+			<div class="card m-2 px-4 pb-4">
+				<!-- Cancel follow Request / Send follow Request / Remove follow -->
+				{% if is_follower == False and is_self == False %}
+						<!-- You sent them a request -->
+						{% if request_sent == 1 %}
+						<div class="d-flex flex-column align-items-center pt-4">
+							<button class="btn btn-danger" id="id_cancel_follow_request_btn">
+								Cancel Follow Request
+							</button>
+						</div>
+						{% endif %}
+						<!-- No requests have been sent -->
+						{% if request_sent == -1 %}
+						<div class="d-flex flex-column align-items-center pt-4">
+							<button class="btn btn-primary" id="id_send_follow_request_btn">
+								Send Follow Request
+							</button>
+						</div>
+						{% endif %}
+				{% endif %}
+					
+					
+				{% if is_follower %}
+					<div class="dropdown pt-4 m-auto">
+						<button class="btn btn-secondary dropdown-toggle friends-btn" type="button" id="id_follow_toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Following
+						</button>
+						<div class="dropdown-menu" aria-labelledby="id_follow_toggle">
+							<a class="dropdown-item" href="#" onclick="removeFollower('{{userid}}', onFollowRemoved)">Unfollow</a>
+						</div>
+					</div>
+				{% endif %}
+				
+				<!-- TODO -->
+				<!-- Follower list link -->
+		  		<div class="d-flex flex-column pt-4">
+					<a href="#">
+						<div class="d-flex flex-row align-items-center justify-content-center icon-container">
+							<span class="material-icons mr-2 friends-icon"></span><span class="friend-text">Followers (0)</span>
+						</div>
+					</a>
+				</div>
+
+			</div>
+
+			<!-- TODO -->
+			{% if follow_requests %}
+			<div class="card m-2 px-4 pb-4">
+				<!-- Follow requests -->
+		  		<div class="d-flex flex-column pt-4">
+					<a href="#">
+						<div class="d-flex flex-row align-items-center justify-content-center icon-container">
+							<span class="fas fa-user-plus mr-2"></span><span class="friend-text">Following Requests (0)</span>
+						</div>
+					</a>
+				</div>
+			</div>
+			{% endif %}
+
+
+		</div>
+		{% endif %}
+
+		
+	</div>
+    </div>
+</div>
+
+<script>
+	
+	function onFollowRequestSent(){
+		console.log("senddddd")
+		location.reload();
+	}
+
+
+	var sendFollowRequestBtn = document.getElementById("id_send_follow_request_btn")
+	if (sendFollowRequestBtn != null){
+		sendFollowRequestBtn.addEventListener("click", function(){
+			sendFollowRequest("{{userid}}", onFollowRequestSent)
+		})
+	}
+	
+	
+</script>
+
+{% include 'follower\snippets\send_follow_request.html' %}
+
+{% endblock %}
+
+
