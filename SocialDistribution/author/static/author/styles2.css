@@ -7,7 +7,7 @@
     -webkit-box-shadow: none !important;
 }
 .btn{
-    color: white;
+    color: #1c1c1c;
     background-color: #28a745 !important;
     border-color: #28a745 !important;
     border-radius: 999px;
@@ -22,7 +22,7 @@
 }
 
 .user-box{
-    background-color: #fff;
+    background-color: #1c1c1c;
     width: 45%;
     border-radius: 5px;
     margin-top: 10vh;
