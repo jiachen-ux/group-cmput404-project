@@ -1,8 +1,16 @@
-<<<<<<< Updated upstream
 from django.http import HttpResponse
 import json
 from author.models import Author
 from follower.models import FollowRequest
+from django.db import IntegrityError
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import render
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
+from .models import *
+from post.models import Post
 
 
 
@@ -57,25 +65,7 @@ def send_follow_request(request):
     return HttpResponse(json.dumps(payload), content_type="application/json")
 
 
-                
-
-
-
-=======
-from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
-from django.urls import reverse
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from django.core.paginator import Paginator
-import json
-
-from .models import *
-from follower.models import Follower
-from post.models import Post
-
-# Create your views here.
+            
 
 def following(request):
     if request.user.is_authenticated:
@@ -132,4 +122,3 @@ def unfollow(request, username):
             return HttpResponse("Method must be 'PUT'")
     else:
         return HttpResponseRedirect(reverse('login'))
->>>>>>> Stashed changes

@@ -1,52 +1,22 @@
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
-<<<<<<< Updated upstream
 from rest_framework import status
 from django.conf import settings
-
+from rest_framework.response import Response
 from .models import Author
 from follower.models import Follower
 from post.models import Post
-
+from django.contrib.auth import authenticate, login
 from follower.follower_status import FollowRequestStatus
 from follower.utils import get_follow_request_or_false
 from follower.models import Follower,FollowRequest
 
 # Create your views here.
-=======
-import json
-from django.contrib.auth import authenticate,login,logout
-from .models import *
-from follower.models import Follower
-from post.models import Post
-
-
-def index(request):
-    all_posts = Post.objects.all().order_by('-date_created')
-    paginator = Paginator(all_posts, 10)
-    page_number = request.GET.get('page')
-    if page_number == None:
-        page_number = 1
-    posts = paginator.get_page(page_number)
-    followings = []
-    suggestions = []
-    if request.user.is_authenticated:
-        followings = Follower.objects.filter(followers=request.user).values_list('user', flat=True)
-        suggestions = Author.objects.exclude(pk__in=followings).exclude(username=request.user.username).order_by("?")[:6]
-    return render(request, "index.html", {
-        "posts": posts,
-        "suggestions": suggestions,
-        "page": "all_posts",
-        'profile': False
-    })
-
-
->>>>>>> Stashed changes
 def login_view(request):
     if request.method == "POST":
 
@@ -67,9 +37,9 @@ def login_view(request):
         return render(request, "login.html")
 
 
-def logout_view(request):
-    logout(request)
-    return HttpResponseRedirect(reverse("index"))
+# def logout_view(request):
+#     logout(request)
+#     return HttpResponseRedirect(reverse("index"))
 
 
 def register(request):
@@ -139,7 +109,6 @@ def profile(request, username):
         "follower_count": follower_count,
         "following_count": following_count
     })
-<<<<<<< Updated upstream
 
 @login_required
 def display_author_profile(request, userId):
@@ -230,5 +199,3 @@ def searched_author(request):
     
 def home(request):
     return render (request, 'author/home.html', {})
-=======
->>>>>>> Stashed changes

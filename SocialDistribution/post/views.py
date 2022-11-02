@@ -1,12 +1,22 @@
-<<<<<<< Updated upstream
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
 from uuid import uuid4
-from .models import Post
 from .serializers import PostSerializer
-from authors.models import Author
+from author.models import Author
+from django.db import IntegrityError
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import render
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
+import json
+from .models import *
+from follower.models import Follower
+from comment.models import Comment
+
 
 # Create your views here.
 class PostApiView(APIView):
@@ -82,23 +92,6 @@ class PostApiView(APIView):
         except Exception as e:
                 return Response(f"Error: {e}", status=status.HTTP_400_BAD_REQUEST)
 
-
-        
-
-=======
-from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
-from django.urls import reverse
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from django.core.paginator import Paginator
-import json
-
-from .models import *
-from follower.models import Follower
-from comment.models import Comment
-from post.models import Post
 
 # Create your views here.
 @login_required
@@ -300,4 +293,3 @@ def delete_post(request, post_id):
             return HttpResponse("Method must be 'PUT'")
     else:
         return HttpResponseRedirect(reverse('login'))
->>>>>>> Stashed changes
