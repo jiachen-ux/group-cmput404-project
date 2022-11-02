@@ -5,20 +5,6 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
-<<<<<<< Updated upstream
-from rest_framework import status
-from django.conf import settings
-
-from .models import Author
-from follower.models import Follower
-from post.models import Post
-
-from follower.follower_status import FollowRequestStatus
-from follower.utils import get_follow_request_or_false
-from follower.models import Follower,FollowRequest
-
-# Create your views here.
-=======
 import json
 from django.contrib.auth import authenticate,login,logout
 from .models import *
@@ -46,7 +32,6 @@ def index(request):
     })
 
 
->>>>>>> Stashed changes
 def login_view(request):
     if request.method == "POST":
 
@@ -139,96 +124,3 @@ def profile(request, username):
         "follower_count": follower_count,
         "following_count": following_count
     })
-<<<<<<< Updated upstream
-
-@login_required
-def display_author_profile(request, userId):
-
-    context = {}
-    try:
-        author = get_object_or_404(Author, userid = userId)
-
-    except Author.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if author:
-        context['userid'] = author.userid
-        context['username'] = author.username
-        context['github'] = author.github
-        try:
-            follower_list = Follower.objects.get(user=author)
-        except Follower.DoesNotExist:
-            follower_list = Follower(user=author)
-            follower_list.save()
-
-        followers = follower_list.followers.all()
-        context['followers'] = followers
-
-        # Define template variables
-        is_self = True
-        is_follower = False
-        user = request.user
-        request_sent= FollowRequestStatus.NO_REQUEST_SENT.value
-        follow_request = None
-
-        if user.is_authenticated and user != author:
-            is_self = False
-            if followers.filter(pk=user.userid):
-                is_follower = True
-            else:
-                is_follower = False
-                # CASE1: request has been sent to you
-                if get_follow_request_or_false(sender=author, reciever=user) != False:
-                    request_sent = FollowRequestStatus.THEY_SENT_YOU.value
-                    context['pending_follow_request_id'] = get_follow_request_or_false(sender=author, reciever=user)
-
-                # CASE 2: request has been sent to them from you
-                elif get_follow_request_or_false(sender=user, reciever=author) != False:
-                    request_sent = FollowRequestStatus.YOU_SENT_THEM.value
-
-                #case 3: no request sent 
-                else:
-                    request_sent = FollowRequestStatus.NO_REQUEST_SENT.value
-
-
-
-
-        elif not user.is_authenticated:
-            is_self = False
-    
-        else:
-            try:
-                follow_request = FollowRequest.objects.filter(receiver=user, is_active=True)
-            except:
-                pass
-
-        context['is_self'] = is_self
-        context['is_follower'] = is_follower
-        context['request_sent'] = request_sent
-        context['follow_request'] = follow_request
-
-        return render(request, 'author/profile.html', context) 
-
-
-@login_required
-def searched_author(request):
-    # assume author exist and user name is correct
-    # username = request.GET['username']
-    # author = Author.objects.get(username=username)
-    # id = author.userid
-
-    if request.method == "POST":
-        q = request.POST['q']
-        results = Author.objects.filter(username__contains = q)
-        print(results)
-        return render(request, 'author/listUsers.html', {'q':  q, 'results':results})
-    
-    else:
-        results = Author.objects.all()
-        return render(request, 'author/listUsers.html', {'results':results})
-
-    
-def home(request):
-    return render (request, 'author/home.html', {})
-=======
->>>>>>> Stashed changes

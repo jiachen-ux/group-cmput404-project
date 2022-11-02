@@ -22,7 +22,8 @@ class AuthorManager(BaseUserManager):
 
     def create_superuser(self, username, password, **other):
         other.setdefault('is_superuser', True)
-  
+        other.setdefault('is_staff', True)
+        other.setdefault('is_active', True)
         return self.create_user(username, password,**other)
 
      
