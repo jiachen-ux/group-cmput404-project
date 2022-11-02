@@ -122,10 +122,6 @@ def display_author_profile(request, userId):
         follow_request = None
 
         if user.is_authenticated and user != author:
-            print("author:")
-            print(author)
-            print("user")
-            print(user)
             is_self = False
             if followers.filter(pk=user.userid):
                 is_follower = True
@@ -133,21 +129,17 @@ def display_author_profile(request, userId):
                 is_follower = False
                 # CASE1: request has been sent to you
                 if get_follow_request_or_false(sender=author, reciever=user) != False:
-                    print("request sent")
                     request_sent = FollowRequestStatus.THEY_SENT_YOU.value
                     context['pending_follow_request_id'] = get_follow_request_or_false(sender=author, reciever=user)
 
                 # CASE 2: request has been sent to them from you
                 elif get_follow_request_or_false(sender=user, reciever=author) != False:
                     request_sent = FollowRequestStatus.YOU_SENT_THEM.value
-                    print("sned request")
-                    print(request_sent)
 
                 #case 3: no request sent 
                 else:
                     request_sent = FollowRequestStatus.NO_REQUEST_SENT.value
-                    print("no request")
-                    print(request_sent)
+
 
 
 

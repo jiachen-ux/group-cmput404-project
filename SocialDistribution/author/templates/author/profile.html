@@ -186,22 +186,6 @@
 		location.reload();
 	}
 
-	function onFollowRequestCancelled(){
-		location.reload();
-	}
-
-	function onFollowRemoved(){
-		location.reload();
-	}
-
-	function onFollowRequestAccepted(){
-		location.reload();
-	}
-
-	function onFollowRequestDeclined(){
-		location.reload();
-	}
-
 
 	var sendFollowRequestBtn = document.getElementById("id_send_follow_request_btn")
 	if (sendFollowRequestBtn != null){
@@ -209,40 +193,11 @@
 			sendFollowRequest("{{userid}}", onFollowRequestSent)
 		})
 	}
-
-	var cancelFollowRequestBtn = document.getElementById("id_cancel_follow_request_btn")
-	if(cancelFollowRequestBtn != null){
-		cancelFollowRequestBtn.addEventListener("click", function(){
-			//cancelFollowRequest("{{id}}", onFollowRequestCancelled)
-		})
-	}
-
-	var removeFollowerBtn = document.getElementById("id_unfollow_btn")
-	if (removeFollowerBtn != null){
-		removeFollowerBtn.addEventListener("click", function(){
-			//removeFollower("{{id}}", onFollowRemoved)
-		})
-	}
-
-	function triggerAcceptFollowRequest(follow_request_id){
-		//acceptFollowRequest(follow_request_id, onFollowRequestAccepted)
-	}
-
-	function triggerDeclineFollowRequest(follow_request_id){
-		//declineFollowRequest(follow_request_id, onFollowRequestDeclined)
-	}
-
-
 	
 	
 </script>
 
 {% include 'follower\snippets\send_follow_request.html' %}
-{#% include 'follower\snippets\accept_follow_request.html' %#}
-{#% include 'snippets/decline_follow_request.html' %#}
-{#% include 'snippets/cancel_follow_request.html' %#}
-{#% include 'snippets/remove_follow.html' %#}
-
 
 {% endblock %}
 
