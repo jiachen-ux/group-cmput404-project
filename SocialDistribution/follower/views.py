@@ -5,13 +5,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
-import json
 
-from .models import *
-from follower.models import Follower
-from post.models import Post
-
-# Create your views here.
 
 def following(request):
     if request.user.is_authenticated:
