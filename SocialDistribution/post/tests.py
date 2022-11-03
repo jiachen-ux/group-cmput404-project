@@ -1,15 +1,21 @@
 from django.test import TestCase
-from author.models import Author
-from post.models import Post
-from django.utils import timezone
+from SocialDistribution.authors.models import Author
+from SocialDistribution.post.models import Post
 
-class TestPost(TestCase):
-
-    def test_create_post(self):
-        Post.objects.all().delete()
-        Author.objects.all().delete()
-        author = Author.objects.create_user(username="Test Author", password="testpassword")
-        postid = author.userid
-
-        post = Post.objects.create(creater=author,content_image="no source", content_text="still idk", comment_count= 123)
-        self.assertTrue(Post.objects.filter(id=post.id)) 
+# Create your tests here.
+class PostViewTestCases(TestCase):
+     @classmethod
+     def setUpData(cls):
+        uuids = [
+            "e84c8098-c240-48c2-91d9-1d266a0cd371",
+            "e84c8098-c240-48c2-91d9-1d266a0cd372",
+        ]
+        authors = []
+        for index in range(len(uuids)):
+            authors.append(Author.objects.create(
+                userId=uuids[index],
+                username = "PostTestCase{}".format(index),
+                display_name="Test object{}".format(index),
+                url="https://cmput-404-social-distribution.herokuapp.com/author/{}".format(uuids[index]),
+                host="https://cmput-404-social-distribution.herokuapp.com/",
+            ))
