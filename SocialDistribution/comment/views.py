@@ -10,8 +10,10 @@ import json
 from .models import *
 from follower.models import Follower
 from post.models import Post
-
+from rest_framework.decorators import api_view
 # Create your views here.
+
+@api_view(['POST','GET'])
 @csrf_exempt
 def comment(request, post_id):
     if request.user.is_authenticated:

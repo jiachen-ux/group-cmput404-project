@@ -6,6 +6,9 @@ from django.contrib.auth.models import PermissionsMixin
 from django.utils import timezone
 
 
+
+
+
 class AuthorManager(BaseUserManager):
     def create_user(self, username, password=None, **kwargs):
         """
@@ -29,10 +32,9 @@ class AuthorManager(BaseUserManager):
 
 
 class Author(AbstractBaseUser,PermissionsMixin ):
-
     username= models.CharField(unique=True, max_length=200)
     type = models.CharField(default="author", max_length=200)
-    userid = models.UUIDField(default=uuid.uuid4, editable=True)
+    userid = models.UUIDField(primary_key=True,default=uuid.uuid4, editable=True)
     url = models.CharField(max_length=200, blank=True)
     host = models.CharField(max_length=200, blank=True)
     displayName = models.CharField(max_length=200, null=True, blank=True)
@@ -59,5 +61,3 @@ class Author(AbstractBaseUser,PermissionsMixin ):
             'displayName': self.displayName,
             'github': self.github
         }
-    def usern(self):
-        return self.username

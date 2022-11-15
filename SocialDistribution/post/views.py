@@ -6,12 +6,16 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 import json
-
+from rest_framework.response import Response
 from .models import *
 from follower.models import Follower
 from comment.models import Comment
 from post.models import Post
+from .serializers import PostSerializer
+from rest_framework.decorators import api_view
 
+
+@api_view(['POST','GET'])
 # Create your views here.
 @login_required
 def create_post(request):
@@ -25,7 +29,8 @@ def create_post(request):
             return HttpResponse(e)
     else:
         return HttpResponse("Method must be 'POST'")
-
+    
+@api_view(['POST','POST','GET'])   
 @login_required
 @csrf_exempt
 def edit_post(request, post_id):
@@ -64,7 +69,7 @@ def edit_post(request, post_id):
             })
     else:
             return HttpResponse("Method must be 'POST'")
-
+@api_view(['PUT','POST','GET'])
 @csrf_exempt
 def like_post(request, id):
     if request.user.is_authenticated:
@@ -82,6 +87,7 @@ def like_post(request, id):
     else:
         return HttpResponseRedirect(reverse('login'))
 
+@api_view(['PUT','POST','GET'])
 @csrf_exempt
 def unlike_post(request, id):
     if request.user.is_authenticated:
@@ -99,6 +105,8 @@ def unlike_post(request, id):
     else:
         return HttpResponseRedirect(reverse('login'))
 
+
+@api_view(['PUT'])
 @csrf_exempt
 def save_post(request, id):
     if request.user.is_authenticated:
@@ -116,6 +124,8 @@ def save_post(request, id):
     else:
         return HttpResponseRedirect(reverse('login'))
 
+
+@api_view(['PUT'])
 @csrf_exempt
 def unsave_post(request, id):
     if request.user.is_authenticated:
@@ -133,6 +143,7 @@ def unsave_post(request, id):
     else:
         return HttpResponseRedirect(reverse('login'))
 
+@api_view(['PUT','POST','GET'])
 @csrf_exempt
 def follow(request, username):
     if request.user.is_authenticated:
@@ -152,6 +163,7 @@ def follow(request, username):
     else:
         return HttpResponseRedirect(reverse('login'))
 
+@api_view(['PUT','POST','GET'])
 @csrf_exempt
 def unfollow(request, username):
     if request.user.is_authenticated:
@@ -171,7 +183,7 @@ def unfollow(request, username):
     else:
         return HttpResponseRedirect(reverse('login'))
 
-
+@api_view(['POST','GET'])
 @csrf_exempt
 def comment(request, post_id):
     if request.user.is_authenticated:
@@ -195,6 +207,8 @@ def comment(request, post_id):
     else:
         return HttpResponseRedirect(reverse('login'))
 
+
+@api_view(['PUT','POST','GET'])
 @csrf_exempt
 def delete_post(request, post_id):
     if request.user.is_authenticated:
@@ -202,7 +216,7 @@ def delete_post(request, post_id):
             post = Post.objects.get(id=post_id)
             if request.user == post.creater:
                 try:
-                    delet = post.delete()
+                    delete = post.delete()
                     return HttpResponse(status=201)
                 except Exception as e:
                     return HttpResponse(e)

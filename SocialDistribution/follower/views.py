@@ -5,8 +5,12 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
+from follower.models import Follower
+from post.models import Post
+from author.models import Author
+from rest_framework.decorators import api_view
 
-
+@api_view(['POST','GET'])
 def following(request):
     if request.user.is_authenticated:
         following_user = Follower.objects.filter(followers=request.user).values('user')
@@ -25,6 +29,8 @@ def following(request):
         })
     else:
         return HttpResponseRedirect(reverse('login'))
+
+@api_view(['PUT','POST','GET'])
 @csrf_exempt
 def follow(request, username):
     if request.user.is_authenticated:
@@ -44,6 +50,7 @@ def follow(request, username):
     else:
         return HttpResponseRedirect(reverse('login'))
 
+@api_view(['PUT','POST','GET'])
 @csrf_exempt
 def unfollow(request, username):
     if request.user.is_authenticated:

@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate,login,logout
 from .models import *
 from follower.models import Follower
 from post.models import Post
+from rest_framework.decorators import api_view
 
 
 def index(request):
@@ -31,7 +32,7 @@ def index(request):
         'profile': False
     })
 
-
+@api_view(['POST','GET'])
 def login_view(request):
     if request.method == "POST":
 
@@ -56,7 +57,7 @@ def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
 
-
+@api_view(['POST','GET'])
 def register(request):
     if request.method == "POST":
         username = request.POST["username"]
@@ -93,9 +94,9 @@ def register(request):
         return render(request, "temp.html")
 
 
-
-def profile(request, username):
-    user = Author.objects.get(username=username)  
+@api_view(['GET','POST'])
+def profile(request, userid):
+    user = Author.objects.get(userid=userid)  
     all_posts = Post.objects.filter(creater=user).order_by('-date_created')
     paginator = Paginator(all_posts, 10)
     page_number = request.GET.get('page')
@@ -107,7 +108,7 @@ def profile(request, username):
     follower = False
     if request.user.is_authenticated:
         followings = Follower.objects.filter(followers=request.user).values_list('user', flat=True)
-        suggestions = Author.objects.exclude(pk__in=followings).exclude(username=request.user.username).order_by("?")[:6]
+        suggestions = Author.objects.exclude(pk__in=followings).exclude(userid=request.user.userid).order_by("?")[:6]
 
         if request.user in Follower.objects.get(user=user).followers.all():
             follower = True
