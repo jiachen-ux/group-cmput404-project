@@ -25,18 +25,18 @@
                             <div class="post" data-post_id="{{post.id}}">
                                 <div>
                                     <div>
-                                        <a href="{% url 'profile' post.creater.username %}">
+                                        <a href="{% url 'profile' post.creater.userid %}">
                                             <div class="small-profilepic" style="background-image: url(/media/{{post.creater.profile_pic}})"></div>
                                         </a>
                                     </div>
                                     <div style="flex: 1">
                                         <div class="post-user">
                                             <div>
-                                                <a href="{% url 'profile' post.creater.username %}">
+                                                <a href="{% url 'profile' post.creater.userid %}">
                                                     <span><strong>{{post.creater.first_name}} {{post.creater.last_name}}</strong></span>
                                                 </a>
-                                                <a href="{% url 'profile' post.creater.username %}">
-                                                    <span class="grey">&nbsp;@{{post.creater.username}}</span>
+                                                <a href="{% url 'profile' post.creater.userid %}">
+                                                    <span class="grey">&nbsp;@{{post.creater.userid}}</span>
                                                 </a>
                                                 <span class="grey">&nbsp;&middot;&nbsp;&nbsp;{{post.date_created | date:"P M d Y"}}</span>
                                             </div>
@@ -120,7 +120,7 @@
                                         <div class="comment-div-data" style="display: none;">
                                             <div class="head-comment-input">
                                                 <div>
-                                                    <a href="{% url 'profile' user.username %}">
+                                                    <a href="{% url 'profile' user.userid %}">
                                                         <div class="small-profilepic" style="background-image: url(/media/{{user.profile_pic}})"></div>
                                                     </a>
                                                 </div>

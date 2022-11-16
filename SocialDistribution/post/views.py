@@ -1,10 +1,3 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.request import Request
-from rest_framework import status
-from uuid import uuid4
-from .serializers import PostSerializer
-from author.models import Author
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -13,86 +6,16 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 import json
+from rest_framework.response import Response
 from .models import *
 from follower.models import Follower
 from comment.models import Comment
+from post.models import Post
+from .serializers import PostSerializer
+from rest_framework.decorators import api_view
 
 
-# Create your views here.
-class PostApiView(APIView):
-    def get(self, request: Request, author_id: str = None, post_id: str = None):
-        if author_id == None:
-            posts = list(Post.objects.filter(visibility='PUBLIC', unlisted=False).order_by('-published'))
-            serializer =  PostSerializer(posts, many=True)
-            res = {"items": serializer.data}
-            return Response(res)
-        try:
-            author = Author.objects.get(userId = author_id)
-        except Exception as e:
-            return Response(f"Error: {e}", status=status.HTTP_404_NOT_FOUND)
-        if author == None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        if post_id == None:
-            posts = list(Post.objects.filter(author = author).order_by("-published"))
-            serializer = PostSerializer(posts, many=True)
-            result = {"items": serializer.data}
-            return Response(result, status=status.HTTP_200_OK)
-        else:
-            try:
-                postObj = Post.objects.get(id = post_id, author = author, visibility='PUBLIC')
-                serializer = PostSerializer(postObj)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            except Exception as e:
-                return Response(f"Error: {e}", status=status.HTTP_404_NOT_FOUND)
-    
-    def post(self, request: Request, author_id: str, post_id: str = None):
-        try:
-            author = Author.objects.get(userId = author_id)
-        except Exception as e:
-            return Response(f"Error: {e}", status=status.HTTP_404_NOT_FOUND)
-        if author == None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        # Update a post
-        if post_id is not None:
-            try: 
-                author = Author.objects.get(userId=author_id)
-                post = Post.objects.get(id = post_id, author=author)
-                serializer = PostSerializer(post, data=request.data)
-                if serializer.is_valid(raise_exception=True):
-                    serializer.save()
-                    return Response(serializer.validated_data, status=status.HTTP_200_OK)
-            except Exception as e:
-                return Response(f"Error: {e}", status=status.HTTP_404_NOT_FOUND)
-        else:
-            serialize = PostSerializer(data=request.data)
-            if serialize.is_valid(raise_exception=True):
-                try:
-                    author = Author.objects.get(userId=author_id)
-                    ID = str(uuid4())
-                    
-                    serialize.save(
-                        id=ID,
-                        author=author,
-                        )
-                    return Response(serialize.data, status=status.HTTP_201_CREATED)
-                except Exception as e:
-                    return Response(f"Error: {e}", status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request: Request, author_id: str, post_id: str):
-        try:
-            author = Author.objects.get(userId = author_id)
-        except Exception as e:
-            return Response(f"Error: {e}", status=status.HTTP_404_NOT_FOUND)
-        if author == None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        try:
-            post = Post.objects.get(id=post_id, author=author)
-            post.delete()
-            return Response("Post was deleted Successfully", status.HTTP_200_OK)
-        except Exception as e:
-                return Response(f"Error: {e}", status=status.HTTP_400_BAD_REQUEST)
-
-
+@api_view(['POST','GET'])
 # Create your views here.
 @login_required
 def create_post(request):
@@ -106,7 +29,8 @@ def create_post(request):
             return HttpResponse(e)
     else:
         return HttpResponse("Method must be 'POST'")
-
+    
+@api_view(['POST','POST','GET'])   
 @login_required
 @csrf_exempt
 def edit_post(request, post_id):
@@ -145,7 +69,7 @@ def edit_post(request, post_id):
             })
     else:
             return HttpResponse("Method must be 'POST'")
-
+@api_view(['PUT','POST','GET'])
 @csrf_exempt
 def like_post(request, id):
     if request.user.is_authenticated:
@@ -163,6 +87,7 @@ def like_post(request, id):
     else:
         return HttpResponseRedirect(reverse('login'))
 
+@api_view(['PUT','POST','GET'])
 @csrf_exempt
 def unlike_post(request, id):
     if request.user.is_authenticated:
@@ -180,6 +105,8 @@ def unlike_post(request, id):
     else:
         return HttpResponseRedirect(reverse('login'))
 
+
+@api_view(['PUT'])
 @csrf_exempt
 def save_post(request, id):
     if request.user.is_authenticated:
@@ -197,6 +124,8 @@ def save_post(request, id):
     else:
         return HttpResponseRedirect(reverse('login'))
 
+
+@api_view(['PUT'])
 @csrf_exempt
 def unsave_post(request, id):
     if request.user.is_authenticated:
@@ -214,6 +143,7 @@ def unsave_post(request, id):
     else:
         return HttpResponseRedirect(reverse('login'))
 
+@api_view(['PUT','POST','GET'])
 @csrf_exempt
 def follow(request, username):
     if request.user.is_authenticated:
@@ -233,6 +163,7 @@ def follow(request, username):
     else:
         return HttpResponseRedirect(reverse('login'))
 
+@api_view(['PUT','POST','GET'])
 @csrf_exempt
 def unfollow(request, username):
     if request.user.is_authenticated:
@@ -252,7 +183,7 @@ def unfollow(request, username):
     else:
         return HttpResponseRedirect(reverse('login'))
 
-
+@api_view(['POST','GET'])
 @csrf_exempt
 def comment(request, post_id):
     if request.user.is_authenticated:
@@ -276,6 +207,8 @@ def comment(request, post_id):
     else:
         return HttpResponseRedirect(reverse('login'))
 
+
+@api_view(['PUT','POST','GET'])
 @csrf_exempt
 def delete_post(request, post_id):
     if request.user.is_authenticated:
@@ -283,7 +216,7 @@ def delete_post(request, post_id):
             post = Post.objects.get(id=post_id)
             if request.user == post.creater:
                 try:
-                    delet = post.delete()
+                    delete = post.delete()
                     return HttpResponse(status=201)
                 except Exception as e:
                     return HttpResponse(e)
