@@ -1,12 +1,20 @@
-from django.conf import settings
-from django.conf.urls.static import static
-from django.urls import path
+from django.urls import path 
 from . import views
+from .viewsets import LoginViewSet, RefreshTokenViewSet
+from rest_framework_nested import routers
+
+
+
+router = routers.SimpleRouter()
+router.register(r'login', LoginViewSet, basename='auth_login')
+router.register(r'refresh', RefreshTokenViewSet, basename='auth_refresh')
 urlpatterns = [
-    path("", views.index, name="index"),
-    path("authors/login", views.login_view, name="login"),
-    path("authors/logout", views.logout_view, name="logout"),
-    path("authors/register", views.register, name="register"),
-    path("<uuid:userid>", views.profile, name='profile')
+    path('register/', views.AuthorCreate.as_view()),
+    path('data/', views.testAuth),
+
+    path('authors/', views.getAllAuthors), # TODO add pagination
+    path('authors/<uuid:uuidOfAuthor>/', views.getSingleAuthor),
+
+    path('author/search/', views.AuthorSearchView.as_view()), 
+    *router.urls,
 ]
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,127 +1,88 @@
-from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render, get_object_or_404
-from django.urls import reverse
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from django.core.paginator import Paginator
+from functools import partial
 import json
-from django.contrib.auth import authenticate,login,logout
+from re import A
+import re
+from . import utils
+from django.shortcuts import render
+from rest_framework import generics, mixins, response, status
 from .models import *
-from follower.models import Follower
-from post.models import Post
-from rest_framework.decorators import api_view
+from .serializers import *
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from base64 import b64encode
 
 
-def index(request):
-    all_posts = Post.objects.all().order_by('-date_created')
-    paginator = Paginator(all_posts, 10)
-    page_number = request.GET.get('page')
-    if page_number == None:
-        page_number = 1
-    posts = paginator.get_page(page_number)
-    followings = []
-    suggestions = []
-    if request.user.is_authenticated:
-        followings = Follower.objects.filter(followers=request.user).values_list('user', flat=True)
-        suggestions = Author.objects.exclude(pk__in=followings).exclude(username=request.user.username).order_by("?")[:6]
-    return render(request, "index.html", {
-        "posts": posts,
-        "suggestions": suggestions,
-        "page": "all_posts",
-        'profile': False
-    })
+class AuthorCreate(
+    generics.CreateAPIView
+):
 
-@api_view(['POST','GET'])
-def login_view(request):
-    if request.method == "POST":
+    # queryset = Author.objects.all()
+    serializer_class = AuthorRegisterSerializer
 
-        # Attempt to sign user in
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
-
-        # Check if authentication successful
-        if user is not None:
-            login(request, user)
-            return HttpResponseRedirect(reverse("index"))
-        else:
-            return render(request, "login.html", {
-                "message": "Invalid username and/or password."
-            })
-    else:
-        return render(request, "login.html")
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def logout_view(request):
-    logout(request)
-    return HttpResponseRedirect(reverse("index"))
+class GetAuthorData(generics.ListAPIView):
 
-@api_view(['POST','GET'])
-def register(request):
-    if request.method == "POST":
-        username = request.POST["username"]
-        profile = request.FILES.get("profile")
-        print(f"--------------------------Profile: {profile}----------------------------")
-        cover = request.FILES.get('cover')
-        print(f"--------------------------Cover: {cover}----------------------------")
+    queryset = Author.objects.all()
+    # serializer_class = GetAuthorSerializer
+    # permission_classes = [IsAuthenticated]
 
-        # Ensure password matches confirmation
-        password = request.POST["password"]
-        confirmation = request.POST["confirmation"]
-        if password != confirmation:
-            return render(request, "temp.html", {
-                "message": "Passwords must match."
-            })
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = GetAuthorSerializer(queryset, many=True)
 
-        # Attempt to create new user
-        try:
-            user = Author.objects.create_user(username,password)
-            if profile is not None:
-                user.profile_pic = profile
-            else:
-                user.profile_pic = "no_pic.png"
-            user.cover = cover           
-            user.save()
-            Follower.objects.create(user=user)
-        except IntegrityError:
-            return render(request, "temp.html", {
-                "message": "Username already taken."
-            })
-        login(request, user)
-        return HttpResponseRedirect(reverse("index"))
-    else:
-        return render(request, "temp.html")
+        return response.Response(serializer.data)
 
 
-@api_view(['GET','POST'])
-def profile(request, userid):
-    user = Author.objects.get(userid=userid)  
-    all_posts = Post.objects.filter(creater=user).order_by('-date_created')
-    paginator = Paginator(all_posts, 10)
-    page_number = request.GET.get('page')
-    if page_number == None:
-        page_number = 1
-    posts = paginator.get_page(page_number)
-    followings = []
-    suggestions = []
-    follower = False
-    if request.user.is_authenticated:
-        followings = Follower.objects.filter(followers=request.user).values_list('user', flat=True)
-        suggestions = Author.objects.exclude(pk__in=followings).exclude(userid=request.user.userid).order_by("?")[:6]
+@api_view(["GET"])
+def getAllAuthors(request):
+    allAuthors = Author.objects.all()
+    serializer = GetAuthorSerializer(allAuthors, many=True)
+    resp = {
+        "type": "authors",
+        "items": serializer.data
+    }
+    return response.Response(resp)
 
-        if request.user in Follower.objects.get(user=user).followers.all():
-            follower = True
-    
-    follower_count = Follower.objects.get(user=user).followers.all().count()
-    following_count = Follower.objects.filter(followers=user).count()
-    return render(request, 'profile.html', {
-        "username": user,
-        "posts": posts,
-        "posts_count": all_posts.count(),
-        "suggestions": suggestions,
-        "page": "profile",
-        "is_follower": follower,
-        "follower_count": follower_count,
-        "following_count": following_count
-    })
+
+@api_view(["GET", "POST"])
+def getSingleAuthor(request, uuidOfAuthor):
+    # Get single author
+    singleAuthor = Author.objects.get(id=uuidOfAuthor)
+    if request.method == "GET":
+        serializer = GetAuthorSerializer(singleAuthor)
+        return response.Response(serializer.data)
+    # Update single author
+    elif request.method == "POST":
+        serializer = GetAuthorSerializer(
+            instance=singleAuthor, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+        return response.Response(serializer.data)
+
+@api_view(["GET", "PUT", "POST", "DELETE"])
+@permission_classes([AllowAny])
+def testAuth(request):
+    resp = {
+        "method": request.method,
+        "user": str(request.user),
+        "isAuthenticated": request.user.is_authenticated,
+    }
+class AuthorSearchView(generics.ListAPIView):
+    queryset = Author.objects.all()
+    serializer_class = GetAuthorSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = Author.objects.filter(
+            username__icontains=request.GET.get('username'))
+        serializer = self.serializer_class(queryset, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

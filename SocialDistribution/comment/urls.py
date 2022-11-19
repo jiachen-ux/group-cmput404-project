@@ -4,7 +4,7 @@ from django.urls import path
 
 from . import views
 urlpatterns = [
-    path("authors/post/<uuid:postid>/comments", views.comment, name="comments"),
-    path("authors/post/<uuid:postid>/write_comment",views.comment, name="writecomment")
+     # Comment routes!
+    path('authors/<uuid:uuidOfAuthor>/posts/<uuid:uuidOfPost>/comments', views.CommentPostView.as_view()),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
