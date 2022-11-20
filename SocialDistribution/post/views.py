@@ -13,6 +13,11 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from base64 import b64encode
 
+from follower.models import Follower
+from comment.models import Comment
+from comment.serializer import CommentSerializer
+
+
 
 @api_view(["GET"])
 def getAllPostLikes(request, uuidOfAuthor, uuidOfPost):

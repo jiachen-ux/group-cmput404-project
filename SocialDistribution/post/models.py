@@ -7,6 +7,7 @@ from django.utils import timezone
 from email.policy import default
 from SocialDistribution.settings import HOSTNAME
 from author.models import Author
+from comment.models import Comment
 
 def post_upload_to(instance, filename):
     return 'posts/{filename}'.format(filename=filename)
