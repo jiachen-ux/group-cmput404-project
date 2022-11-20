@@ -6,6 +6,7 @@ from rest_framework import serializers
 from .models import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from author.serializers import GetAuthorSerializer
+from like.models import Like
 
 class LikeSerializer(serializers.ModelSerializer): 
     type = serializers.CharField(read_only=True)
@@ -26,7 +27,7 @@ class PostSerializer(serializers.ModelSerializer):
     author = GetAuthorSerializer("author", read_only=True)
     id = serializers.CharField(source="get_id", read_only=True)
     class Meta:
-        model = POST
+        model = Post
         fields = "__all__"
     
     def get_type(self, obj):

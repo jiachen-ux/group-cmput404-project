@@ -15,6 +15,7 @@ from base64 import b64encode
 
 from follower.models import Follower
 from comment.models import Comment
+from like.models import Like
 from comment.serializer import CommentSerializer
 
 
@@ -44,7 +45,7 @@ def getAllAuthorLiked(request, uuidOfAuthor):
 
 class PostSingleDetailView(generics.RetrieveUpdateDestroyAPIView, generics.CreateAPIView):
 
-    queryset = POST.objects.all()
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
 
     # adding extra data to context object becoz we need author(finding the correct author by uuid) to create the post
@@ -65,7 +66,7 @@ class PostSingleDetailView(generics.RetrieveUpdateDestroyAPIView, generics.Creat
     '''
 
     def get(self, request, *args, **kwargs):
-        queryset = POST.objects.filter(id=kwargs['uuidOfPost']).first()
+        queryset = Post.objects.filter(id=kwargs['uuidOfPost']).first()
 
         if (kwargs['uuidOfAuthor'] == queryset.author.id) or queryset.visibility == 'PUBLIC':
             serializer = self.serializer_class(queryset, many=False)
@@ -81,7 +82,7 @@ class PostSingleDetailView(generics.RetrieveUpdateDestroyAPIView, generics.Creat
     '''
 
     def post(self, request, *args, **kwargs):
-        queryset = POST.objects.filter(id=kwargs['uuidOfPost']).first()
+        queryset = Post.objects.filter(id=kwargs['uuidOfPost']).first()
         serializer = self.serializer_class(queryset, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -100,7 +101,7 @@ class PostSingleDetailView(generics.RetrieveUpdateDestroyAPIView, generics.Creat
     '''
 
     def delete(self, request, *args, **kwargs):
-        queryset = POST.objects.filter(id=kwargs['uuidOfPost']).first()
+        queryset = Post.objects.filter(id=kwargs['uuidOfPost']).first()
         if queryset.author.id == kwargs['uuidOfAuthor']:
             queryset.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -110,12 +111,12 @@ class PostSingleDetailView(generics.RetrieveUpdateDestroyAPIView, generics.Creat
 
 class PostMutipleDetailView(generics.ListCreateAPIView):
 
-    queryset = POST.objects.all()
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get(self, request, *args, **kwargs):
-        queryset = POST.objects.filter(author__id=kwargs['uuidOfAuthor'])
+        queryset = Post.objects.filter(author__id=kwargs['uuidOfAuthor'])
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -136,7 +137,7 @@ class PostMutipleDetailView(generics.ListCreateAPIView):
 
 class PostDistinctView(generics.ListAPIView):
 
-    queryset = POST.objects.all()
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
 
     '''
@@ -151,7 +152,7 @@ class PostDistinctView(generics.ListAPIView):
         # author__id=kwargs['uuidOfAuthor']
 
         all_post_objects = []
-        queryset = POST.objects.all().exclude(unlisted=True)
+        queryset = Post.objects.all().exclude(unlisted=True)
         for obj in queryset:
             # adding  the all public post objects anf author self create post
             if (kwargs.get('uuidOfAuthor')) == obj.author.id or obj.visibility == 'PUBLIC':
@@ -174,7 +175,7 @@ def handleInboxRequests(request, author_id):
             allPostIDsInThisAuthorsInbox = Inbox.objects.filter(
                 author__id=author_id, object_type="post")
             setOfIds = set([o.object_id for o in allPostIDsInThisAuthorsInbox])
-            allPosts = POST.objects.filter(id__in=setOfIds)
+            allPosts = Post.objects.filter(id__in=setOfIds)
             items = PostSerializer(allPosts, many=True)
             resp = {
                 "type": "inbox",
@@ -267,7 +268,7 @@ def getEntireInboxRequests(request, author_id):
                 objectToSerialize = None
                 data = None
                 if obj.object_type == "post":
-                    objectToSerialize = POST.objects.get(id=obj.object_id)
+                    objectToSerialize = Post.objects.get(id=obj.object_id)
                     serializerClass = PostSerializer
                 elif obj.object_type == "comment":
                     objectToSerialize = Comment.objects.get(id=obj.object_id)

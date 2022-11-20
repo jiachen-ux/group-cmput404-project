@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'comment',
     'follower',
     'post',
+    'like',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
