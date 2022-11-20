@@ -131,8 +131,8 @@ class PostMutipleDetailView(generics.ListCreateAPIView):
         return context
 
     # by default does the same as this
-    # def post(self, request, format=None, *args, **kwargs):
-    #     return self.create(request, *args, **kwargs)
+    def post(self, request, format=None, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
 
 
 class PostDistinctView(generics.ListAPIView):
