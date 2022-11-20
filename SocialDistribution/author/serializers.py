@@ -4,6 +4,7 @@ from re import A
 from rest_framework import serializers
 from .models import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth import authenticate
 
 
 
@@ -19,17 +20,32 @@ class AuthorRegisterSerializer(serializers.ModelSerializer):
         return Author.objects.create_user(**validated_data)
 
 
-class LoginSerializer(TokenObtainPairSerializer):
+class LoginSerializer(serializers.ModelSerializer):
+
+    username =  serializers.CharField()
+    password = serializers.CharField()
+
+    class Meta:
+        model = Author
+        fields = ('username', 'password')
  
     def validate(self, attrs):
-        data =  super().validate(attrs)
+        username = attrs.get('username')
+        password = attrs.get('password')
 
-        data['username'] = self.user.username
-        data['id'] = self.user.id
-        data['github'] = self.user.github
-        data['displayName'] = self.user.displayName
- 
-        return data
+        author = authenticate(
+            request=self.context.get('request'),
+            username = username,
+            password = password,
+        )
+        if not author:
+            raise serializers.ValidationError({"Error": "Incorrect credentials provided."})
+        
+        attrs['user'] = author
+        
+        return attrs
+
+
 
 class GetAuthorSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source="url", read_only=True)
