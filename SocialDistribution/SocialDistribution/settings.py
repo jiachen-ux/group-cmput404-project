@@ -29,7 +29,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 NAME = "social.herokuapp.com"
-HOSTNAME = "https://{}/".format(NAME)
+# HOSTNAME = "https://{}/".format(NAME)
+HOSTNAME = "http://127.0.0.1:8000/"
 # Application definition
 
 INSTALLED_APPS = [

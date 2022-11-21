@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+
+{% block title %}Make a Post{% endblock %}
+
+
+{% block content %}
+<p>Enter the following information for the new post</p><br>
+
+<form>
+    Title: <input type="text" id="title" value=""> <br>
+    Description: <input type="text" id="description" value=""> <br>
+    categories: <input id="postcat" name="postcategories" value=""> <br>
+<form>
+
+
+<p>Choose if you want to list your post or not:</p>
+
+<form>
+    <input type="radio" id="listed" name="listedstatus" value="listed">
+    <label for="listed">LISTED</label><br>
+    <input type="radio" id="notlisted" name="listedstatus" value="notlisted">
+    <label for="notlisted">NOT LISTED</label><br>
+</form>
+
+<p>Choose the visibility of your post:</p>
+
+<form>
+    <input type="radio" id="public" name="visibility" value="PUBLIC">
+    <label for="public">PUBLIC</label><br>
+    <input type="radio" id="friends" name="visibility" value="FRIENDS">
+    <label for="friends">FRIENDS</label><br>
+</form>
+
+<p>Choose if content will be text or file:</p>
+
+<form>
+    <input type="radio" id="textchoice" name="textorfile" value="text">
+    <label for="text">Text</label><br>
+    <input type="radio" id="filechoice" name="textorfile" value="file">
+    <label for="file">File</label><br>
+</form>
+
+
+
+<p id="choosefiletext" hidden>Choose your file:</p>
+
+<input type="file" id="filecontent" hidden/>
+
+
+
+<p id="inputcontenttext" hidden>Enter your post content:</p>
+
+<input type="text" id="textcontent" hidden>
+
+<button id="submitbutton" >Submit</button>
+<script>
+    var encode_Content;
+    var content_isText;
+    var postString;
+    var authorUrl;
+    var post;
+    var content;
+    function createPost(){
+        post = new Object();
+        var postTitle = document.getElementById("title").value;
+        var postDesc = document.getElementById("description").value;
+        var listedStatus = document.querySelector('input[name = "listedstatus"]:checked').value;
+        var visibility = document.querySelector('input[name = "visibility"]:checked').value;
+        if(listedStatus==="listed"){
+            post.unlisted=false;
+        }
+        else{
+            post.unlisted=true;
+        }
+        if(content_isText===true){
+            encode_Content = document.getElementById("textcontent").value;
+            post.content = encode_Content;
+        }
+        else{
+            post.content = encode_Content;
+        }
+        
+        post.visibility=visibility;
+        post.author = '{{ author }}';
+        post.title=postTitle;
+        post.description=postDesc;
+        var date = new Date()
+        post.published = date.toISOString();
+        post.count=0;
+        post.comments='http://127.0.0.1:8000/service' +'/authors/' +'{{author.id}}'+'/posts/';
+
+        post.type = "post";
+        post.id="";
+        post.content=encode_Content;
+        categories = document.getElementById("postcat").value;
+        if(categories===""){
+            post.categories=[];
+        }
+        else{
+            post.categories=categories.split(',');
+        }
+    }
+    function sendMessage(){
+        fetch(authorUrl,{
+        method: 'GET',
+        headers: {
+                'Content-Type' : 'application/json',
+                'X-CSRFToken' : "{{ csrf_token }}"
+            },})
+        .then(function(response){
+            return response.json();
+        })
+        .then(function(authorObj){
+            post.author = authorObj;
+        })
+        .then(function(){
+            postString=JSON.stringify(post);
+            var postUrl = 'http://127.0.0.1:8000/service'+'/authors/'+'{{author.id}}' + "/posts/";
+            return fetch(postUrl,{
+                method: 'POST',
+                headers: {
+                    'Content-Type' : 'application/json',
+                    'X-CSRFToken' : "{{ csrf_token }}"
+                },
+                body: postString
+
+            })
+        })
+        .then(function(response){
+            return response.json();
+        })
+        .then(function(data){
+            post.id = data.data.id;
+            post.comments=post.id+'/comments'
+            
+            postString = JSON.stringify(post);
+            return fetch(post.id+'/',{
+                method: 'POST',
+                headers: {
+                'Content-Type' : 'application/json',
+                'X-CSRFToken' : "{{ csrf_token }}"
+                },
+                body: postString 
+            })
+        })
+        .then(function(){ // update newly created post with new comments link
+            var urlofFollowers = 'http://127.0.0.1:8000/service' + '/authors/'+ '{{ author.id }}' + '/followers';
+            return fetch(urlofFollowers,{
+            method: 'GET',
+            headers: {
+                'Content-Type' : 'application/json',
+                'X-CSRFToken' : "{{ csrf_token }}"
+            } 
+            })
+        })
+        .then(function(response){
+            return response.json();
+        })
+        .then(function(data){
+            if(post.unlisted===false){
+                followersInJson = data["items"]["data"];
+                if(post.visibility === "FRIENDS"){
+                    for(let follower of followersInJson){
+                        var urlofFriend = 'http://127.0.0.1:8000/service/'+"/authors/" + follower.id +'/followers/'+'{{ author.id }}';
+                        fetch(urlofFriend,{
+                            method: 'GET',
+                            headers: {
+                            'Content-Type' : 'application/json',
+                            'X-CSRFToken' : "{{ csrf_token }}"
+                            }, 
+                        })
+                        .then(function(response){
+                            return response.json();
+                        })
+                        .then(function(data){
+                            if(data.id==='{{ author.id }}'){
+                                var urlofInbox = 'http://127.0.0.1:8000/service'+"/authors/" + follower.id +'/inbox';
+                                fetch(urlofInbox,{
+                                    method: 'POST',
+                                    headers: {
+                                    'Content-Type' : 'application/json',
+                                    'X-CSRFToken' : "{{ csrf_token }}"
+                                    },
+                                    body: postString 
+                                })
+                            }
+
+                        })
+                        .catch (function (error) {
+                            console.log('Request is failed', error);
+                        });
+                    } 
+                }
+                else{
+                    for(let follower of followersInJson){
+                        var urlofInbox = 'http://127.0.0.1:8000/service'+"/authors/" + follower.id +'/inbox';
+                        fetch(urlofInbox,{
+                            method: 'POST',
+                            headers: {
+                            'Content-Type' : 'application/json',
+                            'X-CSRFToken' : "{{ csrf_token }}"
+                            },
+                            body: postString 
+                        })
+                    } 
+                }
+            }
+        })
+        .then(function(){
+            alert("A new post is successfully created and delivered to your followers! Redirecting you to post-list page...");
+            location.href = 'http://127.0.0.1:8000/service'+'/site/posts';
+        })
+        .catch (function (error) {
+            console.log('Request failed', error);
+        });
+    }
+    for(element of document.getElementsByName("textorfile")){
+        element.onclick = function(event){
+
+        if(document.querySelector('input[name = "textorfile"]:checked').value ==="text"){
+            document.getElementById("inputcontenttext").removeAttribute("hidden");
+            document.getElementById("textcontent").removeAttribute("hidden");
+            document.getElementById("choosefiletext").hidden = true;
+            document.getElementById("filecontent").hidden=true;
+            
+            content_isText=true;
+        }
+
+        else{
+            document.getElementById("choosefiletext").removeAttribute("hidden");
+            document.getElementById("filecontent").removeAttribute("hidden");
+            document.getElementById("inputcontenttext").hidden=true;
+            document.getElementById("textcontent").hidden=true;
+            content_isText=false;
+            content = document.getElementById("filecontent");
+            
+        }
+        }
+    }
+    document.getElementById("submitbutton").onclick = function(){
+        var allFilled = true;
+        if(document.getElementById("textchoice").checked===false && document.getElementById("filechoice").checked===false){
+            allfilled=false;
+            alert("Please fill in content choice");
+        }
+        if(document.getElementById("listed").checked===false && document.getElementById("unlisted").checked===false){
+            allfilled=false;
+            alert("Please fill in if post is listed");
+        }
+        if(document.getElementById("friends").checked===false && document.getElementById("public").checked===false){
+            allfilled=false;
+            alert("Please fill in post visibility");
+        }
+        if(document.getElementById("title").value===""){
+            allfilled=false;
+            alert("Please enter a title");
+        }
+        if (allFilled){
+            createPost();
+            postString = JSON.stringify(post);
+            authorUrl ='http://127.0.0.1:8000/service'+'/authors/'+'{{author.id}}';
+            if(content_isText===true){
+                post.contentType = 'text/plain';
+                postString = JSON.stringify(post);
+                sendMessage();
+            }
+            else{
+                // https://stackoverflow.com/questions/53211073/capture-result-of-html5-filereader-when-using-promises-in-async
+                function getBase64(file, onLoadCallback) {
+                    return new Promise(function(resolve, reject) {
+                        var reader = new FileReader();
+                        reader.onload = function() { resolve(reader.result); };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                }
+                var file= content.files[0];
+                post.contentType = file.type+';base64';
+                var promise = getBase64(file);
+                promise.then(function(result) {
+                    encode_Content=result;
+                    post.content=encode_Content;
+                    postString = JSON.stringify(post);
+                    sendMessage();
+                });
+            }
+        }
+        
+    };
+</script>
+{% else %}
+<p>Please login to make a post</p>
+
+{% endif %}
+
+{% endblock %}
