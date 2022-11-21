@@ -3,6 +3,7 @@ from django.conf.urls.static import static
 from django.urls import path
 
 from . import views
+app_name = 'post'
 urlpatterns = [
        # Post routes!
     path('authors/<uuid:uuidOfAuthor>/posts/<uuid:uuidOfPost>/', views.PostSingleDetailView.as_view()),
@@ -21,5 +22,11 @@ urlpatterns = [
 
     # Inbox route to get everything (not only posts!)
     path("authors/<uuid:author_id>/inboxAll", views.getEntireInboxRequests),
+
+    path('site/posts', views.postIndex, name='index'),
+    path('site/my_posts', views.myPosts, name='myPosts'),
+    path('createpost',views.createpost,name='createpost'),
+    path('editpost/<str:post_id>',views.editpost, name='editpost'),
+    path('deletepost/<str:post_id>',views.deletepost, name='deletepost'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

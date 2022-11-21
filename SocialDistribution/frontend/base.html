@@ -15,11 +15,10 @@
         <div id="navbar" class="row">
             {% block navbar %}
             <div class="column">
-                <!-- <a href="{% url 'author:index' %}">Home</a> -->
                 <a href="{% url 'post:index' %}">Posts</a>
-                <a href="{% url 'post:makepost' %}">Make a Post</a>
-                <a href="{% url 'post:editpost' %}">Edit a Post</a>
-                <a href="{% url 'post:inbox' %}">Inbox</a>
+                <a href="{% url 'post:myPosts' %}">My Posts</a>
+                <a href="{% url 'post:createpost' %}">create a Post</a>
+                
                 {% if user.is_authenticated %}
                     <a href="{% url 'logout' %}">Log Out</a>
                 {% else %}

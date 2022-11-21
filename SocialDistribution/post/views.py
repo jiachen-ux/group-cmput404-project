@@ -3,7 +3,8 @@ import json
 from re import A
 import re
 from . import utils
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.http.request import HttpRequest
 from rest_framework import generics, mixins, response, status
 from .models import *
 from .serializers import *
@@ -310,3 +311,56 @@ def getEntireInboxRequests(request, author_id):
             return response.Response({"message": "Inbox cleared!"}, status.HTTP_204_NO_CONTENT)
         except:
             return response.Response({"message": "Something went wrong!"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# def get_post_likes(post_id):
+#     likes = Like.objects.filter(post=post_id)
+#     return likes
+# def get_latest_comments(post_id):
+#     comments = Comment.objects.filter(post=post_id)[:2]
+#     return comments
+
+def postIndex(request: HttpRequest):
+    posts = Post.objects.filter(visibility="PUBLIC", unlisted=False)
+    for post in posts:
+        post.numberOfLikes =  0 #len(get_post_likes(post.id)) 
+        #post.topComments = get_latest_comments(post.id)
+    context = {
+        'posts': posts,
+        }
+    return render(request, 'index.html', context)
+
+def myPosts(request: HttpRequest):
+    if request.user.is_anonymous or not (request.user.is_authenticated):
+        return render(request,'index.html')
+    author = Author.objects.get(userId=request.user)
+    posts = Post.objects.filter(author=author)
+    for post in posts:
+        post.numberOfLikes = 0 #len(get_post_likes(post.id)) 
+        #post.topComments = get_latest_comments(post.id)
+    context = {
+        'posts': posts,
+        'userAuthor': author
+        }
+    return render(request, 'index.html', context)
+
+def createpost(request: HttpRequest):
+    author = Author.objects.filter(userId=request.user.id).first()
+    context = {'author' : author}
+    return render(request,'create.html',context)
+
+def editpost(request: HttpRequest, post_id: str, user_id: str):
+    if request.user.is_anonymous or not (request.user.is_authenticated):
+        return render(request,'edit.html')
+    author=Author.objects.get(userId = user_id)
+    post = Post.objects.get(id=post_id)
+    context = {'author' : author, 'post': post}
+    return render(request,'edit.html',context)
+
+def deletepost(request: HttpRequest, post_id: str, user_id: str):
+    if request.user.is_anonymous or not (request.user.is_authenticated):
+        return render(request,'index.html')
+    author=Author.objects.get(userId = user_id)
+    post = Post.objects.get(id=post_id)
+    if post.author.id == author.id:
+        post.delete()
+    return redirect('posts:index')
