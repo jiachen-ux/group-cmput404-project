@@ -28,7 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+NAME = "social.herokuapp.com"
+HOSTNAME = "https://{}/".format(NAME)
 # Application definition
 
 INSTALLED_APPS = [
@@ -36,8 +37,6 @@ INSTALLED_APPS = [
     'comment',
     'follower',
     'post',
-    'frontend',
-    'crispy_forms',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -46,6 +45,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_yasg',
+    'rest_framework_simplejwt',
+     "corsheaders",
+     'djoser',
+     'crispy_forms',
+    
 
 ]
 
@@ -134,3 +138,4 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+

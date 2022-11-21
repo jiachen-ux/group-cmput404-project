@@ -4,10 +4,21 @@ from django.urls import path
 
 from . import views
 urlpatterns = [
-    path("authors/createpost", views.create_post, name="createpost"),
-    path("authors/post/<uuid:id>/like", views.like_post, name="likepost"),
-    path("authors/post/<uuid:id>/unlike", views.unlike_post, name="unlikepost"),
-    path("authors/post/<uuid:post_id>/delete", views.delete_post, name="deletepost"),
-    path("authors/post/<uuid:post_id>/edit", views.edit_post, name="editpost")
+       # Post routes!
+    path('authors/<uuid:uuidOfAuthor>/posts/<uuid:uuidOfPost>/', views.PostSingleDetailView.as_view()),
+ 
+
+    # Like routes!
+    path('authors/<uuid:uuidOfAuthor>/posts/<uuid:uuidOfPost>/likes', views.getAllPostLikes),
+    path('authors/<uuid:uuidOfAuthor>/posts/<uuid:uuidOfPost>/comments/<uuid:uuidOfComment>/likes', views.getAllCommentLikes),
+
+    # Liked routes!
+    path('authors/<uuid:uuidOfAuthor>/liked', views.getAllAuthorLiked),
+    
+    # Inbox routes!
+    path("authors/<uuid:author_id>/inbox", views.handleInboxRequests),
+
+    # Inbox route to get everything (not only posts!)
+    path("authors/<uuid:author_id>/inboxAll", views.getEntireInboxRequests),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
