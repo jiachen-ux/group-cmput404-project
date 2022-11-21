@@ -5,7 +5,8 @@ import re
 from . import utils
 from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect
 from rest_framework import generics, mixins, response, status
-from .models import *
+from post.models import POST
+from follower.models import Follower
 from .serializers import *
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.decorators import api_view, permission_classes, parser_classes
@@ -96,10 +97,40 @@ class AuthorSearchView(generics.ListAPIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
+# def index(request):
+#     all_posts = Post.objects.all().order_by('-date_created')
+#     paginator = Paginator(all_posts, 10)
+#     page_number = request.GET.get('page')
+#     if page_number == None:
+#         page_number = 1
+#     posts = paginator.get_page(page_number)
+#     followings = []
+#     suggestions = []
+#     if request.user.is_authenticated:
+#         followings = Follower.objects.filter(followers=request.user).values_list('user', flat=True)
+#         suggestions = Author.objects.exclude(pk__in=followings).exclude(username=request.user.username).order_by("?")[:6]
+#     return render(request, "index.html", {
+#         "posts": posts,
+#         "suggestions": suggestions,
+#         "page": "all_posts",
+#         'profile': False
+#     })
 def homeView(request):
-    template_name = 'author/home.html'
-    return render(request, template_name)
+    all_posts = POST.objects.all().order_by('-published')
+    followings = []
+    suggestions = []
+    if request.user.is_authenticated:
+        # followings = Follower.objects.filter(follower=request.user).values_list('user', flat=True)
+        suggestions = Author.objects.exclude(pk__in=followings).exclude(username=request.user.username).order_by("?")[:6]
+
+    template_name = '../frontend/index.html'
+    return render(request, template_name, {
+        "posts": all_posts,
+        "suggestions": suggestions,
+        "page": "all_posts",
+        'profile': False
+    }
+    )
 
 def loginView(request):
     template_name = 'author/login.html'
