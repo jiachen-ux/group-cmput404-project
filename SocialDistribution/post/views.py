@@ -344,14 +344,14 @@ def myPosts(request: HttpRequest):
     return render(request, 'index.html', context)
 
 def createpost(request: HttpRequest):
-    author = Author.objects.filter(userId=request.user.id).first()
+    author = Author.objects.filter(id=request.user.id).first()
     context = {'author' : author}
     return render(request,'create.html',context)
 
-def editpost(request: HttpRequest, post_id: str, user_id: str):
+def editpost(request: HttpRequest, post_id: str):
     if request.user.is_anonymous or not (request.user.is_authenticated):
         return render(request,'edit.html')
-    author=Author.objects.get(userId = user_id)
+    author=Author.objects.get(id = request.user.id)
     post = Post.objects.get(id=post_id)
     context = {'author' : author, 'post': post}
     return render(request,'edit.html',context)
