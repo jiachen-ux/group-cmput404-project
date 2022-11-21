@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import django_on_heroku
 from pathlib import Path
 import os
 
@@ -134,3 +134,4 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+django_on_heroku.settings(locals())
