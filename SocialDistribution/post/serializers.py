@@ -7,6 +7,7 @@ from .models import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from author.serializers import GetAuthorSerializer
 from like.models import Like
+from uuid import uuid4
 
 class LikeSerializer(serializers.ModelSerializer): 
     type = serializers.CharField(read_only=True)
@@ -31,7 +32,7 @@ class PostSerializer(serializers.ModelSerializer):
     # type = serializers.ReadOnlyField(default=POST.type)
     # read_only equals to true becoz we don't want users to edit the author data while changing post data
     author = GetAuthorSerializer("author", read_only=True)
-    id = serializers.CharField(source="get_id", read_only=True)
+    # id = serializers.CharField(source="get_id", read_only=True, default=uuid4)
     class Meta:
         model = Post
         fields = "__all__"

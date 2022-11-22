@@ -142,26 +142,9 @@ class PostMutipleDetailView(generics.ListCreateAPIView):
         return context
 
     # by default does the same as this
-    def post(self, request: HttpRequest, uuidOfAuthor: str):
+    def post(self, request: HttpRequest, *args, **kwargs):
         return self.create(request, *args, **kwargs)
-        # author = self.get_author(uuidOfAuthor)
-        # data = request.data
-        # serializer = self.get_serializer(data=data)
-        # # if serializer.is_valid():
-        # serializer.is_valid()
-        # post = Post.objects.create(
-        #     author=author, 
-        #     **serializer.validated_data
-        # )
-
-        # # serialize saved post for response
-        # serializer = self.get_serializer(post)
-        # res_data = {
-        #     'query': "POST on posts",
-        #     'data': serializer.data
-        # }
-        # return Response(res_data, status=status.HTTP_201_CREATED)
-        # # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
 
 
 class PostDistinctView(generics.ListAPIView):

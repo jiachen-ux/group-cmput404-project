@@ -67,7 +67,6 @@
         fetch('http://127.0.0.1:8000'+'/service/authors/'+'{{post.author.id}}'+'/posts/'+'{{post.id}}',{
                 method: 'GET',
                 headers: {
-                    'Content-Type' : 'application/json',
                     'X-CSRFToken' : "{{ csrf_token }}"
                 }
             })
@@ -78,18 +77,11 @@
                 post=data;
             })
             .then(function(){
-                document.getElementById("postcat").value= post.categories;
-                document.getElementById("postcat").innerHTML= post.categories;
-                document.getElementById("title").value = post.title;
-                document.getElementById("title").innerHTML = post.title;
-                document.getElementById("description").value= post.description;
-                document.getElementById("desccription").innerHTML= post.description;
                 if(post.visibility==="FRIENDS"){
                     
                     document.getElementById("friends").checked=true;
                 }
                 else{
-                    alert("ok")
                     document.getElementById("public").checked=true;
                 }
                 if(post.unlisted===true){
@@ -115,6 +107,12 @@
                     document.getElementById("inputcontenttext").hidden=true;
                     document.getElementById("textcontent").hidden=true;
                 }
+                document.getElementById("title").value = post.title;
+                document.getElementById("title").innerHTML = post.title;
+                document.getElementById("description").value= post.description;
+                document.getElementById("desccription").innerHTML= post.description;
+                document.getElementById("postcat").value= post.categories;
+                document.getElementById("postcat").innerHTML= post.categories;
             }) 
         for(element of document.getElementsByName("textorfile")){
             element.onclick = function(event){
@@ -138,140 +136,52 @@
             }
             }
         }
-
         function createPost(){
+            formdata = new FormData();
             var postTitle = document.getElementById("title").value;
             var postDesc = document.getElementById("description").value;
             var listedStatus = document.querySelector('input[name = "listedstatus"]:checked').value;
             var visibility = document.querySelector('input[name = "visibility"]:checked').value;
             if(listedStatus==="listed"){
-                post.unlisted=false;
+                formdata.append("unlisted", false);
             }
             else{
-                post.unlisted=true;
+                formdata.append("unlisted", true);
             }
             if(content_isText===true){
                 encode_Content = document.getElementById("textcontent").value;
-                post.content = encode_Content;
+                formdata.append("content", encode_Content);
             }
             else{
-                post.content = encode_Content;
+                encode_Content = document.getElementById("filecontent").files;
+                formdata.append("image", encode_Content[0]);
             }
             
-            post.visibility=visibility;
-            post.title=postTitle;
-            post.description=postDesc;
+            formdata.append("visibility", visibility);
+            formdata.append("title", postTitle);
+            formdata.append("author", '{{ post.author }}');
+            formdata.append("description", postDesc);
             var date = new Date()
-            post.published = date.toISOString();
-            post.content=encode_Content;
+            formdata.append("published", date.toISOString());
             categories = document.getElementById("postcat").value;
             if(categories===""){
-                post.categories=[];
+                formdata.append("categories", []);
             }
             else{
-                post.categories=categories.split(',');
+                formdata.append("categories", categories.split(','));
             }
         }
         function sendMessage(){
-            fetch(AuthorUrl,{
-                method: 'get',
+            fetch(postUrl,{
+                method: 'post',
                 headers: {
-                        'Content-Type' : 'application/json',
-                        'X-CSRFToken' : "{{ csrf_token }}"
-                    },})
-            .then(function(response){
-                return response.json();
-            })
-            .then(function(authorObj){
-                post.author = authorObj;
-            })
-            .then(function(){
-                postString=JSON.stringify(post);
-                return fetch(postUrl,{
-                    method: 'post',
-                    headers: {
-                        'Content-Type' : 'application/json',
-                        'X-CSRFToken' : "{{ csrf_token }}"
-                    },
-                    body: postString 
-
-                })
-            })
-            .then(function(response){
-                return response.json();
-            })
-            .then(function(data){    
-                var urlofFollowers = 'http://127.0.0.1:8000/service'+'/authors/'+'{{author.id}}'+ '/followers';
-                return fetch(urlofFollowers,{
-                method: 'GET',
-                headers: {
-                    'Content-Type' : 'application/json',
                     'X-CSRFToken' : "{{ csrf_token }}"
-                } 
-                })
-            })
-            .then(function(response){
-                return response.json();
-            })
-            .then(function(data){
-                if(post.unlisted===false){
-                    followersInJson = data["items"]["data"];
-                    if(post.visibility === "FRIENDS"){
-                        for(let follower of followersInJson){
-                            var urlofFriend = 'http://127.0.0.1:8000/service'+'/authors/' + follower.id +'/followers/'+'{{ author.id }}';
-                            fetch(urlofFriend,{
-                                method: 'GET',
-                                headers: {
-                                'Content-Type' : 'application/json',
-                                'X-CSRFToken' : "{{ csrf_token }}"
-                                }, 
-                            })
-                            .then(function(response){
-                                return response.json();
-                            })
-                            .then(function(data){
-                                if(data.id==='{{ author.id }}'){ // if we both follow each other the current author will be returned
-                                    var urlofInbox = 'http://127.0.0.1:8000/service'+'/author/' + follower.id +'/inbox';
-                                    fetch(urlofInbox,{
-                                        method: 'POST',
-                                        headers: {
-                                        'Content-Type' : 'application/json',
-                                        'X-CSRFToken' : "{{ csrf_token }}"
-                                        },
-                                        body: postString 
-                                    })
-                                }
-
-                            })
-                            .catch (function (error) {
-                                console.log('Request failed', error);
-                            });
-                        } 
-                    }
-                    else{
-                        for(let follower of followersInJson){
-                            var urlofInbox = 'http://127.0.0.1:8000/service'+"/authors/" + follower.id +'/inbox';
-                            fetch(urlofInbox,{
-                                method: 'POST',
-                                headers: {
-                                'Content-Type' : 'application/json',
-                                'X-CSRFToken' : "{{ csrf_token }}"
-                                },
-                                body: postString 
-                            })
-                        } 
-                    }
-                }
+                },
+                body: formdata 
             })
             .then(function(){
-                if(post.unlisted===false){
-                    alert("Successfully modified post and delivered to your followers! Redirecting you to posts page.");
-                    location.href = 'http://127.0.0.1:8000/service'+'/site/posts';
-                }
-                else{
-                    alert("Successfully modified post, since this was not listed it was not delivered to your followers! Redirecting you to posts page.");
-                    location.href = 'http://127.0.0.1:8000/service'+'/site/posts';
-                }
+                alert("Successfully modified your post! Redirecting you to posts page.");
+                location.href = 'http://127.0.0.1:8000/service'+'/site/posts';
             })
             .catch (function (error) {
                 console.log('Request failed', error);
@@ -281,12 +191,10 @@
             
         document.getElementById("submitbutton").onclick = function(){
             createPost();
-            postString = JSON.stringify(post);
-            postUrl = 'http://127.0.0.1:8000/service'+'/authors/'+'{{author.id}}' + "/posts/"+'{{post.id}}'+'/';
-            AuthorUrl = 'http://127.0.0.1:8000/service'+'/authors/'+'{{author.id}}';
+            postUrl = 'http://127.0.0.1:8000/service'+'/authors/'+'{{post.author.id}}' + "/posts/"+'{{post.id}}'+'/';
+            AuthorUrl = 'http://127.0.0.1:8000/service'+'/authors/'+'{{post.author.id}}';
             if(content_isText===true){
-                post.contentType = 'text/plain';
-                postString = JSON.stringify(post);
+                formdata.append("contentType", 'text/plain');
                 sendMessage();
             }
             else{
@@ -299,12 +207,10 @@
                     });
                 }
                 var file= content.files[0];
-                post.contentType = file.type +';base64';
+                formdata.append("contentType", file.type+';base64');
                 var promise = getBase64(file);
                 promise.then(function(result) {
                     encode_Content=result;
-                    post.content=encode_Content;
-                    postString = JSON.stringify(post);
                     sendMessage();
                 });
             }
