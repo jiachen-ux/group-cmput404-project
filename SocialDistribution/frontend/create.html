@@ -102,6 +102,7 @@
         }
     }
     function sendMessage(){
+        authorUrl ='http://127.0.0.1:8000/service'+'/authors/'+'{{author.id}}';
         fetch(authorUrl,{
         method: 'GET',
         headers: {
@@ -116,7 +117,7 @@
         })
         .then(function(){
             postString=JSON.stringify(post);
-            var postUrl = 'http://127.0.0.1:8000/service'+'/authors/'+'{{author.id}}' + "/posts/";
+            postUrl = 'http://127.0.0.1:8000/service'+'/authors/'+'{{author.id}}' + "/posts/";
             return fetch(postUrl,{
                 method: 'POST',
                 headers: {
@@ -156,56 +157,56 @@
         .then(function(response){
             return response.json();
         })
-        .then(function(data){
-            if(post.unlisted===false){
-                followersInJson = data["items"]["data"];
-                if(post.visibility === "FRIENDS"){
-                    for(let follower of followersInJson){
-                        var urlofFriend = 'http://127.0.0.1:8000/service/'+"/authors/" + follower.id +'/followers/'+'{{ author.id }}';
-                        fetch(urlofFriend,{
-                            method: 'GET',
-                            headers: {
-                            'Content-Type' : 'application/json',
-                            'X-CSRFToken' : "{{ csrf_token }}"
-                            }, 
-                        })
-                        .then(function(response){
-                            return response.json();
-                        })
-                        .then(function(data){
-                            if(data.id==='{{ author.id }}'){
-                                var urlofInbox = 'http://127.0.0.1:8000/service'+"/authors/" + follower.id +'/inbox';
-                                fetch(urlofInbox,{
-                                    method: 'POST',
-                                    headers: {
-                                    'Content-Type' : 'application/json',
-                                    'X-CSRFToken' : "{{ csrf_token }}"
-                                    },
-                                    body: postString 
-                                })
-                            }
+        //.then(function(data){
+            // if(post.unlisted===false){
+            //     //followersInJson = data["items"]["data"];
+            //     if(post.visibility === "FRIENDS"){
+            //         for(let follower of followersInJson){
+            //             var urlofFriend = 'http://127.0.0.1:8000/service/'+"/authors/" + follower.id +'/followers/'+'{{ author.id }}';
+            //             fetch(urlofFriend,{
+            //                 method: 'GET',
+            //                 headers: {
+            //                 'Content-Type' : 'application/json',
+            //                 'X-CSRFToken' : "{{ csrf_token }}"
+            //                 }, 
+            //             })
+            //             .then(function(response){
+            //                 return response.json();
+            //             })
+            //             .then(function(data){
+            //                 if(data.id==='{{ author.id }}'){
+            //                     var urlofInbox = 'http://127.0.0.1:8000/service'+"/authors/" + follower.id +'/inbox';
+            //                     fetch(urlofInbox,{
+            //                         method: 'POST',
+            //                         headers: {
+            //                         'Content-Type' : 'application/json',
+            //                         'X-CSRFToken' : "{{ csrf_token }}"
+            //                         },
+            //                         body: postString 
+            //                     })
+            //                 }
 
-                        })
-                        .catch (function (error) {
-                            console.log('Request is failed', error);
-                        });
-                    } 
-                }
-                else{
-                    for(let follower of followersInJson){
-                        var urlofInbox = 'http://127.0.0.1:8000/service'+"/authors/" + follower.id +'/inbox';
-                        fetch(urlofInbox,{
-                            method: 'POST',
-                            headers: {
-                            'Content-Type' : 'application/json',
-                            'X-CSRFToken' : "{{ csrf_token }}"
-                            },
-                            body: postString 
-                        })
-                    } 
-                }
-            }
-        })
+            //             })
+            //             .catch (function (error) {
+            //                 console.log('Request is failed', error);
+            //             });
+            //         } 
+            //     }
+            //     else{
+            //         for(let follower of followersInJson){
+            //             var urlofInbox = 'http://127.0.0.1:8000/service'+"/authors/" + follower.id +'/inbox';
+            //             fetch(urlofInbox,{
+            //                 method: 'POST',
+            //                 headers: {
+            //                 'Content-Type' : 'application/json',
+            //                 'X-CSRFToken' : "{{ csrf_token }}"
+            //                 },
+            //                 body: postString 
+            //             })
+            //         } 
+            //     }
+            // }
+       // })
         .then(function(){
             alert("A new post is successfully created and delivered to your followers! Redirecting you to post-list page...");
             location.href = 'http://127.0.0.1:8000/service'+'/site/posts';
@@ -258,7 +259,6 @@
         if (allFilled){
             createPost();
             postString = JSON.stringify(post);
-            authorUrl ='http://127.0.0.1:8000/service'+'/authors/'+'{{author.id}}';
             if(content_isText===true){
                 post.contentType = 'text/plain';
                 postString = JSON.stringify(post);

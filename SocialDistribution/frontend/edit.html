@@ -213,56 +213,56 @@
             .then(function(response){
                 return response.json();
             })
-            .then(function(data){
-                if(post.unlisted===false){
-                    followersInJson = data["items"]["data"];
-                    if(post.visibility === "FRIENDS"){
-                        for(let follower of followersInJson){
-                            var urlofFriend = 'http://127.0.0.1:8000/service'+'/authors/' + follower.id +'/followers/'+'{{ author.id }}';
-                            fetch(urlofFriend,{
-                                method: 'GET',
-                                headers: {
-                                'Content-Type' : 'application/json',
-                                'X-CSRFToken' : "{{ csrf_token }}"
-                                }, 
-                            })
-                            .then(function(response){
-                                return response.json();
-                            })
-                            .then(function(data){
-                                if(data.id==='{{ author.id }}'){ // if we both follow each other the current author will be returned
-                                    var urlofInbox = 'http://127.0.0.1:8000/service'+'/author/' + follower.id +'/inbox';
-                                    fetch(urlofInbox,{
-                                        method: 'POST',
-                                        headers: {
-                                        'Content-Type' : 'application/json',
-                                        'X-CSRFToken' : "{{ csrf_token }}"
-                                        },
-                                        body: postString 
-                                    })
-                                }
+            // .then(function(data){
+            //     if(post.unlisted===false){
+            //         followersInJson = data["items"]["data"];
+            //         if(post.visibility === "FRIENDS"){
+            //             for(let follower of followersInJson){
+            //                 var urlofFriend = 'http://127.0.0.1:8000/service'+'/authors/' + follower.id +'/followers/'+'{{ author.id }}';
+            //                 fetch(urlofFriend,{
+            //                     method: 'GET',
+            //                     headers: {
+            //                     'Content-Type' : 'application/json',
+            //                     'X-CSRFToken' : "{{ csrf_token }}"
+            //                     }, 
+            //                 })
+            //                 .then(function(response){
+            //                     return response.json();
+            //                 })
+            //                 .then(function(data){
+            //                     if(data.id==='{{ author.id }}'){ // if we both follow each other the current author will be returned
+            //                         var urlofInbox = 'http://127.0.0.1:8000/service'+'/author/' + follower.id +'/inbox';
+            //                         fetch(urlofInbox,{
+            //                             method: 'POST',
+            //                             headers: {
+            //                             'Content-Type' : 'application/json',
+            //                             'X-CSRFToken' : "{{ csrf_token }}"
+            //                             },
+            //                             body: postString 
+            //                         })
+            //                     }
 
-                            })
-                            .catch (function (error) {
-                                console.log('Request failed', error);
-                            });
-                        } 
-                    }
-                    else{
-                        for(let follower of followersInJson){
-                            var urlofInbox = 'http://127.0.0.1:8000/service'+"/authors/" + follower.id +'/inbox';
-                            fetch(urlofInbox,{
-                                method: 'POST',
-                                headers: {
-                                'Content-Type' : 'application/json',
-                                'X-CSRFToken' : "{{ csrf_token }}"
-                                },
-                                body: postString 
-                            })
-                        } 
-                    }
-                }
-            })
+            //                 })
+            //                 .catch (function (error) {
+            //                     console.log('Request failed', error);
+            //                 });
+            //             } 
+            //         }
+            //         else{
+            //             for(let follower of followersInJson){
+            //                 var urlofInbox = 'http://127.0.0.1:8000/service'+"/authors/" + follower.id +'/inbox';
+            //                 fetch(urlofInbox,{
+            //                     method: 'POST',
+            //                     headers: {
+            //                     'Content-Type' : 'application/json',
+            //                     'X-CSRFToken' : "{{ csrf_token }}"
+            //                     },
+            //                     body: postString 
+            //                 })
+            //             } 
+            //         }
+            //     }
+            // })
             .then(function(){
                 if(post.unlisted===false){
                     alert("Successfully modified post and delivered to your followers! Redirecting you to posts page.");
