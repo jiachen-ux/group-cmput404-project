@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block script %}
-    <script type"text/javascript" src="{% static 'frontend/signup.js' %}"></script>
+    <script type"text/javascript" src="{% static 'signup.js' %}"></script>
 {% endblock %}
 
 {% block body %}
@@ -30,18 +30,10 @@
             <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
         </div>
         <div class="form-group">
-            <div class="custom-file">
-                <input type="file" name="profile" class="form-control custom-file-input" id="profile" accept="image/jpeg,image/png,image/webp,image/gif" data-focusable="true" aria-describedby="inputGroupFileAddon01">
-                <label class="custom-file-label" for="profile"><span style="color: #6c757d;">Choose profile picture<span></label>
-                <span class="star small"></span>
-            </div>
+            <input class="form-control" type="github" name="github" placeholder="Github">
         </div>
         <div class="form-group">
-            <div class="custom-file">
-                <input type="file" name="cover" class="form-control custom-file-input" id="cover" accept="image/jpeg,image/png,image/webp,image/gif" data-focusable="true" aria-describedby="inputGroupFileAddon01">
-                <label class="custom-file-label" for="cover"><span style="color: #6c757d;">Choose cover picture<span></label>
-                <span class="star small"></span>
-            </div>
+            <input class="form-control" type="displayName" name="displayName" placeholder="Display Name">
         </div>
         <input class="btn btn-primary" type="submit" value="Register">
     </form>

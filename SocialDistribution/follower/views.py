@@ -30,7 +30,7 @@ def following(request):
     else:
         return HttpResponseRedirect(reverse('login'))
 
-@api_view(['PUT','POST','GET'])
+
 @csrf_exempt
 def follow(request, username):
     if request.user.is_authenticated:
@@ -50,7 +50,7 @@ def follow(request, username):
     else:
         return HttpResponseRedirect(reverse('login'))
 
-@api_view(['PUT','POST','GET'])
+
 @csrf_exempt
 def unfollow(request, username):
     if request.user.is_authenticated:

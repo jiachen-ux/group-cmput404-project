@@ -11,7 +11,9 @@ from .models import *
 from follower.models import Follower
 from post.models import Post
 from rest_framework.decorators import api_view
-
+from rest_framework.generics  import ListCreateAPIView,RetrieveUpdateDestroyAPIView
+from rest_framework import serializers
+from .serial import  *
 
 def index(request):
     all_posts = Post.objects.all().order_by('-date_created')
@@ -34,13 +36,11 @@ def index(request):
 
 @api_view(['POST','GET'])
 def login_view(request):
-    if request.method == "POST":
 
-        # Attempt to sign user in
+    if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
-
         # Check if authentication successful
         if user is not None:
             login(request, user)
@@ -57,44 +57,42 @@ def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
 
-@api_view(['POST','GET'])
 def register(request):
     if request.method == "POST":
         username = request.POST["username"]
-        profile = request.FILES.get("profile")
-        print(f"--------------------------Profile: {profile}----------------------------")
-        cover = request.FILES.get('cover')
-        print(f"--------------------------Cover: {cover}----------------------------")
-
-        # Ensure password matches confirmation
         password = request.POST["password"]
         confirmation = request.POST["confirmation"]
+        displayName = request.POST["displayName"]
+        github= request.POST["github"]
         if password != confirmation:
-            return render(request, "temp.html", {
+            return render(request, "signup.html", {
                 "message": "Passwords must match."
             })
-
-        # Attempt to create new user
         try:
-            user = Author.objects.create_user(username,password)
-            if profile is not None:
-                user.profile_pic = profile
-            else:
-                user.profile_pic = "no_pic.png"
-            user.cover = cover           
-            user.save()
+            user = Author.objects.create_user(username,password,displayName,github)
             Follower.objects.create(user=user)
         except IntegrityError:
-            return render(request, "temp.html", {
+            return render(request, "signup.html", {
                 "message": "Username already taken."
             })
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
     else:
-        return render(request, "temp.html")
+        return render(request, "signup.html")
 
 
-@api_view(['GET','POST'])
+class ProfileView(ListCreateAPIView):
+    queryset = Author.objects.all()
+    serializer_class = GetAuthorSerializer
+
+class SingleProfileView(RetrieveUpdateDestroyAPIView):
+    queryset = Author.objects.all() 
+    serializer_class = GetAuthorSerializer
+    def get_object(self):
+        return Author.objects.get(userid=self.kwargs.get("uuid"))
+
+
+
 def profile(request, userid):
     user = Author.objects.get(userid=userid)  
     all_posts = Post.objects.filter(creater=user).order_by('-date_created')

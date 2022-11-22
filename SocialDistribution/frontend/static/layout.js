@@ -304,29 +304,29 @@ function follow_user(element, username, origin) {
     })
     .then(() => {
         if(origin === 'suggestion') {
-            element.parentElement.innerHTML = `<button class="btn btn-success" type="button" onclick="unfollow_user(this,'${username}','suggestion')">Following</button>`;
+            element.parentElement.innerHTML = `<button class="btn btn-success" type="button" onclick="unfollow_user(this,'${userid}','suggestion')">Following</button>`;
         }
         else if(origin === 'edit_page') {
-            element.parentElement.innerHTML = `<button class="btn btn-success float-right" onclick="unfollow_user(this,'${username}','edit_page')" id="following-btn">Following</button>`;
+            element.parentElement.innerHTML = `<button class="btn btn-success float-right" onclick="unfollow_user(this,'${userid}','edit_page')" id="following-btn">Following</button>`;
         }
         else if(origin === 'dropdown') {
             ////////////////////////////////////////////////////////////////////////////////////////////
         }
 
         if(document.querySelector('.body').dataset.page === 'profile') {
-            if(document.querySelector('.profile-view').dataset.user === username) {
+            if(document.querySelector('.profile-view').dataset.user === userid) {
                 document.querySelector('#follower__count').innerHTML++;
             }
         }
         if(document.querySelector('.body').dataset.page === 'profile') {
-            if(document.querySelector('.profile-view').dataset.user === document.querySelector('#user_is_authenticated').dataset.username) {
+            if(document.querySelector('.profile-view').dataset.user === document.querySelector('#user_is_authenticated').dataset.userid) {
                 document.querySelector('#following__count').innerHTML++;
             }
         }
     });
 }
 
-function unfollow_user(element, username, origin) {
+function unfollow_user(element, user, origin) {
     if(document.querySelector('#user_is_authenticated').value === 'False') {
         login_popup('follow');
         return false;

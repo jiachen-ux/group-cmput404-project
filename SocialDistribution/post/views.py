@@ -9,10 +9,9 @@ import json
 from rest_framework.response import Response
 from .models import *
 from follower.models import Follower
-from comment.models import Comment
-from post.models import Post
-from .serializers import PostSerializer
+from .serializers import PostSerializer,LikeSerializer
 from rest_framework.decorators import api_view
+from rest_framework.generics  import CreateAPIView,RetrieveUpdateDestroyAPIView
 
 
 @api_view(['POST','GET'])
@@ -29,6 +28,7 @@ def create_post(request):
             return HttpResponse(e)
     else:
         return HttpResponse("Method must be 'POST'")
+
     
 @api_view(['POST','POST','GET'])   
 @login_required
@@ -106,51 +106,13 @@ def unlike_post(request, id):
         return HttpResponseRedirect(reverse('login'))
 
 
-@api_view(['PUT'])
-@csrf_exempt
-def save_post(request, id):
-    if request.user.is_authenticated:
-        if request.method == 'PUT':
-            post = Post.objects.get(pk=id)
-            print(post)
-            try:
-                post.savers.add(request.user)
-                post.save()
-                return HttpResponse(status=204)
-            except Exception as e:
-                return HttpResponse(e)
-        else:
-            return HttpResponse("Method must be 'PUT'")
-    else:
-        return HttpResponseRedirect(reverse('login'))
-
-
-@api_view(['PUT'])
-@csrf_exempt
-def unsave_post(request, id):
-    if request.user.is_authenticated:
-        if request.method == 'PUT':
-            post = Post.objects.get(pk=id)
-            print(post)
-            try:
-                post.savers.remove(request.user)
-                post.save()
-                return HttpResponse(status=204)
-            except Exception as e:
-                return HttpResponse(e)
-        else:
-            return HttpResponse("Method must be 'PUT'")
-    else:
-        return HttpResponseRedirect(reverse('login'))
 
 @api_view(['PUT','POST','GET'])
 @csrf_exempt
-def follow(request, username):
+def follow(request, userid):
     if request.user.is_authenticated:
         if request.method == 'PUT':
-            user = Author.objects.get(username=username)
-            print(f".....................User: {user}......................")
-            print(f".....................Follower: {request.user}......................")
+            user = Author.objects.get(userid=userid)
             try:
                 (follower, create) = Follower.objects.get_or_create(user=user)
                 follower.followers.add(request.user)
@@ -165,12 +127,10 @@ def follow(request, username):
 
 @api_view(['PUT','POST','GET'])
 @csrf_exempt
-def unfollow(request, username):
+def unfollow(request, userid):
     if request.user.is_authenticated:
         if request.method == 'PUT':
-            user = Author.objects.get(username=username)
-            print(f".....................User: {user}......................")
-            print(f".....................Unfollower: {request.user}......................")
+            user = Author.objects.get(username=userid)
             try:
                 follower = Follower.objects.get(user=user)
                 follower.followers.remove(request.user)
@@ -183,32 +143,7 @@ def unfollow(request, username):
     else:
         return HttpResponseRedirect(reverse('login'))
 
-@api_view(['POST','GET'])
-@csrf_exempt
-def comment(request, post_id):
-    if request.user.is_authenticated:
-        if request.method == 'POST':
-            data = json.loads(request.body)
-            comment = data.get('comment_text')
-            post = Post.objects.get(id=post_id)
-            try:
-                newcomment = Comment.objects.create(post=post,commenter=request.user,comment_content=comment)
-                post.comment_count += 1
-                post.save()
-                print(newcomment.to_dict())
-                return JsonResponse([newcomment.to_dict()], safe=False, status=201)
-            except Exception as e:
-                return HttpResponse(e)
-    
-        post = Post.objects.get(id=post_id)
-        comments = Comment.objects.filter(post=post)
-        comments = comments.order_by('-comment_time').all()
-        return JsonResponse([comment.to_dict() for comment in comments], safe=False)
-    else:
-        return HttpResponseRedirect(reverse('login'))
 
-
-@api_view(['PUT','POST','GET'])
 @csrf_exempt
 def delete_post(request, post_id):
     if request.user.is_authenticated:
@@ -226,3 +161,5 @@ def delete_post(request, post_id):
             return HttpResponse("Method must be 'PUT'")
     else:
         return HttpResponseRedirect(reverse('login'))
+
+

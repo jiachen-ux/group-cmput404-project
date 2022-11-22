@@ -11,16 +11,17 @@ from .models import *
 from follower.models import Follower
 from post.models import Post
 from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 # Create your views here.
 
 @api_view(['POST','GET'])
 @csrf_exempt
-def comment(request, post_id):
+def comment(request, postid):
     if request.user.is_authenticated:
         if request.method == 'POST':
             data = json.loads(request.body)
             comment = data.get('comment_text')
-            post = Post.objects.get(id=post_id)
+            post = Post.objects.get(id=postid)
             try:
                 newcomment = Comment.objects.create(post=post,commenter=request.user,comment_content=comment)
                 post.comment_count += 1
@@ -30,7 +31,7 @@ def comment(request, post_id):
             except Exception as e:
                 return HttpResponse(e)
     
-        post = Post.objects.get(id=post_id)
+        post = Post.objects.get(id=postid)
         comments = Comment.objects.filter(post=post)
         comments = comments.order_by('-comment_time').all()
         return JsonResponse([comment.to_dict() for comment in comments], safe=False)
