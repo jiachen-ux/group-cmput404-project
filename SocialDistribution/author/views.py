@@ -115,22 +115,7 @@ class AuthorSearchView(generics.ListAPIView):
 #         "page": "all_posts",
 #         'profile': False
 #     })
-def homeView(request):
-    all_posts = POST.objects.all().order_by('-published')
-    followings = []
-    suggestions = []
-    if request.user.is_authenticated:
-        # followings = Follower.objects.filter(follower=request.user).values_list('user', flat=True)
-        suggestions = Author.objects.exclude(pk__in=followings).exclude(username=request.user.username).order_by("?")[:6]
 
-    template_name = '../frontend/index.html'
-    return render(request, template_name, {
-        "posts": all_posts,
-        "suggestions": suggestions,
-        "page": "all_posts",
-        'profile': False
-    }
-    )
 
 def loginView(request):
     template_name = 'author/login.html'
