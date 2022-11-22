@@ -16,5 +16,6 @@ urlpatterns = [
     path('authors/<uuid:uuidOfAuthor>/', views.getSingleAuthor),
 
     path('author/search/', views.AuthorSearchView.as_view()), 
+    path("logout", views.logoutView, name="logout_url"),
     *router.urls,
 ]

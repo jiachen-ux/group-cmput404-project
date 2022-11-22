@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import include, path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view as swagger_get_schema_view
+import author.views as author_view
 
 
 schema_view = swagger_get_schema_view(
@@ -29,6 +30,11 @@ schema_view = swagger_get_schema_view(
 )
 
 urlpatterns = [
+    path("register/", author_view.registerView, name="register_url"),
+    path("login/", author_view.loginView, name="login_url"),
+
+
+    path("home/", author_view.homeView),
     path("admin/", admin.site.urls),
     path("service/", include("author.urls")),
     path("service/", include("comment.urls")),

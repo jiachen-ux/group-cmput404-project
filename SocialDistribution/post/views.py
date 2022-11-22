@@ -6,6 +6,8 @@ from . import utils
 from django.shortcuts import render, redirect
 from django.http.request import HttpRequest
 from rest_framework import generics, mixins, response, status
+from django.shortcuts import get_object_or_404
+from django.http.response import Http404
 from .models import *
 from .serializers import *
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
@@ -116,6 +118,14 @@ class PostMutipleDetailView(generics.ListCreateAPIView):
     serializer_class = PostSerializer
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
+    def get_author(self, author_id):
+        # Validate given author
+        try:
+            author = get_object_or_404(Author.objects.all(), id=author_id)
+            return author
+        except:
+            raise Http404()
+
     def get(self, request, *args, **kwargs):
         queryset = Post.objects.filter(author__id=kwargs['uuidOfAuthor'])
         serializer = self.serializer_class(queryset, many=True)
@@ -132,8 +142,26 @@ class PostMutipleDetailView(generics.ListCreateAPIView):
         return context
 
     # by default does the same as this
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request: HttpRequest, uuidOfAuthor: str):
         return self.create(request, *args, **kwargs)
+        # author = self.get_author(uuidOfAuthor)
+        # data = request.data
+        # serializer = self.get_serializer(data=data)
+        # # if serializer.is_valid():
+        # serializer.is_valid()
+        # post = Post.objects.create(
+        #     author=author, 
+        #     **serializer.validated_data
+        # )
+
+        # # serialize saved post for response
+        # serializer = self.get_serializer(post)
+        # res_data = {
+        #     'query': "POST on posts",
+        #     'data': serializer.data
+        # }
+        # return Response(res_data, status=status.HTTP_201_CREATED)
+        # # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PostDistinctView(generics.ListAPIView):
@@ -332,7 +360,7 @@ def postIndex(request: HttpRequest):
 def myPosts(request: HttpRequest):
     if request.user.is_anonymous or not (request.user.is_authenticated):
         return render(request,'index.html')
-    author = Author.objects.get(userId=request.user)
+    author = Author.objects.get(id=request.user.id)
     posts = Post.objects.filter(author=author)
     for post in posts:
         post.numberOfLikes = 0 #len(get_post_likes(post.id)) 
@@ -356,11 +384,11 @@ def editpost(request: HttpRequest, post_id: str):
     context = {'author' : author, 'post': post}
     return render(request,'edit.html',context)
 
-def deletepost(request: HttpRequest, post_id: str, user_id: str):
+def deletepost(request: HttpRequest, post_id: str):
     if request.user.is_anonymous or not (request.user.is_authenticated):
         return render(request,'index.html')
-    author=Author.objects.get(userId = user_id)
+    author=Author.objects.get(id = request.user.id)
     post = Post.objects.get(id=post_id)
     if post.author.id == author.id:
         post.delete()
-    return redirect('posts:index')
+    return redirect('post:index')

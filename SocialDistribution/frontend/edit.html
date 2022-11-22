@@ -64,19 +64,18 @@
         var postUrl;
         var content;
         var chosenPost;
-        fetch('http://127.0.0.1:8000'+'/authors/'+'{{post.author.id}}'+'/posts/'+'{{post.id}}/',{
+        fetch('http://127.0.0.1:8000'+'/service/authors/'+'{{post.author.id}}'+'/posts/'+'{{post.id}}',{
                 method: 'GET',
                 headers: {
                     'Content-Type' : 'application/json',
                     'X-CSRFToken' : "{{ csrf_token }}"
                 }
-
             })
             .then(function(response){
                 return response.json();
             })
             .then(function(data){
-                post=data.data;
+                post=data;
             })
             .then(function(){
                 document.getElementById("postcat").value= post.categories;
@@ -86,9 +85,11 @@
                 document.getElementById("description").value= post.description;
                 document.getElementById("desccription").innerHTML= post.description;
                 if(post.visibility==="FRIENDS"){
+                    
                     document.getElementById("friends").checked=true;
                 }
                 else{
+                    alert("ok")
                     document.getElementById("public").checked=true;
                 }
                 if(post.unlisted===true){

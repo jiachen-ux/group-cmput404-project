@@ -18,6 +18,12 @@ class LikeSerializer(serializers.ModelSerializer):
  
         
 class PostSerializer(serializers.ModelSerializer):
+    # type = serializers.CharField(default="post", read_only=True)
+    # source = serializers.CharField(source="get_source", read_only=True)
+    # origin = serializers.CharField(source="get_origin", read_only=True)
+    # contentType = serializers.ChoiceField(choices=Post.ContentTypeEnum.choices, default=Post.ContentTypeEnum.PLAIN)
+    # visibility = serializers.ChoiceField(choices=Post.VisibilityEnum.choices, default=Post.VisibilityEnum.PUBLIC)
+    
 
     #Method 1
     type = serializers.SerializerMethodField()
