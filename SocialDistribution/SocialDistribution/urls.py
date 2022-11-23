@@ -31,12 +31,11 @@ schema_view = swagger_get_schema_view(
 
 urlpatterns = [
     path("register/", author_view.registerView, name="register_url"),
-    path("login/", author_view.loginView, name="login_url"),
-
+    path("", author_view.loginView, name="login_url"),
 
     path("home/", author_view.homeView),
     path("admin/", admin.site.urls),
-    #path("service/", include("author.urls")),
+    path("service/", include("author.urls")),
     #path("service/", include("comment.urls")),
     #path("service/", include("post.urls")),
     #path("service/", include("follower.urls")),

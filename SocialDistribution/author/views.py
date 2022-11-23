@@ -22,6 +22,7 @@ from django.contrib.auth.forms import AuthenticationForm
 
 from author.serializers import *
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 
 class AuthorCreate(
@@ -116,6 +117,10 @@ class AuthorSearchView(generics.ListAPIView):
 #         'profile': False
 #     })
 
+@login_required
+def homeView(request):
+    template_name = 'author/home.html'
+    return render(request, template_name)
 
 def loginView(request):
     template_name = 'author/login.html'
