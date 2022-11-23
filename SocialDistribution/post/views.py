@@ -3,8 +3,11 @@ import json
 from re import A
 import re
 from . import utils
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.http.request import HttpRequest
 from rest_framework import generics, mixins, response, status
+from django.shortcuts import get_object_or_404
+from django.http.response import Http404
 from .models import *
 from .serializers import *
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
@@ -12,6 +15,12 @@ from rest_framework.decorators import api_view, permission_classes, parser_class
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from base64 import b64encode
+
+from follower.models import Follower
+from comment.models import Comment
+from like.models import Like
+from comment.serializer import CommentSerializer
+
 
 
 @api_view(["GET"])
@@ -39,7 +48,7 @@ def getAllAuthorLiked(request, uuidOfAuthor):
 
 class PostSingleDetailView(generics.RetrieveUpdateDestroyAPIView, generics.CreateAPIView):
 
-    queryset = POST.objects.all()
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
 
     # adding extra data to context object becoz we need author(finding the correct author by uuid) to create the post
@@ -60,7 +69,7 @@ class PostSingleDetailView(generics.RetrieveUpdateDestroyAPIView, generics.Creat
     '''
 
     def get(self, request, *args, **kwargs):
-        queryset = POST.objects.filter(id=kwargs['uuidOfPost']).first()
+        queryset = Post.objects.filter(id=kwargs['uuidOfPost']).first()
 
         if (kwargs['uuidOfAuthor'] == queryset.author.id) or queryset.visibility == 'PUBLIC':
             serializer = self.serializer_class(queryset, many=False)
@@ -76,7 +85,7 @@ class PostSingleDetailView(generics.RetrieveUpdateDestroyAPIView, generics.Creat
     '''
 
     def post(self, request, *args, **kwargs):
-        queryset = POST.objects.filter(id=kwargs['uuidOfPost']).first()
+        queryset = Post.objects.filter(id=kwargs['uuidOfPost']).first()
         serializer = self.serializer_class(queryset, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -95,7 +104,7 @@ class PostSingleDetailView(generics.RetrieveUpdateDestroyAPIView, generics.Creat
     '''
 
     def delete(self, request, *args, **kwargs):
-        queryset = POST.objects.filter(id=kwargs['uuidOfPost']).first()
+        queryset = Post.objects.filter(id=kwargs['uuidOfPost']).first()
         if queryset.author.id == kwargs['uuidOfAuthor']:
             queryset.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -105,12 +114,20 @@ class PostSingleDetailView(generics.RetrieveUpdateDestroyAPIView, generics.Creat
 
 class PostMutipleDetailView(generics.ListCreateAPIView):
 
-    queryset = POST.objects.all()
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
+    def get_author(self, author_id):
+        # Validate given author
+        try:
+            author = get_object_or_404(Author.objects.all(), id=author_id)
+            return author
+        except:
+            raise Http404()
+
     def get(self, request, *args, **kwargs):
-        queryset = POST.objects.filter(author__id=kwargs['uuidOfAuthor'])
+        queryset = Post.objects.filter(author__id=kwargs['uuidOfAuthor'])
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -125,13 +142,14 @@ class PostMutipleDetailView(generics.ListCreateAPIView):
         return context
 
     # by default does the same as this
-    # def post(self, request, format=None, *args, **kwargs):
-    #     return self.create(request, *args, **kwargs)
+    def post(self, request: HttpRequest, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+        
 
 
 class PostDistinctView(generics.ListAPIView):
 
-    queryset = POST.objects.all()
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
 
     '''
@@ -146,7 +164,7 @@ class PostDistinctView(generics.ListAPIView):
         # author__id=kwargs['uuidOfAuthor']
 
         all_post_objects = []
-        queryset = POST.objects.all().exclude(unlisted=True)
+        queryset = Post.objects.all().exclude(unlisted=True)
         for obj in queryset:
             # adding  the all public post objects anf author self create post
             if (kwargs.get('uuidOfAuthor')) == obj.author.id or obj.visibility == 'PUBLIC':
@@ -169,7 +187,7 @@ def handleInboxRequests(request, author_id):
             allPostIDsInThisAuthorsInbox = Inbox.objects.filter(
                 author__id=author_id, object_type="post")
             setOfIds = set([o.object_id for o in allPostIDsInThisAuthorsInbox])
-            allPosts = POST.objects.filter(id__in=setOfIds)
+            allPosts = Post.objects.filter(id__in=setOfIds)
             items = PostSerializer(allPosts, many=True)
             resp = {
                 "type": "inbox",
@@ -262,7 +280,7 @@ def getEntireInboxRequests(request, author_id):
                 objectToSerialize = None
                 data = None
                 if obj.object_type == "post":
-                    objectToSerialize = POST.objects.get(id=obj.object_id)
+                    objectToSerialize = Post.objects.get(id=obj.object_id)
                     serializerClass = PostSerializer
                 elif obj.object_type == "comment":
                     objectToSerialize = Comment.objects.get(id=obj.object_id)
@@ -304,3 +322,56 @@ def getEntireInboxRequests(request, author_id):
             return response.Response({"message": "Inbox cleared!"}, status.HTTP_204_NO_CONTENT)
         except:
             return response.Response({"message": "Something went wrong!"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# def get_post_likes(post_id):
+#     likes = Like.objects.filter(post=post_id)
+#     return likes
+# def get_latest_comments(post_id):
+#     comments = Comment.objects.filter(post=post_id)[:2]
+#     return comments
+
+def postIndex(request: HttpRequest):
+    posts = Post.objects.filter(visibility="PUBLIC", unlisted=False)
+    for post in posts:
+        post.numberOfLikes =  0 #len(get_post_likes(post.id)) 
+        #post.topComments = get_latest_comments(post.id)
+    context = {
+        'posts': posts,
+        }
+    return render(request, 'index.html', context)
+
+def myPosts(request: HttpRequest):
+    if request.user.is_anonymous or not (request.user.is_authenticated):
+        return render(request,'index.html')
+    author = Author.objects.get(id=request.user.id)
+    posts = Post.objects.filter(author=author)
+    for post in posts:
+        post.numberOfLikes = 0 #len(get_post_likes(post.id)) 
+        #post.topComments = get_latest_comments(post.id)
+    context = {
+        'posts': posts,
+        'userAuthor': author
+        }
+    return render(request, 'index.html', context)
+
+def createpost(request: HttpRequest):
+    author = Author.objects.filter(id=request.user.id).first()
+    context = {'author' : author}
+    return render(request,'create.html',context)
+
+def editpost(request: HttpRequest, post_id: str):
+    if request.user.is_anonymous or not (request.user.is_authenticated):
+        return render(request,'edit.html')
+    author=Author.objects.get(id = request.user.id)
+    post = Post.objects.get(id=post_id)
+    context = {'author' : author, 'post': post}
+    return render(request,'edit.html',context)
+
+def deletepost(request: HttpRequest, post_id: str):
+    if request.user.is_anonymous or not (request.user.is_authenticated):
+        return render(request,'index.html')
+    author=Author.objects.get(id = request.user.id)
+    post = Post.objects.get(id=post_id)
+    if post.author.id == author.id:
+        post.delete()
+    return redirect('post:index')

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'comment',
     'follower',
     'post',
+    'like',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -46,9 +47,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'rest_framework_simplejwt',
-     "corsheaders",
-     'djoser',
-     'crispy_forms',
+    "corsheaders",
+    'djoser',
+    'crispy_forms',
     
 
 ]

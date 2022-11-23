@@ -7,7 +7,7 @@ from django.utils import timezone
 from email.policy import default
 from SocialDistribution.settings import HOSTNAME
 from author.models import Author
-from post.models import POST
+from post.models import Post
 
 # Create your models here.
 class Comment(models.Model):
@@ -18,7 +18,7 @@ class Comment(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    post = models.ForeignKey(POST, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
     comment = models.CharField(max_length=255)
     published = models.DateTimeField(auto_now_add=True)
     contentType = models.CharField(max_length=255, choices=CONTENT_TYPE, default='text/markdown')

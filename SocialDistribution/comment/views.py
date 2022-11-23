@@ -12,6 +12,7 @@ from rest_framework.decorators import api_view, permission_classes, parser_class
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from base64 import b64encode
+from post.models import Post
 
 
 class CommentPostView(generics.ListCreateAPIView):
@@ -30,7 +31,7 @@ class CommentPostView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             context['author'] = Author.objects.filter(
                 id=self.kwargs['uuidOfAuthor']).first()
-            context['post'] = POST.objects.filter(
+            context['post'] = Post.objects.filter(
                 id=self.kwargs.get('uuidOfPost')).first()
 
         return context
@@ -41,7 +42,7 @@ class CommentPostView(generics.ListCreateAPIView):
     '''
 
     def post(self, request, *args, **kwargs):
-        queryset = POST.objects.filter(id=kwargs['uuidOfPost']).first()
+        queryset = Post.objects.filter(id=kwargs['uuidOfPost']).first()
         data = {'count': queryset.count + 1}
         serializer = PostSerializer(queryset, data=data)
         if serializer.is_valid():
@@ -71,7 +72,7 @@ class CommentPostView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             context['author'] = Author.objects.filter(
                 id=self.kwargs['uuidOfAuthor']).first()
-            context['post'] = POST.objects.filter(
+            context['post'] = Post.objects.filter(
                 id=self.kwargs.get('uuidOfPost')).first()
 
         return context
@@ -82,7 +83,7 @@ class CommentPostView(generics.ListCreateAPIView):
     '''
 
     def post(self, request, *args, **kwargs):
-        queryset = POST.objects.filter(id=kwargs['uuidOfPost']).first()
+        queryset = Post.objects.filter(id=kwargs['uuidOfPost']).first()
         data = {'count': queryset.count + 1}
         serializer = PostSerializer(queryset, data=data)
         if serializer.is_valid():
