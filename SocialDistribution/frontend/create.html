@@ -1,59 +1,78 @@
-{% extends "base.html" %}
+{% extends "author\base.html" %}
 
 {% block title %}Make a Post{% endblock %}
 
 
 {% block content %}
-{% if user.is_authenticated %}
-<p>Enter the following information for the new post</p><br>
 
-<form>
-    Title: <input type="text" id="title" value=""> <br>
-    Description: <input type="text" id="description" value=""> <br>
-    categories: <input id="postcat" name="postcategories" value=""> <br>
-<form>
+<div class="row justify-content-center">
+    <div class="col-6">
+        <div class="card">
+            <div class="card-body">
+            {% if user.is_authenticated %}
+            
+            <h4>Enter the following information for the new post:</h4><br>
+            
+            {%csrf_token%}
 
+            <div class="form-group">
+                <label for="exampleInputEmail1">Title</label><br/>
+                <div class="input-group-prepend">
+                    <input type="text" id="title" value="" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                </div>
+                <label for="exampleInputEmail1">Description</label><br/>
+                <div class="input-group-prepend">
+                    <input type="text" id="description" value="" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"> <br>
+                </div>
+                <label for="exampleInputEmail1">Categories</label><br/>
+                <div class="input-group-prepend">
+                <input id="postcat" name="postcategories" value="" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"> <br>
+                </div>
 
-<p>Choose if you want to list your post or not:</p>
+            </div>
+                
+            <label for="exampleInputEmail1">Choose if you want to list your post or not:</label>
+            
+            <div class="form-group">
+                <input type="radio" id="listed" name="listedstatus" value="listed" >
+                <label for="listed">LISTED</label><br>
+                <input type="radio" id="notlisted" name="listedstatus" value="notlisted">
+                <label for="notlisted">NOT LISTED</label><br>
+            </div>
+            
+            <label>Choose the visibility of your post:</label>
+            
+            <div class="form-group">
+                <input type="radio" id="public" name="visibility" value="PUBLIC">
+                <label for="public">PUBLIC</label><br>
+                <input type="radio" id="friends" name="visibility" value="FRIENDS">
+                <label for="friends">FRIENDS</label><br>
+            </div>
+            <label>Choose if content will be text or file:</label>
+            
+            <div class="form-group">
+                <input type="radio" id="textchoice" name="textorfile" value="text">
+                <label for="text">Text</label><br>
+                <input type="radio" id="filechoice" name="textorfile" value="file">
+                <label for="file">File</label><br>
 
-<form>
-    <input type="radio" id="listed" name="listedstatus" value="listed">
-    <label for="listed">LISTED</label><br>
-    <input type="radio" id="notlisted" name="listedstatus" value="notlisted">
-    <label for="notlisted">NOT LISTED</label><br>
-</form>
+            </div>
+            
+            <div class="form-group">
+            <p id="choosefiletext" hidden>Choose your file:</p>
+            <input type="file" id="filecontent" hidden/>
+            <p id="inputcontenttext" hidden>Enter your post content:</p>
+            <input type="text" id="textcontent" hidden class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+            </div>
+            
+            <div class="form-group">
+            <input  type="submit" class = "btn btn-info float-right" id="submitbutton"></input>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
 
-<p>Choose the visibility of your post:</p>
-
-<form>
-    <input type="radio" id="public" name="visibility" value="PUBLIC">
-    <label for="public">PUBLIC</label><br>
-    <input type="radio" id="friends" name="visibility" value="FRIENDS">
-    <label for="friends">FRIENDS</label><br>
-</form>
-
-<p>Choose if content will be text or file:</p>
-
-<form>
-    <input type="radio" id="textchoice" name="textorfile" value="text">
-    <label for="text">Text</label><br>
-    <input type="radio" id="filechoice" name="textorfile" value="file">
-    <label for="file">File</label><br>
-</form>
-
-
-
-<p id="choosefiletext" hidden>Choose your file:</p>
-
-<input type="file" id="filecontent" hidden/>
-
-
-
-<p id="inputcontenttext" hidden>Enter your post content:</p>
-
-<input type="text" id="textcontent" hidden>
-
-<button id="submitbutton" >Submit</button>
 <script>
     var encode_Content;
     var content_isText;
