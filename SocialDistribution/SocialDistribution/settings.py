@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-import django_on_heroku
+
 from pathlib import Path
 import os
 
@@ -27,6 +27,10 @@ SECRET_KEY = 'django-insecure-f6(ck#duqqc)8bo$-2mjmud2_!&zem03o9lm_#v7i-=-@ywb2!
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+NAME = "team9-socialdistribution.herokuapp.com"
+HOSTNAME = "https://{}/".format(NAME)
+# Application definition
 
 INSTALLED_APPS = [
     'author',
@@ -135,4 +139,3 @@ MEDIA_URL = '/media/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-django_on_heroku.settings(locals())
