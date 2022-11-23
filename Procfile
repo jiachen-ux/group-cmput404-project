@@ -1,1 +1,1 @@
-web: gunicorn SocialDistribution.wsgi
+web: gunicorn --chdir SocialDistribution  SocialDistribution.wsgi
