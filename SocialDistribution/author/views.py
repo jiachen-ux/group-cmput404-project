@@ -5,7 +5,8 @@ import re
 from . import utils
 from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect
 from rest_framework import generics, mixins, response, status
-from .models import *
+
+from follower.models import Follower
 from .serializers import *
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.decorators import api_view, permission_classes, parser_classes
@@ -21,6 +22,7 @@ from django.contrib.auth.forms import AuthenticationForm
 
 from author.serializers import *
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 
 class AuthorCreate(
@@ -96,6 +98,26 @@ class AuthorSearchView(generics.ListAPIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+# def index(request):
+#     all_posts = Post.objects.all().order_by('-date_created')
+#     paginator = Paginator(all_posts, 10)
+#     page_number = request.GET.get('page')
+#     if page_number == None:
+#         page_number = 1
+#     posts = paginator.get_page(page_number)
+#     followings = []
+#     suggestions = []
+#     if request.user.is_authenticated:
+#         followings = Follower.objects.filter(followers=request.user).values_list('user', flat=True)
+#         suggestions = Author.objects.exclude(pk__in=followings).exclude(username=request.user.username).order_by("?")[:6]
+#     return render(request, "index.html", {
+#         "posts": posts,
+#         "suggestions": suggestions,
+#         "page": "all_posts",
+#         'profile': False
+#     })
+
+@login_required
 def homeView(request):
     template_name = 'author/home.html'
     return render(request, template_name)
@@ -104,12 +126,14 @@ def loginView(request):
     template_name = 'author/login.html'
     serializer_class = LoginSerializer
 
+    
     if request.method == 'POST':
 
         # serializer = serializer_class(data=request.data,
         #                                    context={'request': request})
         # serializer.is_valid(raise_exception=True)
 
+        
         username = request.POST.get('username')
         password = request.POST.get('password')
         print(username)
@@ -119,6 +143,7 @@ def loginView(request):
 
         print(user)
 
+        
         if user:
             print("yesssssss")
             if not user.is_active:
@@ -128,16 +153,19 @@ def loginView(request):
             else:
                 login(request, user)
             return redirect(homeView)
+            return HttpResponse(render(request, 'author/home.html'),status=200)
 
         else:
             messages.error(request, 'Please enter a valid username and password. Note that both fields are case sensitive.', extra_tags='invalid')
             return HttpResponse(render(request, 'author/login.html'),status=401)
 
+        
 
     return render(request, template_name)
 
 def registerView(request):
 
+    
     template_name = 'author/register.html'
     form = CreateAuthorForm()
 
@@ -146,6 +174,7 @@ def registerView(request):
     if request.method == 'POST':
         form = CreateAuthorForm(request.POST)
 
+        
         if form.is_valid():
             git_user = form.cleaned_data.get('github')
             github_url = f'http://github.com/{git_user}'
@@ -161,3 +190,5 @@ def logoutView(request):
     logout(request)
     messages.success(request, ("You were logged out"))
     return redirect(loginView)
+
+    

@@ -26,11 +26,10 @@ SECRET_KEY = 'django-insecure-f6(ck#duqqc)8bo$-2mjmud2_!&zem03o9lm_#v7i-=-@ywb2!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["team9-socialdistribution.herokuapp.com", "127.0.0.1"]
 
-NAME = "social.herokuapp.com"
-# HOSTNAME = "https://{}/".format(NAME)
-HOSTNAME = "http://127.0.0.1:8000/"
+NAME = "team9-socialdistribution.herokuapp.com"
+HOSTNAME = "https://{}/".format(NAME)
 # Application definition
 
 INSTALLED_APPS = [
@@ -135,9 +134,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'author/media')
 MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
+# Configure Django App for Heroku.
+import django_heroku
+django_heroku.settings(locals())

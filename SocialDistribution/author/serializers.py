@@ -7,6 +7,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
 
 
+
 class AuthorRegisterSerializer(serializers.ModelSerializer):
     
     password = serializers.CharField(max_length=128, min_length=8, write_only=True)
@@ -43,6 +44,8 @@ class LoginSerializer(serializers.ModelSerializer):
         attrs['user'] = author
         
         return attrs
+
+
 
 class GetAuthorSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source="url", read_only=True)
