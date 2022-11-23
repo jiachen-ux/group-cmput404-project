@@ -1,6 +1,10 @@
 
 # CMPUT404-Project-Social-Distribution
 
+## Website
+
+The  application can be opened using https://team9-socialdistribution.herokuapp.com/
+
 ## Team members 
 * jiachen2
 * shovo
@@ -29,3 +33,15 @@
 
 * Backend: SQLite3 and Django
 * Frontend: Bootstrapped CSS & HTML
+
+## Deployment
+Push to heroku using 
+'''
+git push heroku main
+'''
+
+Run your migrations, create a Superuser
+'''
+heroku run --app team9-socialdistribution python SocialDistribution/manage.py migrate
+heroku run --app team9-socialdistribution python SocialDistribution/manage.py createsuperuser
+'''
