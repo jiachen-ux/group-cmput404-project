@@ -28,10 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-NAME = "social.herokuapp.com"
-HOSTNAME = "https://{}/".format(NAME)
-# Application definition
-
 INSTALLED_APPS = [
     'author',
     'comment',
