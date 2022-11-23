@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-f6(ck#duqqc)8bo$-2mjmud2_!&zem03o9lm_#v7i-=-@ywb2!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["team9-socialdistribution.herokuapp.com"]
+ALLOWED_HOSTS = ["team9-socialdistribution.herokuapp.com", "127.0.0.1"]
 
 NAME = "team9-socialdistribution.herokuapp.com"
 HOSTNAME = "https://{}/".format(NAME)
@@ -140,3 +140,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
+# Configure Django App for Heroku.
+import django_heroku
+django_heroku.settings(locals())
