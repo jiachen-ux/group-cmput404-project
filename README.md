@@ -1,6 +1,8 @@
 
 # CMPUT404-Project-Social-Distribution
 
+## [API Documentation](https://team9-socialdistribution.herokuapp.com/swagger/schema/)
+
 ## Website
 
 The  application can be opened using https://team9-socialdistribution.herokuapp.com/
