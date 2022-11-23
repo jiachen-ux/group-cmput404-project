@@ -22,6 +22,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from author.serializers import *
 from django.urls import reverse
 
+
 class AuthorCreate(
     generics.CreateAPIView
 ):
@@ -127,7 +128,6 @@ def loginView(request):
             else:
                 login(request, user)
             return redirect(homeView)
-            return HttpResponse(render(request, 'author/home.html'),status=200)
 
         else:
             messages.error(request, 'Please enter a valid username and password. Note that both fields are case sensitive.', extra_tags='invalid')
