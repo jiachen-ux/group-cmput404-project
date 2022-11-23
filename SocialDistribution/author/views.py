@@ -5,7 +5,7 @@ import re
 from . import utils
 from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect
 from rest_framework import generics, mixins, response, status
-from post.models import POST
+
 from follower.models import Follower
 from .serializers import *
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
@@ -125,12 +125,14 @@ def homeView(request):
 def loginView(request):
     template_name = 'author/login.html'
     serializer_class = LoginSerializer
+
     
     if request.method == 'POST':
 
         # serializer = serializer_class(data=request.data,
         #                                    context={'request': request})
         # serializer.is_valid(raise_exception=True)
+
         
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -140,6 +142,7 @@ def loginView(request):
         user = authenticate(request, username = username, password = password)
 
         print(user)
+
         
         if user:
             print("yesssssss")
@@ -155,11 +158,13 @@ def loginView(request):
         else:
             messages.error(request, 'Please enter a valid username and password. Note that both fields are case sensitive.', extra_tags='invalid')
             return HttpResponse(render(request, 'author/login.html'),status=401)
+
         
 
     return render(request, template_name)
 
 def registerView(request):
+
     
     template_name = 'author/register.html'
     form = CreateAuthorForm()
@@ -168,6 +173,7 @@ def registerView(request):
 
     if request.method == 'POST':
         form = CreateAuthorForm(request.POST)
+
         
         if form.is_valid():
             git_user = form.cleaned_data.get('github')

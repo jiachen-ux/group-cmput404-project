@@ -14,7 +14,7 @@ def post_upload_to(instance, filename):
 def profile_upload_to(instance, filename):
     return 'profile/{filename}'.format(filename=filename)
 
-class POST(models.Model): 
+class Post(models.Model): 
 
     CONTENT_TYPE = (
         ('text/markdown', 'text/markdown'),
@@ -45,6 +45,8 @@ class POST(models.Model):
     published = models.DateTimeField(auto_now=True)
     visibility = models.CharField(max_length=15, choices=VISIBILITY_CHOICES, default="PUBLIC")
     unlisted = models.BooleanField(default=False)
+    url = models.URLField(max_length=500, editable=False)
+    comments = models.URLField(max_length=500,editable=False,default=str(url) + '/comments')
 
     def get_id(self):
         return self.origin + "authors/" + str(self.author.id) + "/posts/" + str(self.id)
@@ -65,31 +67,8 @@ class POST(models.Model):
     @property
     def type(self):
         return 'post'
-class Like(models.Model):
 
-    TYPE_CHOICES = (
-        ('post','post'),
-        ("comment","comment")
-    )
-
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    object_type = models.CharField(max_length=20, choices=TYPE_CHOICES, null=True)
-    object_id = models.URLField(null=True) 
-    published = models.DateTimeField(auto_now_add=True)
-
-    @property
-    def type(self):
-        return 'Like'
-
-    def summary(self):
-        return self.author.displayName + " Likes your " + self.object_type
-
-    def object_url(self):
-        if self.object_type == "post":
-            return POST.objects.get(id=self.object_id).get_id()
-        elif self.object_type == "comment":
-            return Comment.objects.get(id=self.object_id).get_id()
+# from comment.models import Comment
 
 class Inbox(models.Model):
 

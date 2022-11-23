@@ -6,6 +6,8 @@ from rest_framework import serializers
 from .models import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from author.serializers import GetAuthorSerializer
+from like.models import Like
+from uuid import uuid4
 
 class LikeSerializer(serializers.ModelSerializer): 
     type = serializers.CharField(read_only=True)
@@ -17,6 +19,12 @@ class LikeSerializer(serializers.ModelSerializer):
  
         
 class PostSerializer(serializers.ModelSerializer):
+    # type = serializers.CharField(default="post", read_only=True)
+    # source = serializers.CharField(source="get_source", read_only=True)
+    # origin = serializers.CharField(source="get_origin", read_only=True)
+    # contentType = serializers.ChoiceField(choices=Post.ContentTypeEnum.choices, default=Post.ContentTypeEnum.PLAIN)
+    # visibility = serializers.ChoiceField(choices=Post.VisibilityEnum.choices, default=Post.VisibilityEnum.PUBLIC)
+    
 
     #Method 1
     type = serializers.SerializerMethodField()
@@ -24,9 +32,9 @@ class PostSerializer(serializers.ModelSerializer):
     # type = serializers.ReadOnlyField(default=POST.type)
     # read_only equals to true becoz we don't want users to edit the author data while changing post data
     author = GetAuthorSerializer("author", read_only=True)
-    id = serializers.CharField(source="get_id", read_only=True)
+    # id = serializers.CharField(source="get_id", read_only=True, default=uuid4)
     class Meta:
-        model = POST
+        model = Post
         fields = "__all__"
     
     def get_type(self, obj):

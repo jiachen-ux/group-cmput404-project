@@ -1,0 +1,229 @@
+{% extends "author\base.html" %}
+
+{% block title %}Make a Post{% endblock %}
+
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-6">
+        <div class="card">
+            <div class="card-body">
+            {% if user.is_authenticated %}
+            
+            <h4>Enter the following information for the new post:</h4><br>
+            
+            {%csrf_token%}
+
+            <div class="form-group">
+                <label for="exampleInputEmail1">Title</label><br/>
+                <div class="input-group-prepend">
+                    <input type="text" id="title" value="" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                </div>
+                <label for="exampleInputEmail1">Description</label><br/>
+                <div class="input-group-prepend">
+                    <input type="text" id="description" value="" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"> <br>
+                </div>
+                <label for="exampleInputEmail1">Categories</label><br/>
+                <div class="input-group-prepend">
+                <input id="postcat" name="postcategories" value="" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"> <br>
+                </div>
+
+            </div>
+                
+            <label for="exampleInputEmail1">Choose if you want to list your post or not:</label>
+            
+            <div class="form-group">
+                <input type="radio" id="listed" name="listedstatus" value="listed" >
+                <label for="listed">LISTED</label><br>
+                <input type="radio" id="notlisted" name="listedstatus" value="notlisted">
+                <label for="notlisted">NOT LISTED</label><br>
+            </div>
+            
+            <label>Choose the visibility of your post:</label>
+            
+            <div class="form-group">
+                <input type="radio" id="public" name="visibility" value="PUBLIC">
+                <label for="public">PUBLIC</label><br>
+                <input type="radio" id="friends" name="visibility" value="FRIENDS">
+                <label for="friends">FRIENDS</label><br>
+            </div>
+            <label>Choose if content will be text or file:</label>
+            
+            <div class="form-group">
+                <input type="radio" id="textchoice" name="textorfile" value="text">
+                <label for="text">Text</label><br>
+                <input type="radio" id="filechoice" name="textorfile" value="file">
+                <label for="file">File</label><br>
+
+            </div>
+            
+            <div class="form-group">
+            <p id="choosefiletext" hidden>Choose your file:</p>
+            <input type="file" id="filecontent" hidden/>
+            <p id="inputcontenttext" hidden>Enter your post content:</p>
+            <input type="text" id="textcontent" hidden class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+            </div>
+            
+            <div class="form-group">
+            <input  type="submit" class = "btn btn-info float-right" id="submitbutton"></input>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var encode_Content;
+    var content_isText;
+    var postString;
+    var authorUrl;
+    var post;
+    var content;
+    var formdata;
+    function createPost(){
+        formdata = new FormData();
+        var postTitle = document.getElementById("title").value;
+        var postDesc = document.getElementById("description").value;
+        var listedStatus = document.querySelector('input[name = "listedstatus"]:checked').value;
+        var visibility = document.querySelector('input[name = "visibility"]:checked').value;
+        if(listedStatus==="listed"){
+            formdata.append("unlisted", false);
+        }
+        else{
+            formdata.append("unlisted", true);
+        }
+        if(content_isText===true){
+            encode_Content = document.getElementById("textcontent").value;
+            formdata.append("content", encode_Content);
+        }
+        else{
+            encode_Content = document.getElementById("filecontent").files;
+            formdata.append("image", encode_Content[0]);
+        }
+        formdata.append("visibility", visibility);
+        formdata.append("author", '{{ author }}');
+        formdata.append("title", postTitle);
+        formdata.append("description", postDesc);
+        var date = new Date()
+        formdata.append("published", date.toISOString());
+        formdata.append("count", 0);
+        formdata.append("comments", 'https://team9-socialdistribution.herokuapp.com/service' +'/authors/' +'{{author.id}}'+'/posts/');
+        formdata.append("type", "post");
+        // post.id="";
+        categories = document.getElementById("postcat").value;
+        if(categories===""){
+            formdata.append("categories", []);
+        }
+        else{
+            formdata.append("categories", categories.split(','));
+        }
+    }
+    function sendMessage(){
+        var postUrl = 'https://team9-socialdistribution.herokuapp.com/service'+'/authors/'+'{{author.id}}' + '/posts/';
+        fetch(postUrl,{
+            method: 'POST',
+            headers: {
+                'X-CSRFToken' : "{{ csrf_token }}"
+            },
+            body: formdata
+        }) 
+        .then(function(response){
+            return response.json();
+        })
+        .then(function(data){
+            formdata.append("id", data.id);
+            formdata.append("comments", data.id + '/comments');
+            let uri = 'https://team9-socialdistribution.herokuapp.com/service'+'/authors/'+'{{author.id}}' + '/posts/' + data.id+'/';
+            return fetch(uri,{
+                method: 'POST',
+                headers: {
+                'X-CSRFToken' : "{{ csrf_token }}"
+                },
+                body: formdata
+            })
+        })
+        .then(function(){
+            alert("A new post is successfully created! Redirecting you to post-list page...");
+            location.href = 'https://team9-socialdistribution.herokuapp.com/service'+'/site/posts';
+        })
+        .catch (function (error) {
+            console.log('Request failed', error);
+        });
+    }
+    for(element of document.getElementsByName("textorfile")){
+        element.onclick = function(event){
+
+        if(document.querySelector('input[name = "textorfile"]:checked').value ==="text"){
+            document.getElementById("inputcontenttext").removeAttribute("hidden");
+            document.getElementById("textcontent").removeAttribute("hidden");
+            document.getElementById("choosefiletext").hidden = true;
+            document.getElementById("filecontent").hidden=true;
+            
+            content_isText=true;
+        }
+
+        else{
+            document.getElementById("choosefiletext").removeAttribute("hidden");
+            document.getElementById("filecontent").removeAttribute("hidden");
+            document.getElementById("inputcontenttext").hidden=true;
+            document.getElementById("textcontent").hidden=true;
+            content_isText=false;
+            content = document.getElementById("filecontent");
+            
+        }
+        }
+    }
+    document.getElementById("submitbutton").onclick = function(){
+        var allFilled = true;
+        if(document.getElementById("textchoice").checked===false && document.getElementById("filechoice").checked===false){
+            allfilled=false;
+            alert("Please fill in content choice");
+        }
+        if(document.getElementById("listed").checked===false && document.getElementById("notlisted").checked===false){
+            allfilled=false;
+            alert("Please fill in if post is listed");
+        }
+        if(document.getElementById("friends").checked===false && document.getElementById("public").checked===false){
+            allfilled=false;
+            alert("Please fill in post visibility");
+        }
+        if(document.getElementById("title").value===""){
+            allfilled=false;
+            alert("Please enter a title");
+        }
+        if (allFilled){
+            createPost();
+            authorUrl ='https://team9-socialdistribution.herokuapp.com/service'+'/authors/'+'{{author.id}}';
+            if(content_isText===true){
+                formdata.append("contentType", 'text/plain');
+                sendMessage();
+            }
+            else{
+                // https://stackoverflow.com/questions/53211073/capture-result-of-html5-filereader-when-using-promises-in-async
+                function getBase64(file, onLoadCallback) {
+                    return new Promise(function(resolve, reject) {
+                        var reader = new FileReader();
+                        reader.onload = function() { resolve(reader.result); };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                }
+                var file= content.files[0];
+                formdata.append("contentType", file.type+';base64');
+                var promise = getBase64(file);
+                promise.then(function(result) {
+                    encode_Content=result;
+                    sendMessage();
+                });
+            }
+        }
+        
+    };
+</script>
+{% else %}
+<p>Please login to make a post</p>
+
+{% endif %}
+
+{% endblock %}

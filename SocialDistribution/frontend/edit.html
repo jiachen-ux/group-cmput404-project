@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Edit a Post{% endblock %}
+
+
+{% block content %}
+{% if author.id == post.author.id %}
+    <p>Editing the post {{post.id}}</p>
+
+
+    <p>Change the following information of the current post</p><br>
+
+    <form>
+        Title: <input type="text" id="title" value=""> <br>
+        Description: <input type="text" id="description" value=""> <br>
+        categories: <input id="postcat" name="postcategories" value=""> <br>
+    <form>
+
+    <p>Choose if you want to list your post or not:</p>
+
+    <form>
+        <input type="radio" id="listed" name="listedstatus" value="listed">
+        <label for="listed">LISTED</label><br>
+        <input type="radio" id="notlisted" name="listedstatus" value="notlisted">
+        <label for="notlisted">NOT LISTED</label><br>
+    </form>
+
+    <p>Choose the visibility of your post:</p>
+
+    <form>
+        <input type="radio" id="public" name="visibility" value="PUBLIC">
+        <label for="public">PUBLIC</label><br>
+        <input type="radio" id="friends" name="visibility" value="FRIENDS">
+        <label for="friends">FRIENDS</label><br>
+    </form>
+
+    <p>Choose if content will be text or file:</p>
+
+    <form>
+        <input type="radio" id="textchoice" name="textorfile" value="text">
+        <label for="text">Text</label><br>
+        <input type="radio" id="filechoice" name="textorfile" value="file">
+        <label for="file">File</label><br>
+    </form>
+
+    <p id="choosefiletext" hidden>Choose your file:</p>
+
+    <input type="file" id="filecontent" hidden/>
+
+
+
+    <p id="inputcontenttext" hidden>Input your post content:</p>
+
+    <input type="text" id="textcontent" hidden>
+
+    <button id="submitbutton" >Submit</button>
+
+    <script>
+        var post;
+        var encode_Content;
+        var content_isText;
+        var postString;
+        var AuthorUrl;
+        var postUrl;
+        var content;
+        var chosenPost;
+        fetch('https://team9-socialdistribution.herokuapp.com'+'/service/authors/'+'{{post.author.id}}'+'/posts/'+'{{post.id}}',{
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken' : "{{ csrf_token }}"
+                }
+            })
+            .then(function(response){
+                return response.json();
+            })
+            .then(function(data){
+                post=data;
+            })
+            .then(function(){
+                if(post.visibility==="FRIENDS"){
+                    
+                    document.getElementById("friends").checked=true;
+                }
+                else{
+                    document.getElementById("public").checked=true;
+                }
+                if(post.unlisted===true){
+                    document.getElementById("notlisted").checked=true;
+                }
+                else{
+                    document.getElementById("listed").checked=true;
+                }
+                if(post.contentType==="text/plain"){
+                    content_isText=true;
+                    document.getElementById("textchoice").checked=true;
+                    document.getElementById("inputcontenttext").removeAttribute("hidden");
+                    document.getElementById("textcontent").removeAttribute("hidden");
+                    document.getElementById("choosefiletext").hidden = true;
+                    document.getElementById("filecontent").hidden=true;
+                    document.getElementById("textcontent").value=post.content;
+                }
+                else{
+                    content_isText=false;
+                    document.getElementById("filechoice").checked=true;
+                    document.getElementById("choosefiletext").removeAttribute("hidden");
+                    document.getElementById("filecontent").removeAttribute("hidden");
+                    document.getElementById("inputcontenttext").hidden=true;
+                    document.getElementById("textcontent").hidden=true;
+                }
+                document.getElementById("title").value = post.title;
+                document.getElementById("title").innerHTML = post.title;
+                document.getElementById("description").value= post.description;
+                document.getElementById("desccription").innerHTML= post.description;
+                document.getElementById("postcat").value= post.categories;
+                document.getElementById("postcat").innerHTML= post.categories;
+            }) 
+        for(element of document.getElementsByName("textorfile")){
+            element.onclick = function(event){
+
+            if(document.querySelector('input[name = "textorfile"]:checked').value ==="text"){
+                content_isText=true;
+                document.getElementById("inputcontenttext").removeAttribute("hidden");
+                document.getElementById("textcontent").removeAttribute("hidden");
+                document.getElementById("choosefiletext").hidden = true;
+                document.getElementById("filecontent").hidden=true;
+            }
+
+            else{
+                content_isText=false;
+                document.getElementById("choosefiletext").removeAttribute("hidden");
+                document.getElementById("filecontent").removeAttribute("hidden");
+                document.getElementById("inputcontenttext").hidden=true;
+                document.getElementById("textcontent").hidden=true;
+                content = document.getElementById("filecontent");
+                
+            }
+            }
+        }
+        function createPost(){
+            formdata = new FormData();
+            var postTitle = document.getElementById("title").value;
+            var postDesc = document.getElementById("description").value;
+            var listedStatus = document.querySelector('input[name = "listedstatus"]:checked').value;
+            var visibility = document.querySelector('input[name = "visibility"]:checked').value;
+            if(listedStatus==="listed"){
+                formdata.append("unlisted", false);
+            }
+            else{
+                formdata.append("unlisted", true);
+            }
+            if(content_isText===true){
+                encode_Content = document.getElementById("textcontent").value;
+                formdata.append("content", encode_Content);
+            }
+            else{
+                encode_Content = document.getElementById("filecontent").files;
+                formdata.append("image", encode_Content[0]);
+            }
+            
+            formdata.append("visibility", visibility);
+            formdata.append("title", postTitle);
+            formdata.append("author", '{{ post.author }}');
+            formdata.append("description", postDesc);
+            var date = new Date()
+            formdata.append("published", date.toISOString());
+            categories = document.getElementById("postcat").value;
+            if(categories===""){
+                formdata.append("categories", []);
+            }
+            else{
+                formdata.append("categories", categories.split(','));
+            }
+        }
+        function sendMessage(){
+            fetch(postUrl,{
+                method: 'post',
+                headers: {
+                    'X-CSRFToken' : "{{ csrf_token }}"
+                },
+                body: formdata 
+            })
+            .then(function(){
+                alert("Successfully modified your post! Redirecting you to posts page.");
+                location.href = 'https://team9-socialdistribution.herokuapp.com/service'+'/site/posts';
+            })
+            .catch (function (error) {
+                console.log('Request failed', error);
+            });
+            
+        }
+            
+        document.getElementById("submitbutton").onclick = function(){
+            createPost();
+            postUrl = 'https://team9-socialdistribution.herokuapp.com/service'+'/authors/'+'{{post.author.id}}' + "/posts/"+'{{post.id}}'+'/';
+            AuthorUrl = 'https://team9-socialdistribution.herokuapp.com/service'+'/authors/'+'{{post.author.id}}';
+            if(content_isText===true){
+                formdata.append("contentType", 'text/plain');
+                sendMessage();
+            }
+            else{
+                function getBase64(file, onLoadCallback) {
+                    return new Promise(function(resolve, reject) {
+                        var reader = new FileReader();
+                        reader.onload = function() { resolve(reader.result); };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                }
+                var file= content.files[0];
+                formdata.append("contentType", file.type+';base64');
+                var promise = getBase64(file);
+                promise.then(function(result) {
+                    encode_Content=result;
+                    sendMessage();
+                });
+            }
+            
+        };
+    </script>
+{% else %}
+<p>Invalid credentials. Must be the original author to edit this post.</p>
+
+{% endif %}
+{% endblock %}
