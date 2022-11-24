@@ -3,7 +3,7 @@ import json
 from re import A
 import re
 from . import utils
-from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect, get_object_or_404
 from rest_framework import generics, mixins, response, status
 
 from follower.models import Follower
@@ -191,4 +191,18 @@ def logoutView(request):
     messages.success(request, ("You were logged out"))
     return redirect(loginView)
 
-    
+
+@login_required
+def profile(request, user_id):
+    # get user's information
+    author_info = get_object_or_404(Author, pk=user_id)
+    author_name = Author.objects.filter(username=request.user.username).first()
+    author = Author.objects.filter(username=user_id).first()
+    github_url = author_info.github
+
+    posts = []
+
+    response_contents = None
+    # original UUID from Original server for current_author_info
+    current_author_original_uuid = current_author_info.id.split('/')[-1]
+    tempNodeURL = 'https://project-socialdistribution.herokuapp.com/api/'
