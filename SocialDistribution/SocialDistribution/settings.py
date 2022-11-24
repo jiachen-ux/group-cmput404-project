@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,6 +23,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-f6(ck#duqqc)8bo$-2mjmud2_!&zem03o9lm_#v7i-=-@ywb2!'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -50,6 +53,7 @@ INSTALLED_APPS = [
     "corsheaders",
     'djoser',
     'crispy_forms',
+    'whitenoise.runserver_nostatic',
     
 
 ]
@@ -62,14 +66,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ROOT_URLCONF = 'SocialDistribution.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ os.path.join(BASE_DIR,'frontend')],
+        'DIRS': [ os.path.join(BASE_DIR,'frontend')], # <-- only read from frontend. when deployed to Heoku, it has error says author\base.html TemplateDoesNotExist
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -90,10 +97,18 @@ WSGI_APPLICATION = 'SocialDistribution.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'NAME': 'app_db',
+    'USER' : 'postgres',
+    'PASSWORD' : 'bigbigBerg0209',
+    'HOST' : 'localhost',
+    'PORT' : '5432',
     }
 }
+
+db_from_env = dj_database_url.config(conn_max_age=600)
+DATABASES['default'].update(db_from_env)
+
 AUTH_USER_MODEL = 'author.Author'
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
@@ -135,6 +150,7 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'author/media')
 MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
