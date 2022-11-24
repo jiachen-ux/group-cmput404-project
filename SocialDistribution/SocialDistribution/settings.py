@@ -76,7 +76,7 @@ ROOT_URLCONF = 'SocialDistribution.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ os.path.join(BASE_DIR,'frontend')],
+        'DIRS': [ os.path.join(BASE_DIR,'frontend')], # <-- only read from frontend. when deployed to Heoku, it has error says author\base.html TemplateDoesNotExist
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
