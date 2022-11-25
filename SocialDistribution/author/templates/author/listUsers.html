@@ -22,7 +22,9 @@
 
               <tr>
                 <td>
-                  <p>{{ result.displayName }}</p>
+                  <a href="{% url 'singleForeignAuthor' result.id %}">{{ result.displayName }} </a>
+
+
                   </a>
                 </td>
                 {% endfor %}

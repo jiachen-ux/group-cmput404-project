@@ -51,26 +51,41 @@ class AuthorAPIView(generics.ListAPIView):
 
         return response.Response(serializer.data)
 
+
 @login_required
 @api_view(["GET"])
 def getAllAuthors(request):
+    '''
+    Used to get all the foreign authors
+    '''
+
     team8 = 'https://c404-team8.herokuapp.com/api/'
     # team9 = 'https://team9-socialdistribution.herokuapp.com/service/'
-    local_Authors = Author.objects.all()
+    
+    #local_Authors = Author.objects.all()
+    
     t8_remote_response = requests.get(f'{team8}authors/')
-    serializer = GetAuthorSerializer(local_Authors, many=True)
-    combined_author = serializer.data
+
+    #serializer = GetAuthorSerializer(local_Authors, many=True)
+    #combined_author = serializer.data
 
     if t8_remote_response.status_code == 200:
         print('connect to team 8')
         team8_data = t8_remote_response.json()
         team8_Authors = team8_data['items']
-        combined_author.extend(team8_Authors)
+        #combined_author.extend(team8_Authors)
 
     context = {
         "type": "authors",
-        "items": combined_author
+        "items": team8_Authors
     }
+
+    for result in context['items']:
+        print("printing results")
+        print(result)
+
+
+    
     # return response.Response(context,status=status.HTTP_200_OK)
     return HttpResponse(render(request, 'author/listUsers.html', context),status=200)
 
@@ -205,33 +220,83 @@ def logoutView(request):
 
 
 @login_required
+@api_view(["GET", "POST"])
 def profile(request, user_id):
     # get user's information
     author = get_object_or_404(Author, pk=user_id)
+    print(author)
     github_url = author.github
     posts = []
     author_id = author.id
+    
+
     team8 = 'https://c404-team8.herokuapp.com/api/'
-    team7 = 'http://cmput404-social.herokuapp.com/service'
+    
+    #team7 = 'http://cmput404-social.herokuapp.com/service'
     currentNode = None
 
     if author.host in team8:
         print('connect tean 8')
-        response = requests.get(f"{team8}authors/{author_id}/posts/",
+        response = requests.get(f"{team8}authors/{user_id}/posts/",
                                 params=request.GET)
         if response.status_code == 200:
             posts = response.json()['items']
 
-    elif author.host in team7:
+    ''' elif author.host in team7:
         print('connect tean 7')
         response = requests.get(f"{team7}authors/{author_id}/posts/",
                                 params=request.GET)
         if response.status_code == 200:
-            posts = response.json()['items']
+            posts = response.json()['items']'''
 
     context = {
         'username': author.username,
         'github_url': github_url,
         'posts': posts,
     }
-    return render(request, 'profile.html', context)
+
+    print(posts)
+    return render(request, 'author/profile.html', context)
+
+def foreignUser(request, authorId):
+
+    results = {}
+    
+    team8 = 'https://c404-team8.herokuapp.com/api/'
+
+    t8_remote_response = requests.get(f'{team8}authors/')
+
+
+    if t8_remote_response.status_code == 200:
+        team8_data = t8_remote_response.json()
+        team8_Authors = team8_data['items']
+        #combined_author.extend(team8_Authors)
+
+    results = {
+        "type": "authors",
+        "items": team8_Authors
+    }
+
+    for result in results:
+        if result['id'] == authorId:
+            select_author_id = authorId
+            displayName = result['displayName']
+
+    
+    response = requests.get(f"{team8}authors/{authorId}/posts/",
+                                params=request.GET)
+                                
+    if response.status_code == 200:
+        posts = response.json()['items']
+
+    context = {
+        'select_author_id': select_author_id,
+        'displayName': displayName,
+        'posts': posts,
+    }
+
+
+    return render(request, 'author/foreignUserProfile.html', context)
+
+
+
