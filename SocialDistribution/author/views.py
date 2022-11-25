@@ -57,20 +57,22 @@ def getAllAuthors(request):
     team8 = 'https://c404-team8.herokuapp.com/api/'
     # team9 = 'https://team9-socialdistribution.herokuapp.com/service/'
     local_Authors = Author.objects.all()
-    response = requests.get(f'{team8}authors/')
+    t8_remote_response = requests.get(f'{team8}authors/')
     serializer = GetAuthorSerializer(local_Authors, many=True)
     combined_author = serializer.data
 
-    if response.status_code == 200:
-        team8_data = response.json()
+    if t8_remote_response.status_code == 200:
+        print('connect to team 8')
+        team8_data = t8_remote_response.json()
         team8_Authors = team8_data['items']
         combined_author.extend(team8_Authors)
 
-    resp = {
+    context = {
         "type": "authors",
         "items": combined_author
     }
-    return response.Response(resp)
+    # return response.Response(context,status=status.HTTP_200_OK)
+    return HttpResponse(render(request, 'author/listUsers.html', context),status=200)
 
 
 @api_view(["GET", "POST"])
