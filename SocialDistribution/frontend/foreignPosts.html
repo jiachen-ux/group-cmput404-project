@@ -14,9 +14,9 @@
                     <div class="row">
                         <div class="col">
                             <h4 class="card-title"> 
-                                <a href="{{ post.id }}" style="color: black;">{{ title }}</a>
+                                <a href="{{ post.id }}" style="color: black;">{{ post.title }}</a>
                             </h4>
-                            <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white" href="https://team9-socialdistribution.herokuapp.com/service/authors/{{ post.author.id }}">{{ authorDisplayName }}</a></p>
+                            <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white" href="https://team9-socialdistribution.herokuapp.com/service/authors/{{ post.author.id }}">{{ post.author.displayNmae }}</a></p>
                         </div>
                         <div class="col-3 pb-3">
                             {% if userAuthor and userAuthor.id == post.author.id %}

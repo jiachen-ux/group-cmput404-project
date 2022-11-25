@@ -335,7 +335,6 @@ def getEntireInboxRequests(request, author_id):
 def postIndex(request: HttpRequest):
     posts = Post.objects.filter(visibility="PUBLIC", unlisted=False)
 
-    print(posts)
     for post in posts:
         post.numberOfLikes =  0 #len(get_post_likes(post.id)) 
         #post.topComments = get_latest_comments(post.id)
@@ -437,12 +436,19 @@ def getForeignPosts(request):
             posts = c[n]
             
             if posts['visibility'] == "PUBLIC" and posts['unlisted'] == False:
-                print(posts)
+                '''print(posts)
                 content = posts["content"]
                 title = posts["title"]
                 author = posts["author"]
                 authorDisplayName = author['displayName']
                 contentType = posts["contentType"]
+
+                print(authorDisplayName)'''
+
+                finalPosts = {
+                    'posts': posts,
+
+                }
                
             
-    return render(request, 'foreignPosts.html', {'posts':posts,'content': content, 'title': title, 'authorDisplayName':authorDisplayName,'contentType': contentType})
+    return render(request, 'foreignPosts.html', finalPosts)
