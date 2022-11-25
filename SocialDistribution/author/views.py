@@ -5,7 +5,8 @@ import re
 from . import utils
 from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect, get_object_or_404
 from rest_framework import generics, mixins, response, status
-
+import requests
+from requests.auth import HTTPBasicAuth
 from follower.models import Follower
 from .serializers import *
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
@@ -13,16 +14,14 @@ from rest_framework.decorators import api_view, permission_classes, parser_class
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from base64 import b64encode
-
 from author.forms import CreateAuthorForm
-
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm
-
 from author.serializers import *
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+# from connect.views import *
+# from connect.models import *
 
 
 class AuthorCreate(
@@ -40,7 +39,7 @@ class AuthorCreate(
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GetAuthorData(generics.ListAPIView):
+class AuthorAPIView(generics.ListAPIView):
 
     queryset = Author.objects.all()
     # serializer_class = GetAuthorSerializer
@@ -52,14 +51,24 @@ class GetAuthorData(generics.ListAPIView):
 
         return response.Response(serializer.data)
 
-
+@login_required
 @api_view(["GET"])
 def getAllAuthors(request):
-    allAuthors = Author.objects.all()
-    serializer = GetAuthorSerializer(allAuthors, many=True)
+    team8 = 'https://c404-team8.herokuapp.com/api/'
+    # team9 = 'https://team9-socialdistribution.herokuapp.com/service/'
+    local_Authors = Author.objects.all()
+    response = requests.get(f'{team8}authors/')
+    serializer = GetAuthorSerializer(local_Authors, many=True)
+    combined_author = serializer.data
+
+    if response.status_code == 200:
+        team8_data = response.json()
+        team8_Authors = team8_data['items']
+        combined_author.extend(team8_Authors)
+
     resp = {
         "type": "authors",
-        "items": serializer.data
+        "items": combined_author
     }
     return response.Response(resp)
 
@@ -78,6 +87,7 @@ def getSingleAuthor(request, uuidOfAuthor):
         if serializer.is_valid():
             serializer.save()
         return response.Response(serializer.data)
+
 
 @api_view(["GET", "PUT", "POST", "DELETE"])
 @permission_classes([AllowAny])
@@ -136,23 +146,23 @@ def loginView(request):
         
         username = request.POST.get('username')
         password = request.POST.get('password')
-        print(username)
-        print(password)
+        # print(username)
+        # print(password)
 
         user = authenticate(request, username = username, password = password)
 
-        print(user)
+        # print(user)
 
         
         if user:
-            print("yesssssss")
+            # print("yesssssss")
             if not user.is_active:
                 # print("This is NOT an active user.")
                 messages.error(request, 'Account Activation Pending.', extra_tags='inactive')
                 return HttpResponse(render(request, 'author/login.html'),status=401)
             else:
                 login(request, user)
-            return redirect(homeView)
+            # return redirect(homeView)
             return HttpResponse(render(request, 'author/home.html'),status=200)
 
         else:
@@ -195,14 +205,31 @@ def logoutView(request):
 @login_required
 def profile(request, user_id):
     # get user's information
-    author_info = get_object_or_404(Author, pk=user_id)
-    author_name = Author.objects.filter(username=request.user.username).first()
-    author = Author.objects.filter(username=user_id).first()
-    github_url = author_info.github
-
+    author = get_object_or_404(Author, pk=user_id)
+    github_url = author.github
     posts = []
+    author_id = author.id
+    team8 = 'https://c404-team8.herokuapp.com/api/'
+    team7 = 'http://cmput404-social.herokuapp.com/service'
+    currentNode = None
 
-    response_contents = None
-    # original UUID from Original server for current_author_info
-    current_author_original_uuid = current_author_info.id.split('/')[-1]
-    tempNodeURL = 'https://project-socialdistribution.herokuapp.com/api/'
+    if author.host in team8:
+        print('connect tean 8')
+        response = requests.get(f"{team8}authors/{author_id}/posts/",
+                                params=request.GET)
+        if response.status_code == 200:
+            posts = response.json()['items']
+
+    elif author.host in team7:
+        print('connect tean 7')
+        response = requests.get(f"{team7}authors/{author_id}/posts/",
+                                params=request.GET)
+        if response.status_code == 200:
+            posts = response.json()['items']
+
+    context = {
+        'username': author.username,
+        'github_url': github_url,
+        'posts': posts,
+    }
+    return render(request, 'profile.html', context)
