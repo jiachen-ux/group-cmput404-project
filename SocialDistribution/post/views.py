@@ -2,6 +2,8 @@ from functools import partial
 import json
 from re import A
 import re
+
+import requests
 from . import utils
 from django.shortcuts import render, redirect
 from django.http.request import HttpRequest
@@ -332,6 +334,8 @@ def getEntireInboxRequests(request, author_id):
 
 def postIndex(request: HttpRequest):
     posts = Post.objects.filter(visibility="PUBLIC", unlisted=False)
+
+    print(posts)
     for post in posts:
         post.numberOfLikes =  0 #len(get_post_likes(post.id)) 
         #post.topComments = get_latest_comments(post.id)
@@ -375,3 +379,70 @@ def deletepost(request: HttpRequest, post_id: str):
     if post.author.id == author.id:
         post.delete()
     return redirect('post:index')
+
+
+@api_view(["GET"])
+def getForeignPosts(request):
+    '''
+    Used to get all the foreign posts
+    '''
+
+    team8 = 'https://c404-team8.herokuapp.com/api/'
+    # team9 = 'https://team9-socialdistribution.herokuapp.com/service/'
+    
+    #local_Authors = Author.objects.all()
+    
+    t8_remote_response = requests.get(f'{team8}authors/')
+
+    #serializer = GetAuthorSerializer(local_Authors, many=True)
+    #combined_author = serializer.data
+
+    if t8_remote_response.status_code == 200:
+        print('connect to team 8')
+        team8_data = t8_remote_response.json()
+        team8_Authors = team8_data['items']
+        #combined_author.extend(team8_Authors)
+
+    context = {
+        "type": "authors",
+        "items": team8_Authors
+    }
+
+    data = []
+    authorId=[]
+    finalPosts = {}
+    
+    
+
+
+    for result in context['items']:
+        authorId.append(result['id'])
+
+    for i in authorId:
+        response = requests.get(f"{team8}authors/{i}/posts", params=request.GET)
+
+        if response.status_code == 200:
+            data.append(response.json())
+
+
+    '''for result in context['items']:
+        print("printing results")
+        print(result)'''
+
+    for post in range(len(data)):
+        d = data[post]
+        c = d['items']
+        
+        for n in range(len(c)):
+            posts = c[n]
+            
+            if posts['visibility'] == "PUBLIC" and posts['unlisted'] == False:
+                print(posts)
+                content = posts["content"]
+                title = posts["title"]
+                author = posts["author"]
+                authorDisplayName = author['displayName']
+                contentType = posts["contentType"]
+               
+            
+    return render(request, 'foreignPosts.html', {'posts':posts,'content': content, 'title': title, 'authorDisplayName':authorDisplayName,'contentType': contentType})

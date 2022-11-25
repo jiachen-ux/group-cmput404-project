@@ -22,6 +22,8 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 # from connect.views import *
 # from connect.models import *
+from django.contrib.auth.forms import AuthenticationForm
+
 
 
 class AuthorCreate(
@@ -52,7 +54,6 @@ class AuthorAPIView(generics.ListAPIView):
         return response.Response(serializer.data)
 
 
-@login_required
 @api_view(["GET"])
 def getAllAuthors(request):
     '''
@@ -79,12 +80,6 @@ def getAllAuthors(request):
         "type": "authors",
         "items": team8_Authors
     }
-
-    for result in context['items']:
-        print("printing results")
-        print(result)
-
-
     
     # return response.Response(context,status=status.HTTP_200_OK)
     return HttpResponse(render(request, 'author/listUsers.html', context),status=200)
@@ -163,23 +158,23 @@ def loginView(request):
         
         username = request.POST.get('username')
         password = request.POST.get('password')
-        # print(username)
-        # print(password)
+        print(username)
+        print(password)
 
         user = authenticate(request, username = username, password = password)
 
-        # print(user)
+        print(user)
 
         
         if user:
-            # print("yesssssss")
+            print("yesssssss")
             if not user.is_active:
                 # print("This is NOT an active user.")
                 messages.error(request, 'Account Activation Pending.', extra_tags='inactive')
                 return HttpResponse(render(request, 'author/login.html'),status=401)
             else:
                 login(request, user)
-            # return redirect(homeView)
+            return redirect(homeView)
             return HttpResponse(render(request, 'author/home.html'),status=200)
 
         else:
@@ -261,7 +256,7 @@ def profile(request, user_id):
 def foreignUser(request, authorId):
 
     results = {}
-    
+
     team8 = 'https://c404-team8.herokuapp.com/api/'
 
     t8_remote_response = requests.get(f'{team8}authors/')
@@ -282,7 +277,7 @@ def foreignUser(request, authorId):
             select_author_id = authorId
             displayName = result['displayName']
 
-    
+
     response = requests.get(f"{team8}authors/{authorId}/posts/",
                                 params=request.GET)
                                 
@@ -297,6 +292,4 @@ def foreignUser(request, authorId):
 
 
     return render(request, 'author/foreignUserProfile.html', context)
-
-
 
