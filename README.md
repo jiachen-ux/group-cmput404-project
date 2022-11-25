@@ -1,9 +1,9 @@
 
 # CMPUT404-Project-Social-Distribution
 
-## Website
+## [Application Website](https://team9-socialdistribution.herokuapp.com/)
 
-The  application can be opened using https://team9-socialdistribution.herokuapp.com/
+## [API Documentation](https://team9-socialdistribution.herokuapp.com/swagger/schema/)
 
 ## Team members 
 * jiachen2
@@ -36,12 +36,12 @@ The  application can be opened using https://team9-socialdistribution.herokuapp.
 
 ## Deployment
 Push to heroku using 
-'''
+`
 git push heroku main
-'''
+`
 
 Run your migrations, create a Superuser
-'''
+`
 heroku run --app team9-socialdistribution python SocialDistribution/manage.py migrate
 heroku run --app team9-socialdistribution python SocialDistribution/manage.py createsuperuser
-'''
+`
