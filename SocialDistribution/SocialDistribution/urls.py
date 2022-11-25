@@ -33,7 +33,7 @@ urlpatterns = [
     path("register/", author_view.registerView, name="register_url"),
     path("", author_view.loginView, name="login_url"),
     path('authors/', author_view.getAllAuthors),
-    path('authors/<id>/', author_view.getSingleAuthor),
+    path('authors/<id>/', author_view.profile),
     path("home/", author_view.homeView),
     path("admin/", admin.site.urls),
     path("service/", include("author.urls")),
