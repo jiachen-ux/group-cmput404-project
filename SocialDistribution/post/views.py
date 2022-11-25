@@ -21,7 +21,7 @@ from comment.models import Comment
 from like.models import Like
 from comment.serializer import CommentSerializer
 
-
+from comment.models import *
 
 @api_view(["GET"])
 def getAllPostLikes(request, uuidOfAuthor, uuidOfPost):
@@ -326,17 +326,18 @@ def getEntireInboxRequests(request, author_id):
 # def get_post_likes(post_id):
 #     likes = Like.objects.filter(post=post_id)
 #     return likes
-# def get_latest_comments(post_id):
-#     comments = Comment.objects.filter(post=post_id)[:2]
-#     return comments
+
+
 
 def postIndex(request: HttpRequest):
     posts = Post.objects.filter(visibility="PUBLIC", unlisted=False)
+    authorloggedin = Author.objects.filter(id=request.user.id)
     for post in posts:
         post.numberOfLikes =  0 #len(get_post_likes(post.id)) 
         #post.topComments = get_latest_comments(post.id)
     context = {
         'posts': posts,
+        'authorloggedin': authorloggedin
         }
     return render(request, 'index.html', context)
 

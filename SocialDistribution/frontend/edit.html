@@ -1,4 +1,4 @@
-{% extends "frontend/base.html" %}
+{% extends "author/base.html" %}
 
 {% block title %}Edit a Post{% endblock %}
 
@@ -64,7 +64,7 @@
         var postUrl;
         var content;
         var chosenPost;
-        fetch('https://team9-socialdistribution.herokuapp.com'+'/service/authors/'+'{{post.author.id}}'+'/posts/'+'{{post.id}}',{
+        fetch('http://127.0.0.1:8000/'+'service/authors/'+'{{post.author.id}}'+'/posts/'+'{{post.id}}',{
                 method: 'GET',
                 headers: {
                     'X-CSRFToken' : "{{ csrf_token }}"
@@ -181,7 +181,7 @@
             })
             .then(function(){
                 alert("Successfully modified your post! Redirecting you to posts page.");
-                location.href = 'https://team9-socialdistribution.herokuapp.com/service'+'/site/posts';
+                location.href = 'http://127.0.0.1:8000/service'+'/site/posts';
             })
             .catch (function (error) {
                 console.log('Request failed', error);
@@ -191,8 +191,8 @@
             
         document.getElementById("submitbutton").onclick = function(){
             createPost();
-            postUrl = 'https://team9-socialdistribution.herokuapp.com/service'+'/authors/'+'{{post.author.id}}' + "/posts/"+'{{post.id}}'+'/';
-            AuthorUrl = 'https://team9-socialdistribution.herokuapp.com/service'+'/authors/'+'{{post.author.id}}';
+            postUrl = 'http://127.0.0.1:8000/service'+'/authors/'+'{{post.author.id}}' + "/posts/"+'{{post.id}}'+'/';
+            AuthorUrl = 'http://127.0.0.1:8000/service'+'/authors/'+'{{post.author.id}}';
             if(content_isText===true){
                 formdata.append("contentType", 'text/plain');
                 sendMessage();
