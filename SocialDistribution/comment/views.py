@@ -2,8 +2,10 @@ from functools import partial
 import json
 from re import A
 import re
+
+from django.urls import reverse
 from . import utils
-from django.shortcuts import render
+from django.shortcuts import HttpResponseRedirect, get_object_or_404, render, redirect
 from rest_framework import generics, mixins, response, status
 from .models import *
 from .serializer import *
@@ -13,6 +15,10 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from base64 import b64encode
 from post.models import Post
+
+from comment.forms import CommentForm
+from comment.models import Comment
+
 
 
 class CommentPostView(generics.ListCreateAPIView):
@@ -96,3 +102,43 @@ class CommentPostView(generics.ListCreateAPIView):
         queryset = self.get_queryset().filter(post__id=kwargs['uuidOfPost'])
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+def add_Comment(request, postID):
+
+    post = get_object_or_404(Post, id = postID)
+    comments = Comment.objects.filter(post=post).order_by('-published')
+
+    #CommentForm
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST, request.FILES)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+
+            return HttpResponseRedirect(reverse("posts"), args=[postID])
+
+        else:
+            form = CommentForm()
+        
+        context = {
+            'form': form,
+            "comments": comment,
+            'post': post,
+        }
+
+    return render(request, 'commentDetails', context)
+
+def commentDetails(request, postId):
+
+    context = {}
+
+    post = get_object_or_404(Post, id = postId)
+    context['post'] = post
+
+    context['comments'] = post.comments
+
+    return render (request, 'comment_details.html', context)
+   

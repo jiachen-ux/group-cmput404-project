@@ -31,7 +31,6 @@
                     </div>
                 </div>
 
-                <hr>
                 
                 <div class="card-body">
                     <p class="field-label"><strong>Description: </strong>{{post.description}}</p>
@@ -43,16 +42,14 @@
                     {% endif %}
                 </div>
 
-                <hr>
                 
                 <div class="card-footer">
                 <div>
                     <button id="{{post.id}}-like-button" type="submit" name="post_id" value="{{post.id}}" class="btn"><span id="like-count-{{post.id}}">{{post.numberOfLikes}}</span> | Like</button>
-                    <a href="{{post.id}}"><button type="button" class="btn">Comments</button></a>
+                    <a href="{% url 'view-comment' post.id %}"><button type="button" class="btn">Comments</button></a>
                     <button type="button" class="btn" id="addcomment-{{post.id}}">Add comment</button>
                 </div>
                 
-                <hr>
                 
                 <p class="field-label"><b>Comments: </b></p>
                 <div id="comments-of-{{post.id}}">
