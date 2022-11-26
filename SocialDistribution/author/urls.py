@@ -12,7 +12,7 @@ urlpatterns = [
     path('register/', views.AuthorCreate.as_view()),
     path('data/', views.testAuth),
 
-    path('authors/', views.getAllAuthors, name="allForeignAuthors"), # TODO add pagination
+    path('authors/', views.get_local_remote_author, name="allForeignAuthors"), # TODO add pagination
     path('authors/<authorId>/', views.profile, name="singleForeignAuthor"),
 
     path('author/search/', views.AuthorSearchView.as_view()), 
