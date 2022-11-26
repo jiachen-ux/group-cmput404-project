@@ -55,53 +55,13 @@ class AuthorAPIView(generics.ListAPIView):
 @login_required
 @api_view(["GET"])
 def getAllAuthors(request):
-    '''
-    get all authors, local and remote
-    '''
-    team8 = 'https://c404-team8.herokuapp.com/api/'
-    team7 = 'https://cmput404-social.herokuapp.com/service/'
-    team9 = 'https://team9-socialdistribution.herokuapp.com/service/'
-
-    local_response = requests.get(f'{team9}authors/')
-    team8_remote_response = requests.get(f'{team8}authors/')
-    team7_remote_response = requests.get(f'{team7}authors/')
-
-    combined_author = []
-
-    if local_response.status_code == 200:
-        print('connect to our team')
-        local_data = local_response.json()
-        local_Authors = local_data['items']
-        
-        # this for loop change our id from an url to uuid.
-        # without it, our id is an url, which cause error when pass to html file
-        for author in local_Authors:
-            author['id'] = author['id'].split('/')[-1]
-        combined_author.extend(local_Authors)
-
-    if team8_remote_response.status_code == 200:
-        print('connect to team 8')
-        team8_data = team8_remote_response.json()
-        team8_Authors = team8_data['items']
-        combined_author.extend(team8_Authors)
-    
-    if team7_remote_response.status_code == 200:
-        print('connect to team 9')
-        team7_data = team7_remote_response.json()
-        # print(team7_data)
-        combined_author.extend(team7_data)
-
-    context = {
+    allAuthors = Author.objects.all()
+    serializer = GetAuthorSerializer(allAuthors, many=True)
+    resp = {
         "type": "authors",
-        "items": combined_author
+        "items": serializer.data
     }
-
-    # for result in context['items']:
-    #     print("printing results")
-    #     print(result)
-
-    # return response.Response(context,status=status.HTTP_200_OK)
-    return HttpResponse(render(request, 'author/listUsers.html', context),status=200)
+    return response.Response(resp)
 
 
 @api_view(["GET", "POST"])
@@ -234,7 +194,6 @@ def logoutView(request):
 
 
 @login_required
-@api_view(["GET", "POST"])
 def profile(request, authorId):
     # get user's information
     team8 = 'https://c404-team8.herokuapp.com/api/'
@@ -262,14 +221,15 @@ def profile(request, authorId):
         combined_author.extend(team8_Authors)
     
     if team7_remote_response.status_code == 200:
-        print('connect to team 9')
+        print('connect to team 7')
         team7_data = team7_remote_response.json()
-        # print(team7_data)
-        combined_author.extend(team7_data)
+        team7_Authors = team7_data['items']
+        combined_author.extend(team7_Authors)
 
 
     for author in combined_author:
-        if authorId == author['id'] or authorId== author['id'].split('/')[-1]:
+        print(author)
+        if authorId == author['id']: #or authorId== author['id'].split('/')[-1]:
             print('found it')
             display_name = author['displayName']
             github_url = author['github']
@@ -305,46 +265,51 @@ def profile(request, authorId):
     # print(context)
     return render(request, 'author/profile.html', context)
 
-# def foreignUser(request, authorId):
-
-#     results = {}
     
-#     team8 = 'https://c404-team8.herokuapp.com/api/'
+def get_local_remote_author(request):
+    '''
+    get all authors, local and remote and show them in browser
+    '''
+    team8 = 'https://c404-team8.herokuapp.com/api/'
+    team7 = 'https://cmput404-social.herokuapp.com/service/'
+    team9 = 'https://team9-socialdistribution.herokuapp.com/service/'
 
-#     t8_remote_response = requests.get(f'{team8}authors/')
+    team8_remote_response = requests.get(f'{team8}authors/')
+    team7_remote_response = requests.get(f'{team7}authors/')
+    team9_remote_response = requests.get(f'{team9}authors/')
+    combined_author = []
+
+    if team9_remote_response.status_code == 200:
+        print('connect to our team')
+        local_data = team9_remote_response.json()
+        local_Authors = local_data['items']
+        
+        # this for loop change our id from an url to uuid.
+        # without it, our id is an url, which cause error when pass to html file
+        for author in local_Authors:
+            author['id'] = author['id'].split('/')[-1]
+        combined_author.extend(local_Authors)
 
 
-#     if t8_remote_response.status_code == 200:
-#         team8_data = t8_remote_response.json()
-#         team8_Authors = team8_data['items']
-#         #combined_author.extend(team8_Authors)
-
-#     results = {
-#         "type": "authors",
-#         "items": team8_Authors
-#     }
-
-#     for author in team8_Authors:
-#         print(author)
-#         if author['id'] == authorId:
-#             select_author_id = authorId
-#             displayName = author['displayName']
-
+    if team8_remote_response.status_code == 200:
+        print('connect to team 8')
+        team8_data = team8_remote_response.json()
+        team8_Authors = team8_data['items']
+        combined_author.extend(team8_Authors)
     
-#     response = requests.get(f"{team8}authors/{authorId}/posts/",
-#                                 params=request.GET)
-                                
-#     if response.status_code == 200:
-#         posts = response.json()['items']
+    if team7_remote_response.status_code == 200:
+        print('connect to team 7')
+        team7_data = team7_remote_response.json()
+        team7_Authors = team7_data['items']
+        combined_author.extend(team7_Authors)
 
-#     context = {
-#         'select_author_id': select_author_id,
-#         'displayName': displayName,
-#         'posts': posts,
-#     }
-
-
-#     return render(request, 'author/foreignUserProfile.html', context)
-
-
-
+    context = {
+        "type": "authors",
+        "items": combined_author
+    }
+    
+    # for result in combined_author:
+    #     print(result)
+    # print(context['items'])
+    # return response.Response(context,status=status.HTTP_200_OK)
+    return HttpResponse(render(request, 'author/listUsers.html', context),status=200)
