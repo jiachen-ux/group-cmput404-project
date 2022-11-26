@@ -23,7 +23,7 @@ from comment.serializer import CommentSerializer
 
 from comment.models import *
 
-@api_view(["GET"])
+@api_view(["POST"])
 def getAllPostLikes(request, uuidOfAuthor, uuidOfPost):
     # Get all likes of that post
     allLikes = Like.objects.filter(object_id=uuidOfPost)
@@ -147,7 +147,7 @@ class PostMutipleDetailView(generics.ListCreateAPIView):
         
 
 
-class PostDistinctView(generics.ListAPIView):
+class PostAllPublicPost(generics.ListAPIView):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -331,13 +331,11 @@ def getEntireInboxRequests(request, author_id):
 
 def postIndex(request: HttpRequest):
     posts = Post.objects.filter(visibility="PUBLIC", unlisted=False)
-    authorloggedin = Author.objects.filter(id=request.user.id)
     for post in posts:
         post.numberOfLikes =  0 #len(get_post_likes(post.id)) 
         #post.topComments = get_latest_comments(post.id)
     context = {
         'posts': posts,
-        'authorloggedin': authorloggedin
         }
     return render(request, 'index.html', context)
 

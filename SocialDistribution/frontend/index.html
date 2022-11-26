@@ -8,31 +8,36 @@
 {% for post in posts %}
 <div class="container">
     <div class="row justify-content-center">
-        <div class="mt-0" >
+        <div class="mt-0">
             <div class="card" style="width: 50rem;">
                 <div class="card-header text-black" style="background-color: #778899;">
                     <div class="row">
                         <div class="col">
-                            <h4 class="card-title"> 
+                            <h4 class="card-title">
                                 <a href="{{ post.id }}" style="color: black;">{{ post.title }}</a>
                             </h4>
-                            <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white" href="http://127.0.0.1:8000/service/authors/{{ post.author.id }}">{{ post.author.displayName }}</a></p>
+                            <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white"
+                                    href="http://127.0.0.1:8000/service/authors/{{ post.author.id }}">{{
+                                    post.author.displayName }}</a></p>
                         </div>
                         <div class="col-3 pb-3">
                             {% if userAuthor and userAuthor.id == post.author.id %}
                             <div class="col pb-3">
-                                <a href="http://127.0.0.1:8000/service/editpost/{{post.id}}"><button class="btn btn-warning float-right" type="button" class="btn">Edit post</button></a>
+                                <a href="http://127.0.0.1:8000/service/editpost/{{post.id}}"><button
+                                        class="btn btn-warning float-right" type="button" class="btn">Edit
+                                        post</button></a>
                             </div>
                             <div class="col mt-4">
-                                <a href="http://127.0.0.1:8000/service/deletepost/{{post.id}}"><button class="btn btn-outline-light float-right" type="button" class="btn" onclick="return confirm('Are you sure?');">Delete post</button></a>
+                                <a href="http://127.0.0.1:8000/service/deletepost/{{post.id}}"><button
+                                        class="btn btn-outline-light float-right" type="button" class="btn"
+                                        onclick="return confirm('Are you sure?');">Delete post</button></a>
                             </div>
                             {% endif %}
                         </div>
                     </div>
                 </div>
-
                 <hr>
-                
+
                 <div class="card-body">
                     <p class="field-label"><strong>Description: </strong>{{post.description}}</p>
                     {% if post.contentType != "text/plain" %}
@@ -44,70 +49,100 @@
                 </div>
 
                 <hr>
-                
-                <div class="card-footer">
-                <div>
-                    <button id="{{post.id}}-like-button" type="submit" name="post_id" value="{{post.id}}" class="btn"><span id="like-count-{{post.id}}">{{post.numberOfLikes}}</span> | Like</button>
-                    <div class="comment-input-div">
-                        <form class="form">
-                            <input type="text" name="comment" class="comment-input" placeholder="Write a comment...">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </form>
-                        <script>
 
-                            var forml = document.querySelector('.form')
-                            forml.addEventListener('submit', function (event) {
-                            event.preventDefault()
-                            const newform = new FormData(forml)
-                            const data = Object.fromEntries(newform)
-                            fetch('http://127.0.0.1:8000/service/authors/{{request.user.id}}/posts/{{post.id}}/comments',{
-                            method: 'POST',
-                            headers: {
-                            'X-CSRFToken' : "{{ csrf_token }}",
-                            'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(data)
-                            }).then(res => res.json());
-                            });
+                <div class="card-footer">
+                    <div>
+                        <button id="myBtn" type="submit" name="post_id" value="{{post.id}}"
+                            class="btn"><span id="like-count-{{post.id}}">{{post.numberOfLikes}}</span> | Like</button>
+                        
+                        <div class="comment-input-div">
+                            <form class="form">
+                                <input type="text" name="comment" class="comment-input"
+                                    placeholder="Write a comment...">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
+                            <script>
+
+                                var forml = document.querySelector('.form')
+                                forml.addEventListener('submit', function (event) {
+                                    event.preventDefault()
+                                    const newform = new FormData(forml)
+                                    const data = Object.fromEntries(newform)
+                                    fetch('http://127.0.0.1:8000/service/authors/{{request.user.id}}/posts/{{post.id}}/comments', {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRFToken': "{{ csrf_token }}",
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify(data)
+                                    }).then(res => res.json());
+                                });
                             </script>
-                </div>
-                
-                <hr>               
-                <p class="field-label"><b>Comments: </b></p>
-                <div id="myData">
+                        </div>
+                        <script>
+                            var comurl = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments'
+                            const element = document.getElementById("myBtn");
+                             element.addEventListener("click", liker());
+                             function liker(){
+            var payload = {
+                type: 'post',
+                author: '{{request.user.id}}',
+                object_id: 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}'
+             };
+
+            var data = new FormData();
+            data.append( "json", JSON.stringify( payload ) )
+            fetch('http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/likes', {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRFToken': "{{ csrf_token }}",
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: data
+                                    }).then(res => res.json())
+                                    .then(function(data){ alert( JSON.stringify( data ) ) })
+                                    
+ 
+                }
+                        </script>
+                        <button onclick="myFunction(comurl)">Move</button>
+                        <p id="demo" onclick="myFunction(comurl)">Click me to change my HTML content </p>
                     </div>
                 </div>
             </div>
-            <script>
-                fetch('http://127.0.0.1:8000/service/authors/{{request.user.id}}/posts/{{post.id}}/comments')
-                .then(function (response) {
-                return response.json();
-                })
-                .then(function (data) {
-                appendData(data);
-                })
-                .catch(function (err) {
-                console.log(err);
-                });
-                function appendData(data) {
-                var mainContainer = document.getElementById("myData");
-                for (var i = 0; i < data.length; i++) {
-                var div = document.createElement("div");
-                div.innerHTML = 'Comment ' + data[i].comment + ' Author' + data[i].author.displayName;
-                mainContainer.appendChild(div);
-                }
-                }
-            </script>
-        
         {% endfor %}
-    </div>
-</div>
-    {% else %}
-        <p>No posts are available.</p>
-    {% endif %}
+        </div>
 
+        <script>
+        
+            function myFunction(comurl) {
+                fetch(comurl)
+                    .then(function (response) {
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        console.log(data);
+                        appendData(data);
+                    })
+                    .catch(function (err) {
+                        console.log(err);
+                    });
+                function appendData(data) {
+                    var main
+                    var mainContainer = document.getElementById("demo");
+                    for (var i = 0; i < data.length; i++) {
+                        var div = document.createElement("div");
+                        div.innerHTML = 'Comment ' + data[i].comment + ' Author' + data[i].author.displayName;
+                        mainContainer.appendChild(div);
+                    }
+                }
+            }
+        </script>
     </div>
 </div>
+{% else %}
+<p>No posts are available.</p>
+{% endif %}
 {% endblock %}
 
 
