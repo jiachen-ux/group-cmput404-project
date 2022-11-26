@@ -198,8 +198,8 @@ def profile(request, authorId):
     # get user's information
     team8 = 'https://c404-team8.herokuapp.com/api/'
     team7 = 'https://cmput404-social.herokuapp.com/service/'
-    team9 = 'https://team9-socialdistribution.herokuapp.com/service/'
-    local_response = requests.get(f'{team9}authors/')
+
+
     team8_remote_response = requests.get(f'{team8}authors/')
     team7_remote_response = requests.get(f'{team7}authors/')
     display_name = ''
@@ -207,12 +207,6 @@ def profile(request, authorId):
     posts = []
     host = ''
     combined_author = []
-
-    if local_response.status_code == 200:
-        print('connect to our team')
-        local_data = local_response.json()
-        local_Authors = local_data['items']
-        combined_author.extend(local_Authors)
         
     if team8_remote_response.status_code == 200:
         print('connect to team 8')
@@ -249,12 +243,6 @@ def profile(request, authorId):
                                 params=request.GET)
         if response.status_code == 200:
             posts = response.json()['items']
-    else:
-        print('in our team')
-        response = requests.get(f"{team9}authors/{authorId}/posts/",
-                                params=request.GET)
-        if response.status_code == 200:
-            posts = response.json()
 
     context = {
         'displayName': display_name,
@@ -272,24 +260,19 @@ def get_local_remote_author(request):
     '''
     team8 = 'https://c404-team8.herokuapp.com/api/'
     team7 = 'https://cmput404-social.herokuapp.com/service/'
-    team9 = 'https://team9-socialdistribution.herokuapp.com/service/'
 
+    local_Authors = Author.objects.all()
+    serializer = GetAuthorSerializer(local_Authors, many=True)
+    a = json.dumps(serializer.data)
+    local_authors_data = json.loads(a)
+    print(local_authors_data)
     team8_remote_response = requests.get(f'{team8}authors/')
     team7_remote_response = requests.get(f'{team7}authors/')
-    team9_remote_response = requests.get(f'{team9}authors/')
     combined_author = []
 
-    if team9_remote_response.status_code == 200:
-        print('connect to our team')
-        local_data = team9_remote_response.json()
-        local_Authors = local_data['items']
-        
-        # this for loop change our id from an url to uuid.
-        # without it, our id is an url, which cause error when pass to html file
-        for author in local_Authors:
-            author['id'] = author['id'].split('/')[-1]
-        combined_author.extend(local_Authors)
-
+    for author in local_authors_data:
+        author['id'] = author['id'].split('/')[-1]
+    combined_author.extend(local_authors_data)
 
     if team8_remote_response.status_code == 200:
         print('connect to team 8')
