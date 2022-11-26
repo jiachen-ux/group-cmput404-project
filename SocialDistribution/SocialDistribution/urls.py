@@ -32,7 +32,7 @@ schema_view = swagger_get_schema_view(
 urlpatterns = [
     path("register/", author_view.registerView, name="register_url"),
     path("", author_view.loginView, name="login_url"),
-    path('authors/', author_view.getAllAuthors),
+    path('authors/', author_view.get_local_remote_author, name="allForeignAuthors"),
     path('authors/<id>/', author_view.profile),
     path("home/", author_view.homeView),
     path("admin/", admin.site.urls),
