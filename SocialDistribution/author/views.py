@@ -20,6 +20,8 @@ from django.contrib.auth import authenticate, login, logout
 from author.serializers import *
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from post.models import Post
+
 # from connect.views import *
 # from connect.models import *
 
@@ -193,22 +195,27 @@ def logoutView(request):
     return redirect(loginView)
 
 
-@login_required
-def profile(request, authorId):
-    # get user's information
+def get_local_remote_author(request):
+    '''
+    get all authors, local and remote and show them in browser
+    '''
     team8 = 'https://c404-team8.herokuapp.com/api/'
     team7 = 'https://cmput404-social.herokuapp.com/service/'
 
-
+    local_Authors = Author.objects.all()
+    serializer = GetAuthorSerializer(local_Authors, many=True)
+    a = json.dumps(serializer.data)
+    local_authors_data = json.loads(a)
+    # print(local_authors_data)
     team8_remote_response = requests.get(f'{team8}authors/')
     team7_remote_response = requests.get(f'{team7}authors/')
-    display_name = ''
-    github_url = ''
-    posts = []
-    host = ''
     combined_author = []
-        
-    if team8_remote_response.status_code == 200:
+
+    for author in local_authors_data:
+        author['id'] = author['id'].split('/')[-1]
+    combined_author.extend(local_authors_data)
+
+    if team8_remote_response.status_code == 200: 
         print('connect to team 8')
         team8_data = team8_remote_response.json()
         team8_Authors = team8_data['items']
@@ -219,9 +226,34 @@ def profile(request, authorId):
         team7_data = team7_remote_response.json()
         team7_Authors = team7_data['items']
         combined_author.extend(team7_Authors)
+    return combined_author
 
 
-    for author in combined_author:
+@login_required
+def profile(request, authorId):
+    # # get user's information
+    # team8_remote_response = requests.get(f'{team8}authors/')
+    # team7_remote_response = requests.get(f'{team7}authors/')        
+    # if team8_remote_response.status_code == 200:
+    #     print('connect to team 8')
+    #     team8_data = team8_remote_response.json()
+    #     team8_Authors = team8_data['items']
+    #     combined_author.extend(team8_Authors)
+    
+    # if team7_remote_response.status_code == 200:
+    #     print('connect to team 7')
+    #     team7_data = team7_remote_response.json()
+    #     team7_Authors = team7_data['items']
+    #     combined_author.extend(team7_Authors)
+    authors = get_local_remote_author(request)
+    team8 = 'https://c404-team8.herokuapp.com/api/'
+    team7 = 'https://cmput404-social.herokuapp.com/service/'
+    display_name = ''
+    github_url = ''
+    posts = []
+    host = ''
+
+    for author in authors:
         print(author)
         if authorId == author['id']: #or authorId== author['id'].split('/')[-1]:
             print('found it')
@@ -243,7 +275,8 @@ def profile(request, authorId):
                                 params=request.GET)
         if response.status_code == 200:
             posts = response.json()['items']
-
+    else:
+        posts = Post.objects.filter(author__id=authorId, visibility="PUBLIC", unlisted=False)
     context = {
         'displayName': display_name,
         'github_url': github_url,
@@ -253,42 +286,12 @@ def profile(request, authorId):
     # print(context)
     return render(request, 'author/profile.html', context)
 
-    
-def get_local_remote_author(request):
-    '''
-    get all authors, local and remote and show them in browser
-    '''
-    team8 = 'https://c404-team8.herokuapp.com/api/'
-    team7 = 'https://cmput404-social.herokuapp.com/service/'
 
-    local_Authors = Author.objects.all()
-    serializer = GetAuthorSerializer(local_Authors, many=True)
-    a = json.dumps(serializer.data)
-    local_authors_data = json.loads(a)
-    print(local_authors_data)
-    team8_remote_response = requests.get(f'{team8}authors/')
-    team7_remote_response = requests.get(f'{team7}authors/')
-    combined_author = []
-
-    for author in local_authors_data:
-        author['id'] = author['id'].split('/')[-1]
-    combined_author.extend(local_authors_data)
-
-    if team8_remote_response.status_code == 200:
-        print('connect to team 8')
-        team8_data = team8_remote_response.json()
-        team8_Authors = team8_data['items']
-        combined_author.extend(team8_Authors)
-    
-    if team7_remote_response.status_code == 200:
-        print('connect to team 7')
-        team7_data = team7_remote_response.json()
-        team7_Authors = team7_data['items']
-        combined_author.extend(team7_Authors)
-
+def display_author(request):
+    authors = get_local_remote_author(request)
     context = {
         "type": "authors",
-        "items": combined_author
+        "items": authors
     }
     
     # for result in combined_author:
