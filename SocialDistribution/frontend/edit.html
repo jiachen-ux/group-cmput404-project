@@ -64,7 +64,7 @@
         var postUrl;
         var content;
         var chosenPost;
-        fetch('https://team9-socialdistribution.herokuapp.com'+'/service/authors/'+'{{post.author.id}}'+'/posts/'+'{{post.id}}',{
+        fetch('{{host}}'+'/service/authors/'+'{{post.author.id}}'+'/posts/'+'{{post.id}}',{
                 method: 'GET',
                 headers: {
                     'X-CSRFToken' : "{{ csrf_token }}"
@@ -132,7 +132,6 @@
                 document.getElementById("inputcontenttext").hidden=true;
                 document.getElementById("textcontent").hidden=true;
                 content = document.getElementById("filecontent");
-                
             }
             }
         }
@@ -181,7 +180,7 @@
             })
             .then(function(){
                 alert("Successfully modified your post! Redirecting you to posts page.");
-                location.href = 'https://team9-socialdistribution.herokuapp.com/service'+'/site/posts';
+                location.href = '{{host}}'+'/service'+'/site/posts';
             })
             .catch (function (error) {
                 console.log('Request failed', error);
@@ -191,8 +190,8 @@
             
         document.getElementById("submitbutton").onclick = function(){
             createPost();
-            postUrl = 'https://team9-socialdistribution.herokuapp.com/service'+'/authors/'+'{{post.author.id}}' + "/posts/"+'{{post.id}}'+'/';
-            AuthorUrl = 'https://team9-socialdistribution.herokuapp.com/service'+'/authors/'+'{{post.author.id}}';
+            postUrl = '{{host}}'+'/service'+'/authors/'+'{{post.author.id}}' + "/posts/"+'{{post.id}}'+'/';
+            AuthorUrl = '{{host}}'+'/service'+'/authors/'+'{{post.author.id}}';
             if(content_isText===true){
                 formdata.append("contentType", 'text/plain');
                 sendMessage();

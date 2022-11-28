@@ -108,7 +108,7 @@
         var date = new Date()
         formdata.append("published", date.toISOString());
         formdata.append("count", 0);
-        formdata.append("comments", 'https://team9-socialdistribution.herokuapp.com/service' +'/authors/' +'{{author.id}}'+'/posts/');
+        formdata.append("comments", '{{host}}'+'/service' +'/authors/' +'{{author.id}}'+'/posts/');
         formdata.append("type", "post");
         // post.id="";
         categories = document.getElementById("postcat").value;
@@ -120,7 +120,7 @@
         }
     }
     function sendMessage(){
-        var postUrl = 'https://team9-socialdistribution.herokuapp.com/service'+'/authors/'+'{{author.id}}' + '/posts/';
+        var postUrl = '{{host}}'+'/service'+'/authors/'+'{{author.id}}' + '/posts/';
         fetch(postUrl,{
             method: 'POST',
             headers: {
@@ -134,7 +134,7 @@
         .then(function(data){
             formdata.append("id", data.id);
             formdata.append("comments", data.id + '/comments');
-            let uri = 'https://team9-socialdistribution.herokuapp.com/service'+'/authors/'+'{{author.id}}' + '/posts/' + data.id+'/';
+            let uri = '{{host}}'+'/service'+'/authors/'+'{{author.id}}' + '/posts/' + data.id+'/';
             return fetch(uri,{
                 method: 'POST',
                 headers: {
@@ -145,7 +145,7 @@
         })
         .then(function(){
             alert("A new post is successfully created! Redirecting you to post-list page...");
-            location.href = 'https://team9-socialdistribution.herokuapp.com/service'+'/site/posts';
+            location.href = '{{host}}'+'/service'+'/site/posts';
         })
         .catch (function (error) {
             console.log('Request failed', error);
@@ -194,7 +194,7 @@
         }
         if (allFilled){
             createPost();
-            authorUrl ='https://team9-socialdistribution.herokuapp.com/service'+'/authors/'+'{{author.id}}';
+            authorUrl ='{{host}}'+'/service'+'/authors/'+'{{author.id}}';
             if(content_isText===true){
                 formdata.append("contentType", 'text/plain');
                 sendMessage();
