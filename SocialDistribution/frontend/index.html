@@ -54,60 +54,32 @@
                             class="btn"><span id="like-count-{{post.id}}">{{post.numberOfLikes}}</span> | Like</button>
                         
                         <div class="comment-input-div">
-                            <form class="form">
+                            <form id= "form-{{post.id}}" class="form">
                                 <input type="text" name="comment" class="comment-input"
-                                    placeholder="Write a comment...">
-                                <button type="submit" class="btn btn-primary">Submit</button>
+                                    placeholder="Write a comment..." >
+                                <button type="submit" id= "form-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' class="btn btn-primary" onclick="CommentFunction(value,id)">Submit</button>
                             </form>
-                            <script>
-
-                                var forml = document.querySelector('.form')
-                                forml.addEventListener('submit', function (event) {
-                                    event.preventDefault()
-                                    const newform = new FormData(forml)
-                                    const data = Object.fromEntries(newform)
-                                    fetch('http://127.0.0.1:8000/service/authors/{{request.user.id}}/posts/{{post.id}}/comments', {
-                                        method: 'POST',
-                                        headers: {
-                                            'X-CSRFToken': "{{ csrf_token }}",
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify(data)
-                                    }).then(res => res.json());
-                                });
-                            </script>
                         </div>
-                        <script>
-                            const element = document.getElementById("myBtn");
-                            element.addEventListener("click", liker());
-                            function liker(){
-                                var payload = {
-                                type: 'post',
-                                author: '{{request.user.id}}',
-                                object_id: 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}'
-                            };
-
-                            var data = new FormData();
-                            data.append( "json", JSON.stringify( payload ) )
-                            fetch('http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/likes', {
-                                        method: 'POST',
-                                        headers: {
-                                            'X-CSRFToken': "{{ csrf_token }}",
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: data
-                                }).then(res => res.json())
-                                .then(function(data){ alert( JSON.stringify( data ) ) })
-                            }
-                        </script>
-                        <button name = "demo-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="myFunction(value, name)">Move</button>
-                        <p id="demo-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="myFunction(value, id)">Click me to change my HTML content </p>
+                        <button name = "demo-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="myFunction(value, name)">Show Comments</button>
+                        <p id="demo-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="myFunction(value, id)"></p>
                     </div>
                 </div>
             </div>
         </div>
-
         <script>
+            function CommentFunction(value,id){
+                var forml = document.getElementById(id)
+                const newform = new FormData(forml)
+                const data = Object.fromEntries(newform)
+                fetch(value, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': "{{ csrf_token }}",
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                }).then(res => res.json());
+            }
         
             function myFunction(value, id) {
                 fetch(value)
@@ -126,7 +98,7 @@
                     var mainContainer = document.getElementById(id);
                     for (var i = 0; i < data.length; i++) {
                         var div = document.createElement("div");
-                        div.innerHTML = 'Comment ' + data[i].comment + ' Author' + data[i].author.displayName;
+                        div.innerHTML =  'Comment :' + data[i].comment + ' -by: ' + data[i].author.displayName 
                         mainContainer.appendChild(div);
                     }
                 }
