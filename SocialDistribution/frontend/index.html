@@ -16,9 +16,7 @@
                             <h4 class="card-title">
                                 <a href="{{ post.id }}" style="color: black;">{{ post.title }}</a>
                             </h4>
-                            <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white"
-                                    href="http://127.0.0.1:8000/service/authors/{{ post.author.id }}">{{
-                                    post.author.displayName }}</a></p>
+                            <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white" href="http://127.0.0.1:8000/service/authors/{{ post.author.id }}">{{ post.author.displayName }}</a></p>
                         </div>
                         <div class="col-3 pb-3">
                             {% if userAuthor and userAuthor.id == post.author.id %}
@@ -80,43 +78,39 @@
                             </script>
                         </div>
                         <script>
-                            var comurl = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments'
                             const element = document.getElementById("myBtn");
-                             element.addEventListener("click", liker());
-                             function liker(){
-            var payload = {
-                type: 'post',
-                author: '{{request.user.id}}',
-                object_id: 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}'
-             };
+                            element.addEventListener("click", liker());
+                            function liker(){
+                                var payload = {
+                                type: 'post',
+                                author: '{{request.user.id}}',
+                                object_id: 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}'
+                            };
 
-            var data = new FormData();
-            data.append( "json", JSON.stringify( payload ) )
-            fetch('http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/likes', {
+                            var data = new FormData();
+                            data.append( "json", JSON.stringify( payload ) )
+                            fetch('http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/likes', {
                                         method: 'POST',
                                         headers: {
                                             'X-CSRFToken': "{{ csrf_token }}",
                                             'Content-Type': 'application/json',
                                         },
                                         body: data
-                                    }).then(res => res.json())
-                                    .then(function(data){ alert( JSON.stringify( data ) ) })
-                                    
- 
-                }
+                                }).then(res => res.json())
+                                .then(function(data){ alert( JSON.stringify( data ) ) })
+                            }
                         </script>
-                        <button onclick="myFunction(comurl)">Move</button>
-                        <p id="demo" onclick="myFunction(comurl)">Click me to change my HTML content </p>
+                        <button name = "demo-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="myFunction(value, name)">Move</button>
+                        <p id="demo-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="myFunction(value, id)">Click me to change my HTML content </p>
                     </div>
                 </div>
             </div>
-        {% endfor %}
         </div>
 
         <script>
         
-            function myFunction(comurl) {
-                fetch(comurl)
+            function myFunction(value, id) {
+                fetch(value)
                     .then(function (response) {
                         return response.json();
                     })
@@ -129,7 +123,7 @@
                     });
                 function appendData(data) {
                     var main
-                    var mainContainer = document.getElementById("demo");
+                    var mainContainer = document.getElementById(id);
                     for (var i = 0; i < data.length; i++) {
                         var div = document.createElement("div");
                         div.innerHTML = 'Comment ' + data[i].comment + ' Author' + data[i].author.displayName;
@@ -140,6 +134,7 @@
         </script>
     </div>
 </div>
+{% endfor %}
 {% else %}
 <p>No posts are available.</p>
 {% endif %}
