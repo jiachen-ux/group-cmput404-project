@@ -22,15 +22,28 @@ from like.models import Like
 from comment.serializer import CommentSerializer
 
 from comment.models import *
-
-@api_view(["POST"])
-def getAllPostLikes(request, uuidOfAuthor, uuidOfPost):
-    # Get all likes of that post
-    allLikes = Like.objects.filter(object_id=uuidOfPost)
-    serializer = LikeSerializer(allLikes, many=True)
-    return response.Response(serializer.data)
+from rest_framework.generics import  ListCreateAPIView
 
 
+class PostLike(ListCreateAPIView):
+    queryset=Like.objects.all()
+    serializer_class=LikeSerializer
+    permission_classes = [AllowAny]
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["author"] = Author.objects.filter(id=self.kwargs['uuidOfAuthor'])[0]
+        context["object_id"] = self.kwargs['uuidOfPost']
+        return context
+    def post(self, request,  *args, **kwargs):
+        return self.create(request)
+        
+    def get(self, request, *args, **kwargs):
+        try:
+            queryset = Like.objects.filter(author__id=self.kwargs['uuidOfAuthor'], object_id=self.kwargs['uuidOfPost'])[0]
+            serializers =  LikeSerializer(queryset)
+            return Response(serializers.data, 200)
+        except:
+            return Response(404)
 @api_view(["GET"])
 def getAllCommentLikes(request, uuidOfAuthor, uuidOfPost, uuidOfComment):
     # Get all likes of that comment

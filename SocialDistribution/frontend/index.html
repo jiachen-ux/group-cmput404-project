@@ -50,18 +50,17 @@
 
                 <div class="card-footer">
                     <div>
-                        <button id="myBtn" type="submit" name="post_id" value="{{post.id}}"
-                            class="btn"><span id="like-count-{{post.id}}">{{post.numberOfLikes}}</span> | Like</button>
-                        
+                        <button id="{{post.id}}" type="submit" name="{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{request.user.id}}/posts/{{post.id}}/likes'
+                        onclick="LikeFunction(value)" class="btn">| Like</button>
                         <div class="comment-input-div">
                             <form id= "form-{{post.id}}" class="form">
                                 <input type="text" name="comment" class="comment-input"
                                     placeholder="Write a comment..." >
-                                <button type="submit" id= "form-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' class="btn btn-primary" onclick="CommentFunction(value,id)">Submit</button>
+                                <button type="submit" id= "form-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{request.user.id}}/posts/{{post.id}}/comments' class="btn btn-primary" onclick="CommentFunction(value,id)">Submit</button>
                             </form>
                         </div>
-                        <button name = "demo-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="myFunction(value, name)">Show Comments</button>
-                        <p id="demo-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="myFunction(value, id)"></p>
+                        <button name = "demo-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, name)">Show Comments</button>
+                        <p id="demo-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, id)"></p>
                     </div>
                 </div>
             </div>
@@ -80,8 +79,32 @@
                     body: JSON.stringify(data)
                 }).then(res => res.json());
             }
+            function LikeFunction(value){
+                fetch(value, {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRFToken': "{{ csrf_token }}",
+                        'Content-Type': 'application/json',
+                    },
+                     
+                }).then(res =>  res.json())
+                .then(data =>  {
+                    if(data == 404){
+                        fetch(value, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': "{{ csrf_token }}",
+                        'Content-Type': 'application/json',
+                    },
+                }).then(res =>  res.json())
+                .then(data => console.log(data))
+                    }
+                })
+      
+                 
+            }
         
-            function myFunction(value, id) {
+            function showComment(value, id) {
                 fetch(value)
                     .then(function (response) {
                         return response.json();
