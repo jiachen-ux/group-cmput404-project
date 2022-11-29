@@ -410,8 +410,10 @@ def getForeignPosts(request):
     data = []
     authorId=[]
     finalPosts = {}
+
+    single_post = None
     
-    
+
 
 
     for result in context['items']:
@@ -428,27 +430,11 @@ def getForeignPosts(request):
         print("printing results")
         print(result)'''
 
-    for post in range(len(data)):
-        d = data[post]
-        c = d['items']
-        
-        for n in range(len(c)):
-            posts = c[n]
-            
-            if posts['visibility'] == "PUBLIC" and posts['unlisted'] == False:
-                '''print(posts)
-                content = posts["content"]
-                title = posts["title"]
-                author = posts["author"]
-                authorDisplayName = author['displayName']
-                contentType = posts["contentType"]
+    for post in data:
+        print(post)
+        if len(post['items']) != 0:
+            single_post = post['items']
+            print(single_post)
+                
 
-                print(authorDisplayName)'''
-
-                finalPosts = {
-                    'posts': posts,
-
-                }
-               
-            
-    return render(request, 'foreignPosts.html', finalPosts)
+    return render(request, 'foreignPosts.html')
