@@ -12,8 +12,9 @@ urlpatterns = [
     path('register/', views.AuthorCreate.as_view()),
     path('data/', views.testAuth),
 
-    path('authors/', views.getAllAuthors), # TODO add pagination
-    path('authors/<authorId>/', views.profile, name="singleForeignAuthor"),
+    # path('authors/', views.getAllAuthors), # TODO add pagination
+    path('authors/<authorId>/', views.profile, name="author_profile"),
+    path('authors/', views.display_author, name="allForeignAuthors"),
 
     path('author/search/', views.AuthorSearchView.as_view()), 
     path("logout", views.logoutView, name="logout_url"),

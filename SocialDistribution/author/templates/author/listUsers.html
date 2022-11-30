@@ -20,7 +20,7 @@
                 {% for result in items %}
               <tr>
                 <td>
-                  <a href="{% url 'singleForeignAuthor' result.id %}">{{ result.displayName }} </a>
+                  <a href="{% url 'author_profile' result.id %}">{{ result.displayName }} </a>
                   </a>
                 </td>
                 {% endfor %}

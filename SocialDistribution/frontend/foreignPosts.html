@@ -20,15 +20,15 @@
                             <h4 class="card-title"> 
                                 <a href="{{ post.id }}" style="color: black;">{{ data.title }}</a>
                             </h4>
-                            <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white" href="https://team9-socialdistribution.herokuapp.com/service/authors/{{ post.author.id }}">{{ data.author.displayName }}</a></p>
+                            <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white" href="https://team9-socialdistribution.herokuapp.com/authors/{{ post.author.id }}">{{ data.author.displayName }}</a></p>
                         </div>
                         <div class="col-3 pb-3">
                             {% if userAuthor and userAuthor.id == post.author.id %}
                             <div class="col pb-3">
-                                <a href="https://team9-socialdistribution.herokuapp.com/service/editpost/{{post.id}}"><button class="btn btn-warning float-right" type="button" class="btn">Edit post</button></a>
+                                <a href="https://team9-socialdistribution.herokuapp.com/editpost/{{post.id}}"><button class="btn btn-warning float-right" type="button" class="btn">Edit post</button></a>
                             </div>
                             <div class="col mt-4">
-                                <a href="https://team9-socialdistribution.herokuapp.com/service/deletepost/{{post.id}}"><button class="btn btn-outline-light float-right" type="button" class="btn" onclick="return confirm('Are you sure?');">Delete post</button></a>
+                                <a href="https://team9-socialdistribution.herokuapp.com/deletepost/{{post.id}}"><button class="btn btn-outline-light float-right" type="button" class="btn" onclick="return confirm('Are you sure?');">Delete post</button></a>
                             </div>
                             {% endif %}
                         </div>
