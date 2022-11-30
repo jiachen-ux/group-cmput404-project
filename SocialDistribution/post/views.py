@@ -196,8 +196,8 @@ def handleInboxRequests(request, author_id):
     if request.method == "GET":
         try:
             # Auth check
-            if not request.user.is_authenticated or request.user.id != author_id:
-                return response.Response({"message": "Unauthenticated!"}, status.HTTP_401_UNAUTHORIZED)
+            # if not request.user.is_authenticated or request.user.id != author_id:
+            #     return response.Response({"message": "Unauthenticated!"}, status.HTTP_401_UNAUTHORIZED)
             # Retrieve all posts
             allPostIDsInThisAuthorsInbox = Inbox.objects.filter(
                 author__id=author_id, object_type="post")
@@ -283,8 +283,8 @@ def getEntireInboxRequests(request, author_id):
     if request.method == "GET":
         try:
             # Auth check
-            if request.user.id != author_id:
-                return response.Response({"message": "Can't retreive someone else's inbox!"}, status.HTTP_401_UNAUTHORIZED)
+            # if request.user.id != author_id:
+            #     return response.Response({"message": "Can't retreive someone else's inbox!"}, status.HTTP_401_UNAUTHORIZED)
             # Get inbox
             inboxObjects = Inbox.objects.filter(author__id=author_id)
 
