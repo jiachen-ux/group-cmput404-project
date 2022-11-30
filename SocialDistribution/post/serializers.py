@@ -10,12 +10,17 @@ from like.models import Like
 from uuid import uuid4
 
 class LikeSerializer(serializers.ModelSerializer): 
-    type = serializers.CharField(read_only=True)
-    author = GetAuthorSerializer("author", read_only=True)
-    # object = serializers.CharField(source="object_url") 
+    author =  GetAuthorSerializer("author", read_only=True)
     class Meta:
         model = Like
         fields = ["type", "author", "object_id"] 
+
+    def create(self, validated_data):
+       validated_data['author'] = self.context.get('author')
+       validated_data['object_type'] = "post"
+       validated_data['object_id'] = self.context.get('object_id')
+       return super().create(validated_data)
+
  
         
 class PostSerializer(serializers.ModelSerializer):
