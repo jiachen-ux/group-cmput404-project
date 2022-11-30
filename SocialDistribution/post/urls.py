@@ -8,10 +8,11 @@ urlpatterns = [
        # Post routes!
     path('authors/<uuid:uuidOfAuthor>/posts/<uuid:uuidOfPost>/', views.PostSingleDetailView.as_view()),
     path('authors/<uuid:uuidOfAuthor>/posts/', views.PostMutipleDetailView.as_view()),
+    path("authors/<uuid:uuidOfAuthor>/posts/getallpublicpost", views.PostAllPublicPost.as_view()),
  
 
     # Like routes!
-    path('authors/<uuid:uuidOfAuthor>/posts/<uuid:uuidOfPost>/likes', views.getAllPostLikes),
+    path('authors/<uuid:uuidOfAuthor>/posts/<uuid:uuidOfPost>/likes', views.PostLike.as_view()),
     path('authors/<uuid:uuidOfAuthor>/posts/<uuid:uuidOfPost>/comments/<uuid:uuidOfComment>/likes', views.getAllCommentLikes),
 
     # Liked routes!
@@ -25,6 +26,7 @@ urlpatterns = [
 
     path('site/posts', views.postIndex, name='index'),
     path('site/my_posts', views.myPosts, name='myPosts'),
+    path('site/foreign_posts', views.getForeignPosts, name='foreignPosts'),
     path('createpost',views.createpost,name='createpost'),
     path('editpost/<str:post_id>',views.editpost, name='editpost'),
     path('deletepost/<str:post_id>',views.deletepost, name='deletepost'),

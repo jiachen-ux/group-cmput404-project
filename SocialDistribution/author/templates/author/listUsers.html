@@ -16,15 +16,11 @@
             </thead>
 
             <tbody>
-                {% if user %}
-                
+              {% if items %}
                 {% for result in items %}
-
               <tr>
                 <td>
                   <a href="{% url 'singleForeignAuthor' result.id %}">{{ result.displayName }} </a>
-
-
                   </a>
                 </td>
                 {% endfor %}
@@ -32,7 +28,7 @@
               {% else %}
 
               <tr>
-                <td>Hey! You Forgot To Search</td>
+                <td>No authors</td>
               </tr>
 
               {% endif %}
