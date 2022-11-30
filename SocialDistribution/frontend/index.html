@@ -21,12 +21,12 @@
                         <div class="col-3 pb-3">
                             {% if userAuthor and userAuthor.id == post.author.id %}
                             <div class="col pb-3">
-                                <a href="http://127.0.0.1:8000/service/editpost/{{post.id}}"><button
+                                <a href="{{host}}/service/editpost/{{post.id}}"><button
                                         class="btn btn-warning float-right" type="button" class="btn">Edit
                                         post</button></a>
                             </div>
                             <div class="col mt-4">
-                                <a href="http://127.0.0.1:8000/service/deletepost/{{post.id}}"><button
+                                <a href="{{host}}/service/deletepost/{{post.id}}"><button
                                         class="btn btn-outline-light float-right" type="button" class="btn"
                                         onclick="return confirm('Are you sure?');">Delete post</button></a>
                             </div>
@@ -52,17 +52,17 @@
 
                 <div class="card-footer">
                     <div>
-                        <button id="{{post.id}}" type="submit" name="{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{request.user.id}}/posts/{{post.id}}/likes'
+                        <button id="{{post.id}}" type="submit" name="{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes'
                         onclick="LikeFunction(value)" class="btn">| Like</button>
                         <div class="comment-input-div">
                             <form id= "form-{{post.id}}" class="form">
                                 <input type="text" name="comment" class="comment-input"
                                     placeholder="Write a comment..." >
-                                <button type="submit" id= "form-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{request.user.id}}/posts/{{post.id}}/comments' class="btn btn-primary" onclick="CommentFunction(value,id)">Submit</button>
+                                <button type="submit" id= "form-{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/comments' class="btn btn-primary" onclick="CommentFunction(value,id)">Submit</button>
                             </form>
                         </div>
-                        <button name = "demo-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, name)">Show Comments</button>
-                        <p id="demo-{{post.id}}" value = 'http://127.0.0.1:8000/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, id)"></p>
+                        <button name = "demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, name)">Show Comments</button>
+                        <p id="demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, id)"></p>
                     </div>
                 </div>
             </div>
