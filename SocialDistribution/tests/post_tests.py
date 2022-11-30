@@ -27,13 +27,12 @@ class PostTest(TestCase):
         published = timezone.now()
         authorJson = json.loads(serializers.serialize('json', Author.objects.filter(id=author.id), fields=('username', 'password', 'displayName', 'github',)))[0]['fields']
 
-        r_uid = uuid.uuid4().hex
-        uid = re.sub('-', '', r_uid)
+        uid = uuid.uuid4()
         postid = authorJson.get("id") + '/posts/' + uid
 
         post = Post.objects.create(id=postid, author_id=author, author=authorJson, title="post with auth", source="no source", origin="still idk", description="not available", contentType="plain", count=0, size=10, visibility="Public", unlisted="False", published=published, content="this should be valid content")
         poststuff = json.loads(serializers.serialize('json', Post.objects.filter(id=post.id), fields=( 'type','title','id','source','origin','description','contentType','content','author','categories','count','size','comments','published','visibility', 'unlisted',)))[0]['fields']
-        self.assertEqual(Post.objects.filter(pk=post.pk)) 
+        self.assertEqual(Post.objects.filter(id=post.id)) 
 
     def test_post_image(self):
         Post.objects.all().delete()
@@ -42,15 +41,14 @@ class PostTest(TestCase):
         published = timezone.now()     
         authorJson = json.loads(serializers.serialize('json', Author.objects.filter(id=author.id), fields=("type","id","host","displayName","url","github","profileImage", "username")))[0]['fields']
 
-        r_uid = uuid.uuid4().hex
-        uid = re.sub('-', '', r_uid)
+        uid = uuid.uuid4()
         postid = authorJson.get("id") + '/posts/' + uid
         with open("./dog.jpg", "rb") as f:
             content = f.read()
         post = Post.objects.create(id=postid, author_id=author, author=authorJson, title="post an image", source="no source", origin="still idk", description="not available", contentType="jpg", count=0, size=10, visibility="Public", unlisted="False", published= published, content=content)
         poststuff = json.loads(serializers.serialize('json', Post.objects.filter(id=post.id), fields=( 'type','title','id','source','origin','description','contentType','content','author','categories','count','size','comments','published','visibility', 'unlisted',)))[0]['fields']
         #print(poststuff)
-        self.assertTrue(Post.objects.filter(pk=post.pk))
+        self.assertTrue(Post.objects.filter(id=post.id))
 
 class AuthorAPITest(TestCase):
     client = APIClient()
