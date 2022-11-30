@@ -24,8 +24,6 @@ from post.models import Post
 
 # from connect.views import *
 # from connect.models import *
-from django.contrib.auth.forms import AuthenticationForm
-
 
 
 class AuthorCreate(
@@ -56,6 +54,7 @@ class AuthorAPIView(generics.ListAPIView):
         return response.Response(serializer.data)
 
 
+@login_required
 @api_view(["GET"])
 def getAllAuthors(request):
     allAuthors = Author.objects.all()
@@ -140,23 +139,23 @@ def loginView(request):
         
         username = request.POST.get('username')
         password = request.POST.get('password')
-        print(username)
-        print(password)
+        # print(username)
+        # print(password)
 
         user = authenticate(request, username = username, password = password)
 
-        print(user)
+        # print(user)
 
         
         if user:
-            print("yesssssss")
+            # print("yesssssss")
             if not user.is_active:
                 # print("This is NOT an active user.")
                 messages.error(request, 'Account Activation Pending.', extra_tags='inactive')
                 return HttpResponse(render(request, 'author/login.html'),status=401)
             else:
                 login(request, user)
-            return redirect(homeView)
+            # return redirect(homeView)
             return HttpResponse(render(request, 'author/home.html'),status=200)
 
         else:
