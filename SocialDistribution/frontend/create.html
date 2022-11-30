@@ -145,7 +145,7 @@
         })
         .then(function(){
             alert("A new post is successfully created! Redirecting you to post-list page...");
-            location.href = '{{host}}'+'/service'+'/site/posts';
+            location.href = '{{host}}'+'/site/posts';
         })
         .catch (function (error) {
             console.log('Request failed', error);
