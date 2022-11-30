@@ -34,7 +34,7 @@ class PostTest(TestCase):
         poststuff = json.loads(serializers.serialize('json', Post.objects.filter(id=post.id), fields=( 'type','title','id','source','origin','description','contentType','content','author','categories','count','size','comments','published','visibility', 'unlisted',)))[0]['fields']
         self.assertEqual(Post.objects.filter(id=post.id)) 
 
-    '''def test_post_image(self):
+    def test_post_image(self):
         Post.objects.all().delete()
         Author.objects.all().delete()
         author = Author.objects.create_user(username="testAuthor", password="testpassword")  
@@ -48,7 +48,7 @@ class PostTest(TestCase):
         post = Post.objects.create(id=postid, author_id=author, author=authorJson, title="post an image", source="no source", origin="still idk", description="not available", contentType="jpg", count=0, size=10, visibility="Public", unlisted="False", published= published, content=content)
         poststuff = json.loads(serializers.serialize('json', Post.objects.filter(id=post.id), fields=( 'type','title','id','source','origin','description','contentType','content','author','categories','count','size','comments','published','visibility', 'unlisted',)))[0]['fields']
         #print(poststuff)
-        self.assertTrue(Post.objects.filter(id=post.id))'''
+        self.assertTrue(Post.objects.filter(id=post.id))
 
 class AuthorAPITest(TestCase):
     client = APIClient()
