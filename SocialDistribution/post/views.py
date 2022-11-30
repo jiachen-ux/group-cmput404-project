@@ -21,16 +21,29 @@ from comment.models import Comment
 from like.models import Like
 from comment.serializer import CommentSerializer
 
+from comment.models import *
+from rest_framework.generics import  ListCreateAPIView
 
 
-@api_view(["GET"])
-def getAllPostLikes(request, uuidOfAuthor, uuidOfPost):
-    # Get all likes of that post
-    allLikes = Like.objects.filter(object_id=uuidOfPost)
-    serializer = LikeSerializer(allLikes, many=True)
-    return response.Response(serializer.data)
-
-
+class PostLike(ListCreateAPIView):
+    queryset=Like.objects.all()
+    serializer_class=LikeSerializer
+    permission_classes = [AllowAny]
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["author"] = Author.objects.filter(id=self.kwargs['uuidOfAuthor'])[0]
+        context["object_id"] = self.kwargs['uuidOfPost']
+        return context
+    def post(self, request,  *args, **kwargs):
+        return self.create(request)
+        
+    def get(self, request, *args, **kwargs):
+        try:
+            queryset = Like.objects.filter(author__id=self.kwargs['uuidOfAuthor'], object_id=self.kwargs['uuidOfPost'])[0]
+            serializers =  LikeSerializer(queryset)
+            return Response(serializers.data, 200)
+        except:
+            return Response(404)
 @api_view(["GET"])
 def getAllCommentLikes(request, uuidOfAuthor, uuidOfPost, uuidOfComment):
     # Get all likes of that comment
@@ -147,7 +160,7 @@ class PostMutipleDetailView(generics.ListCreateAPIView):
         
 
 
-class PostDistinctView(generics.ListAPIView):
+class PostAllPublicPost(generics.ListAPIView):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -326,9 +339,8 @@ def getEntireInboxRequests(request, author_id):
 # def get_post_likes(post_id):
 #     likes = Like.objects.filter(post=post_id)
 #     return likes
-# def get_latest_comments(post_id):
-#     comments = Comment.objects.filter(post=post_id)[:2]
-#     return comments
+
+
 
 def postIndex(request: HttpRequest):
     host = request.scheme + "://" + request.get_host()
