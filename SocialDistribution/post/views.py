@@ -343,12 +343,14 @@ def getEntireInboxRequests(request, author_id):
 
 
 def postIndex(request: HttpRequest):
+    host = request.scheme + "://" + request.get_host()
     posts = Post.objects.filter(visibility="PUBLIC", unlisted=False)
     for post in posts:
         post.numberOfLikes =  0 #len(get_post_likes(post.id)) 
         #post.topComments = get_latest_comments(post.id)
     context = {
         'posts': posts,
+        'host' : host,
         }
     return render(request, 'index.html', context)
 
@@ -357,18 +359,24 @@ def myPosts(request: HttpRequest):
         return render(request,'index.html')
     author = Author.objects.get(id=request.user.id)
     posts = Post.objects.filter(author=author)
+    host = request.scheme + "://" + request.get_host()
     for post in posts:
         post.numberOfLikes = 0 #len(get_post_likes(post.id)) 
         #post.topComments = get_latest_comments(post.id)
     context = {
         'posts': posts,
-        'userAuthor': author
+        'userAuthor': author,
+        'host': host,
         }
     return render(request, 'index.html', context)
 
 def createpost(request: HttpRequest):
     author = Author.objects.filter(id=request.user.id).first()
-    context = {'author' : author}
+    host = request.scheme + "://" + request.get_host()
+    context = {
+            'author' : author,
+            'host': host,
+        }
     return render(request,'create.html',context)
 
 def editpost(request: HttpRequest, post_id: str):
@@ -376,7 +384,8 @@ def editpost(request: HttpRequest, post_id: str):
         return render(request,'edit.html')
     author=Author.objects.get(id = request.user.id)
     post = Post.objects.get(id=post_id)
-    context = {'author' : author, 'post': post}
+    host = request.scheme + "://" + request.get_host()
+    context = {'author' : author, 'post': post, 'host': host}
     return render(request,'edit.html',context)
 
 def deletepost(request: HttpRequest, post_id: str):

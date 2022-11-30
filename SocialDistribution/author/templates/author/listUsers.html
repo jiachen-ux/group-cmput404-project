@@ -1,6 +1,6 @@
 <!doctype html>
 
-{% extends 'author\base.html' %}
+{% extends 'author/base.html' %}
 
 {% block content %}
 
@@ -11,19 +11,16 @@
           <table class="table">
             <thead>
               <tr>
-                <th scope="col">Username</th>
+                <th scope="col">Authors you might like</th>
               </tr>
             </thead>
 
             <tbody>
-                {% if q %}
-
-                {% for result in results %}
-
+              {% if items %}
+                {% for result in items %}
               <tr>
                 <td>
-                  <a href="{% url 'view-profile' result.userid %}">
-                  {{ result.username }}
+                  <a href="{% url 'singleForeignAuthor' result.id %}">{{ result.displayName }} </a>
                   </a>
                 </td>
                 {% endfor %}
@@ -31,7 +28,7 @@
               {% else %}
 
               <tr>
-                <td>Hey! You Forgot To Search</td>
+                <td>No authors</td>
               </tr>
 
               {% endif %}
