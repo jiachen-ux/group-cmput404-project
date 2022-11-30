@@ -44,6 +44,7 @@ class PostLike(ListCreateAPIView):
             return Response(serializers.data, 200)
         except:
             return Response(404)
+
 @api_view(["GET"])
 def getAllCommentLikes(request, uuidOfAuthor, uuidOfPost, uuidOfComment):
     # Get all likes of that comment
@@ -396,3 +397,14 @@ def deletepost(request: HttpRequest, post_id: str):
     if post.author.id == author.id:
         post.delete()
     return redirect('post:index')
+
+class getAllPostLikes(generics.ListAPIView):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.queryset.filter(object_id = kwargs.get('uuidOfPost'))
+        serializers = self.serializer_class(queryset, many= True)
+
+        return Response(serializers.data, 200)
+
