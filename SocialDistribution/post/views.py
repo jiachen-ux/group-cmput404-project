@@ -384,14 +384,16 @@ def deletepost(request: HttpRequest, post_id: str):
 def getForeignPosts(request):
     '''
     Used to get all the foreign posts
+    connected with team 8 and team 7
     '''
+    combined_author = []
 
     team8 = 'https://c404-team8.herokuapp.com/api/'
-    # team9 = 'https://team9-socialdistribution.herokuapp.com/service/'
-    
+    team7 = 'https://cmput404-social.herokuapp.com/service/'    
     #local_Authors = Author.objects.all()
     
     t8_remote_response = requests.get(f'{team8}authors/')
+    team7_remote_response = requests.get(f'{team7}authors/')
 
     #serializer = GetAuthorSerializer(local_Authors, many=True)
     #combined_author = serializer.data
@@ -400,20 +402,26 @@ def getForeignPosts(request):
         print('connect to team 8')
         team8_data = t8_remote_response.json()
         team8_Authors = team8_data['items']
-        #combined_author.extend(team8_Authors)
+        combined_author.extend(team8_Authors)
+
+    if team7_remote_response.status_code == 200:
+        print('connect to team 7')
+        team7_data = team7_remote_response.json()
+        team7_Authors = team7_data['items']
+        combined_author.extend(team7_Authors)
+    
+
 
     context = {
         "type": "authors",
-        "items": team8_Authors
+        "items": combined_author
     }
 
     data = []
     authorId=[]
-    finalPosts = {}
+    posts = []
 
-    single_post = None
-    
-
+    finalPost = {}
 
 
     for result in context['items']:
@@ -421,20 +429,21 @@ def getForeignPosts(request):
 
     for i in authorId:
         response = requests.get(f"{team8}authors/{i}/posts", params=request.GET)
-
+        
         if response.status_code == 200:
-            data.append(response.json())
+            posts = response.json()['items']
+            data.append(posts)
 
-
-    '''for result in context['items']:
-        print("printing results")
-        print(result)'''
 
     for post in data:
-        print(post)
-        if len(post['items']) != 0:
-            single_post = post['items']
-            print(single_post)
-                
+        if len(post) == 0:
+            data.remove(post)
+    
+    
 
-    return render(request, 'foreignPosts.html')
+    finalPost = {
+        "posts": data
+    }
+
+    
+    return render(request, 'foreignPosts.html', finalPost)
