@@ -73,7 +73,7 @@
 
 <div class="container">
     <div class="row justify-content-center">
-        <div class="card" style="width: 30rem">
+        <div class="card" style="width: 50rem">
             <div class="card-body">
 				{% if request.user.is_authenticated %}
 					<button class="btn-info float-right mr-2">
@@ -82,11 +82,79 @@
                 <h2>Profile</h2>
                 <hr>
                 <h5 class="card-text">Username</h5>
-                {{ username }}
+                {{ displayName }}
                 <p class="card-text"></p>
-                <h5 class="card-text">Email</h5>
-                {{ github }}
+                <h5 class="card-text">Github</h5>
+                {{ github_url }}
                 <p class="card-text"></p>
+                <h5 class="card-text">Posts</h5>
+                {% if posts %}
+                {% for post in posts %}
+                <div class="post_container">
+                    <div class="row justify-content-center">
+                        <div class="mt-0" >
+                            <div class="card" style="width: 50rem;">
+                                <div class="card-header text-black" style="background-color: #778899;">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h4 class="card-title"> 
+                                                <a href="{{ post.id }}" style="color: black;">{{ post.title }}</a>
+                                            </h4>
+                                            <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white" href="{{host}}/service/authors/{{ post.author.id }}">{{ post.author.displayName }}</a></p>
+                                        </div>
+                                        <div class="col-3 pb-3">
+                                            {% if userAuthor and userAuthor.id == post.author.id %}
+                                            <div class="col pb-3">
+                                                <a href="{{host}}/service/editpost/{{post.id}}"><button class="btn btn-warning float-right" type="button" class="btn">Edit post</button></a>
+                                            </div>
+                                            <div class="col mt-4">
+                                                <a href="{{host}}/service/deletepost/{{post.id}}"><button class="btn btn-outline-light float-right" type="button" class="btn" onclick="return confirm('Are you sure?');">Delete post</button></a>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr>
+                                
+                                <div class="card-body">
+                                    <p class="field-label"><strong>Description: </strong>{{post.description}}</p>
+                                    {% if post.contentType != "text/plain" %}
+                                    <div class="post-image">
+                                        <img src='{{host}}/service{{ post.image.url }}' alt="Post image" style = "height: 290px; width: 290px; border-radius: 15px; margin-top: 10px;" />
+                                    </div>
+                                    {% else %}
+                                    <p class="field-label"></p>
+                                    <p>{{post.content}}</p>
+                                    {% endif %}
+                                </div>
+
+                                <hr>
+                                
+                                <div class="card-footer">
+                                <div>
+                                    <button id="{{post.id}}-like-button" type="submit" name="post_id" value="{{post.id}}" class="btn"><span id="like-count-{{post.id}}">{{post.numberOfLikes}}</span> | Like</button>
+                                    <a href="{{post.id}}"><button type="button" class="btn">Comments</button></a>
+                                    <button type="button" class="btn" id="addcomment-{{post.id}}">Add comment</button>
+                                </div>
+                                
+                                <hr>
+                                
+                                <p class="field-label"><b>Comments: </b></p>
+                                <div id="comments-of-{{post.id}}">
+                                    {% for comment in post.topComments %}
+                                        <div class="comment">
+                                            <p><a class="author-link" href="{{host}}/service/authors/{{ comment.author.id }}">{{ comment.author.displayName }}</a>: {{comment.comment}}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                    {% else %}
+                        <p>No posts are available.</p>
+                    {% endif %}
                 <hr>
                 <div>
 
