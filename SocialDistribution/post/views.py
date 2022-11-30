@@ -191,7 +191,7 @@ class PostAllPublicPost(generics.ListAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(["GET", "POST", "DELETE"])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def handleInboxRequests(request, author_id):
     if request.method == "GET":
         try:
@@ -278,7 +278,7 @@ def handleInboxRequests(request, author_id):
 
 
 @api_view(["GET", "DELETE"])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def getEntireInboxRequests(request, author_id):
     if request.method == "GET":
         try:
