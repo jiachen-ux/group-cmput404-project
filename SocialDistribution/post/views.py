@@ -2,6 +2,8 @@ from functools import partial
 import json
 from re import A
 import re
+
+import requests
 from . import utils
 from django.shortcuts import render, redirect
 from django.http.request import HttpRequest
@@ -345,6 +347,7 @@ def getEntireInboxRequests(request, author_id):
 def postIndex(request: HttpRequest):
     host = request.scheme + "://" + request.get_host()
     posts = Post.objects.filter(visibility="PUBLIC", unlisted=False)
+
     for post in posts:
         post.numberOfLikes =  0 #len(get_post_likes(post.id)) 
         #post.topComments = get_latest_comments(post.id)
@@ -396,3 +399,72 @@ def deletepost(request: HttpRequest, post_id: str):
     if post.author.id == author.id:
         post.delete()
     return redirect('post:index')
+
+
+@api_view(["GET"])
+def getForeignPosts(request):
+    '''
+    Used to get all the foreign posts
+    connected with team 8 and team 7
+    '''
+    combined_author = []
+
+    team8 = 'https://c404-team8.herokuapp.com/api/'
+    team7 = 'https://cmput404-social.herokuapp.com/service/'    
+    #local_Authors = Author.objects.all()
+    
+    t8_remote_response = requests.get(f'{team8}authors/')
+    team7_remote_response = requests.get(f'{team7}authors/')
+
+    #serializer = GetAuthorSerializer(local_Authors, many=True)
+    #combined_author = serializer.data
+
+    if t8_remote_response.status_code == 200:
+        print('connect to team 8')
+        team8_data = t8_remote_response.json()
+        team8_Authors = team8_data['items']
+        combined_author.extend(team8_Authors)
+
+    if team7_remote_response.status_code == 200:
+        print('connect to team 7')
+        team7_data = team7_remote_response.json()
+        team7_Authors = team7_data['items']
+        combined_author.extend(team7_Authors)
+    
+
+
+    context = {
+        "type": "authors",
+        "items": combined_author
+    }
+
+    data = []
+    authorId=[]
+    posts = []
+
+    finalPost = {}
+
+
+    for result in context['items']:
+        authorId.append(result['id'])
+
+    for i in authorId:
+        response = requests.get(f"{team8}authors/{i}/posts", params=request.GET)
+        
+        if response.status_code == 200:
+            posts = response.json()['items']
+            data.append(posts)
+
+
+    for post in data:
+        if len(post) == 0:
+            data.remove(post)
+    
+    
+
+    finalPost = {
+        "posts": data
+    }
+
+    
+    return render(request, 'foreignPosts.html', finalPost)
