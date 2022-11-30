@@ -54,7 +54,6 @@ class AuthorAPIView(generics.ListAPIView):
         return response.Response(serializer.data)
 
 
-@login_required
 @api_view(["GET"])
 def getAllAuthors(request):
     allAuthors = Author.objects.all()
