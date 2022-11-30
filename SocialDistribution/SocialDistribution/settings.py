@@ -156,6 +156,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CSRF_TRUSTED_ORIGINS=["https://team9-socialdistribution.herokuapp.com/", "http://127.0.0.1:8000/"]
 
 # Configure Django App for Heroku.
 import django_on_heroku
