@@ -39,8 +39,10 @@ urlpatterns = [
 
     path("home/", author_view.homeView),
     path("admin/", admin.site.urls),
+    path('authors/<authorId>/', author_view.profile, name="author_profile"),
+    path('authors/', author_view.display_author, name="allForeignAuthors"),
 
-    path("", include("author.urls")),
+    # path("", include("author.urls")),
     path("", include("comment.urls")),
     path("", include("post.urls")),
     path("", include("follower.urls")),
