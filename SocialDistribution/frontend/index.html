@@ -53,8 +53,9 @@
                 <div class="card-footer">
                     <div>
                         <button id="{{post.id}}" type="submit" name="{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes'
-                        onclick="LikeFunction(value)" class="btn"> {{numberOfLikes}}| Like</button>
-                        <button id="{{post.id}}" type="submit" name="{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/getalllikes'
+                        onclick="LikeFunction(value)" class="btn"> | Like</button>
+                        
+                        <button id="count-{{post.id}}" type="submit" name="{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/getalllikes'
                         onclick="LikeCount(value,id)" class="btn">Like: Count</button>
                         <div class="comment-input-div">
                             <form id= "form-{{post.id}}" class="form">
@@ -115,17 +116,15 @@
                         'X-CSRFToken': "{{ csrf_token }}",
                         'Content-Type': 'application/json',
                     },
-                     
                 }).then(res =>  res.json())
-                .then(data => {console.log(data)
-                    appendData(count=0,data);})
-                function appendData(count=0,data) {
-                        // if(Object.keys(data).length==3 && data.object_id==id){
-                        //     count+=1;
-                        //     document.getElementById(id).innerHTML = count
-                        return Object.keys(data).length ;
-
-                    }
+                .then(data => {
+                    appendData(data);
+                });
+                function appendData(data){
+                    document.getElementById(id).innerHTML = data.length;
+                }
+               
+                 
                 }
             
         
