@@ -376,6 +376,18 @@ svg{
     background-position: center;
     background-repeat: no-repeat;
 }
+.postBody {
+    width: 90%;
+    padding: 1% 5% 1% 5%;
+    /* background-color: aqua; */
+    display: inline-block;
+    /* word-wrap: break-word; */
+    font-family: 'Lato', sans-serif;
+    height: auto;
+    /* height: 100%; */
+    overflow-wrap: break-word;
+    /* inline-size: 70%; */
+}
 .post-actions{
     display: flex;
     flex: 1;
