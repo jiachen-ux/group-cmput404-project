@@ -52,13 +52,12 @@
 
                 <div class="card-footer">
                     <div>
-                        <button id="{{post.id}}" type="submit" name="{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes'
-                        onclick="LikeFunction(value)" class="btn">| Like</button>
+                        <button id="{{post.title}}" type="submit" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes' name='{{host}}/service/authors/{{request.user.id}}/inbox' onclick="LikeFunction(value,name,id)" class="btn">Like</button>
                         <div class="comment-input-div">
                             <form id= "form-{{post.id}}" class="form">
                                 <input type="text" name="comment" class="comment-input"
                                     placeholder="Write a comment..." >
-                                <button type="submit" id= "form-{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/comments' class="btn btn-primary" onclick="CommentFunction(value,id)">Submit</button>
+                                <button type="submit" id= "form-{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/comments' name='{{host}}/service/authors/{{request.user.id}}/inbox' class="btn btn-primary" onclick="CommentFunction(value,id,name)">Submit</button>
                             </form>
                         </div>
                         <button name = "demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, name)">Show Comments</button>
@@ -68,7 +67,7 @@
             </div>
         </div>
         <script>
-            function CommentFunction(value,id){
+            function CommentFunction(value,id,inbox){
                 var forml = document.getElementById(id)
                 const newform = new FormData(forml)
                 const data = Object.fromEntries(newform)
@@ -79,9 +78,27 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(data)
-                }).then(res => res.json());
+                }).then(res =>  res.json())
+                    .then(item => {
+                        console.log(data);
+                        let result = {
+                            type: "comment",
+                            data: item,
+                        };
+                        alert("yes");
+                        fetch(inbox,{
+                            method: 'POST',
+                            headers: {
+                            'X-CSRFToken' : "{{ csrf_token }}",
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(result)
+                    })
+                    }).then(res=> {
+                        alert("yes");
+                    })
             }
-            function LikeFunction(value){
+            function LikeFunction(value,inbox,title){
                 fetch(value, {
                     method: 'GET',
                     headers: {
@@ -92,15 +109,32 @@
                 }).then(res =>  res.json())
                 .then(data =>  {
                     if(data == 404){
-                        fetch(value, {
-                    method: 'POST',
-                    headers: {
+                       fetch(value, {
+                            method: 'POST',
+                            headers: {
                         'X-CSRFToken': "{{ csrf_token }}",
                         'Content-Type': 'application/json',
-                    },
-                }).then(res =>  res.json())
-                .then(data => console.log(data))
-                    }
+                        },
+                    }).then(res =>  res.json())
+                    .then(item => {
+                        console.log(data);
+                        item.id = value;
+                        item.title = title;
+                        let result = {
+                            type: "like",
+                            data: item,
+                        };
+                        alert("yes");
+                        fetch(inbox,{
+                            method: 'POST',
+                            headers: {
+                            'X-CSRFToken' : "{{ csrf_token }}",
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(result)
+                    })
+                    })
+                }
                 })
       
                  
