@@ -102,7 +102,11 @@
             encode_Content = document.getElementById("textcontent").value;
             formdata.append("content", encode_Content);
         }
-        else{
+        else if(content_isMarkdown===true){
+            encode_Content = document.getElementById("textcontent").value;
+            formdata.append("content", encode_Content);
+        }
+        else if(content_isFile===true){
             encode_Content = document.getElementById("filecontent").files;
             formdata.append("image", encode_Content[0]);
         }
@@ -213,11 +217,11 @@
                 formdata.append("contentType", 'text/plain');
                 sendMessage();
             }
-            if(content_isMarkdown===true){
+            else if(content_isMarkdown===true){
                 formdata.append("contentType", 'text/markdown');
                 sendMessage();
             }
-            if(content_isFile===true){
+            else if(content_isFile===true){
                 // https://stackoverflow.com/questions/53211073/capture-result-of-html5-filereader-when-using-promises-in-async
                 function getBase64(file, onLoadCallback) {
                     return new Promise(function(resolve, reject) {
