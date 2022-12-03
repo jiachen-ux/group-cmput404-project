@@ -251,6 +251,13 @@ def profile(request, authorId):
     github_url = ''
     posts = []
     host = ''
+    is_self = True
+    user = request.user
+
+    try:
+        current_author = get_object_or_404(Author, id = authorId)
+    except Author.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     for author in authors:
         print(author)
@@ -276,11 +283,21 @@ def profile(request, authorId):
             posts = response.json()['items']
     else:
         posts = Post.objects.filter(author__id=authorId, visibility="PUBLIC", unlisted=False)
+
+
+    if user.is_authenticated and user != current_author:
+            is_self = False
+    
+
     context = {
         'displayName': display_name,
         'github_url': github_url,
         'posts': posts,
+        'is_self': is_self,
     }
+
+
+    print(context['is_self'])
 
     # print(context)
     return render(request, 'author/profile.html', context)
