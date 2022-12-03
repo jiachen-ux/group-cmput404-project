@@ -39,6 +39,8 @@
     <form>
         <input type="radio" id="textchoice" name="textorfile" value="text">
         <label for="text">Text</label><br>
+        <input type="radio" id="textchoice" name="textorfile" value="text/markdown">
+        <label for="text">Markdown</label><br>
         <input type="radio" id="filechoice" name="textorfile" value="file">
         <label for="file">File</label><br>
     </form>
@@ -59,6 +61,8 @@
         var post;
         var encode_Content;
         var content_isText;
+        var content_isMarkdown;
+        var content_isFile;
         var postString;
         var AuthorUrl;
         var postUrl;
@@ -99,6 +103,15 @@
                     document.getElementById("filecontent").hidden=true;
                     document.getElementById("textcontent").value=post.content;
                 }
+                else if(post.contentType==="text/markdown"){
+                    content_isMarkdown=true;
+                    document.getElementById("textchoice").checked=true;
+                    document.getElementById("inputcontenttext").removeAttribute("hidden");
+                    document.getElementById("textcontent").removeAttribute("hidden");
+                    document.getElementById("choosefiletext").hidden = true;
+                    document.getElementById("filecontent").hidden=true;
+                    document.getElementById("textcontent").value=post.content;
+                }
                 else{
                     content_isText=false;
                     document.getElementById("filechoice").checked=true;
@@ -119,6 +132,18 @@
 
             if(document.querySelector('input[name = "textorfile"]:checked').value ==="text"){
                 content_isText=true;
+                content_isMarkdown=false;
+                content_isFile=false
+                document.getElementById("inputcontenttext").removeAttribute("hidden");
+                document.getElementById("textcontent").removeAttribute("hidden");
+                document.getElementById("choosefiletext").hidden = true;
+                document.getElementById("filecontent").hidden=true;
+            }
+
+            else if(document.querySelector('input[name = "textorfile"]:checked').value ==="text/markdown"){
+                content_isMarkdown=true;
+                content_isText=false;
+                content_isFile=false
                 document.getElementById("inputcontenttext").removeAttribute("hidden");
                 document.getElementById("textcontent").removeAttribute("hidden");
                 document.getElementById("choosefiletext").hidden = true;
@@ -126,6 +151,8 @@
             }
 
             else{
+                content_isFile=true;
+                content_isMarkdown=false;
                 content_isText=false;
                 document.getElementById("choosefiletext").removeAttribute("hidden");
                 document.getElementById("filecontent").removeAttribute("hidden");
@@ -151,7 +178,11 @@
                 encode_Content = document.getElementById("textcontent").value;
                 formdata.append("content", encode_Content);
             }
-            else{
+            else if(content_isMarkdown===true){
+                encode_Content = document.getElementById("textcontent").value;
+                formdata.append("content", encode_Content);
+            }
+            else if(content_isFile===true){
                 encode_Content = document.getElementById("filecontent").files;
                 formdata.append("image", encode_Content[0]);
             }
@@ -194,6 +225,10 @@
             AuthorUrl = '{{host}}'+'/service'+'/authors/'+'{{post.author.id}}';
             if(content_isText===true){
                 formdata.append("contentType", 'text/plain');
+                sendMessage();
+            }
+            else if(content_isMarkdown===true){
+                formdata.append("contentType", 'text/markdown');
                 sendMessage();
             }
             else{
