@@ -20,6 +20,7 @@
                         </div>
                         <div class="col-3 pb-3">
                             {% if userAuthor and userAuthor.id == post.author.id %}
+            
                             <div class="col pb-3">
                                 <a href="{{host}}/service/editpost/{{post.id}}"><button
                                         class="btn btn-warning float-right" type="button" class="btn">Edit
@@ -145,7 +146,7 @@
                     var mainContainer = document.getElementById(id);
                     for (var i = 0; i < data.length; i++) {
                         var div = document.createElement("div");
-                        div.innerHTML =  'Comment :' + data[i].comment + ' -by: ' + data[i].author.displayName 
+                        div.innerHTML =  'Comment :' + data[i].comment + ' -by: ' + data[i].author.displayName + '<p><button onclick="myFunction()">Like</button>' 
                         mainContainer.appendChild(div);
                     }
                 }
