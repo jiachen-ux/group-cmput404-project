@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'djoser',
     'crispy_forms',
     'whitenoise.runserver_nostatic',
-    
+    'markdownify.apps.MarkdownifyConfig',
 
 ]
 

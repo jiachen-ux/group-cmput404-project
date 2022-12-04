@@ -53,8 +53,11 @@
             <div class="form-group">
                 <input type="radio" id="textchoice" name="textorfile" value="text">
                 <label for="text">Text</label><br>
+                <input type="radio" id="filechoice" name="textorfile" value="text/markdown">
+                <label for="text">Markdown</label><br>
                 <input type="radio" id="filechoice" name="textorfile" value="file">
                 <label for="file">File</label><br>
+                
 
             </div>
             
@@ -76,6 +79,8 @@
 <script>
     var encode_Content;
     var content_isText;
+    var content_isMarkdown;
+    var content_isFile;
     var postString;
     var authorUrl;
     var post;
@@ -97,7 +102,11 @@
             encode_Content = document.getElementById("textcontent").value;
             formdata.append("content", encode_Content);
         }
-        else{
+        else if(content_isMarkdown===true){
+            encode_Content = document.getElementById("textcontent").value;
+            formdata.append("content", encode_Content);
+        }
+        else if(content_isFile===true){
             encode_Content = document.getElementById("filecontent").files;
             formdata.append("image", encode_Content[0]);
         }
@@ -163,12 +172,21 @@
             content_isText=true;
         }
 
+        else if(document.querySelector('input[name = "textorfile"]:checked').value ==="text/markdown"){
+            document.getElementById("inputcontenttext").removeAttribute("hidden");
+            document.getElementById("textcontent").removeAttribute("hidden");
+            document.getElementById("choosefiletext").hidden = true;
+            document.getElementById("filecontent").hidden=true;
+            
+            content_isMarkdown=true;
+        }
+
         else{
             document.getElementById("choosefiletext").removeAttribute("hidden");
             document.getElementById("filecontent").removeAttribute("hidden");
             document.getElementById("inputcontenttext").hidden=true;
             document.getElementById("textcontent").hidden=true;
-            content_isText=false;
+            content_isFile=True;
             content = document.getElementById("filecontent");
             
         }
@@ -199,7 +217,11 @@
                 formdata.append("contentType", 'text/plain');
                 sendMessage();
             }
-            else{
+            else if(content_isMarkdown===true){
+                formdata.append("contentType", 'text/markdown');
+                sendMessage();
+            }
+            else if(content_isFile===true){
                 // https://stackoverflow.com/questions/53211073/capture-result-of-html5-filereader-when-using-promises-in-async
                 function getBase64(file, onLoadCallback) {
                     return new Promise(function(resolve, reject) {
