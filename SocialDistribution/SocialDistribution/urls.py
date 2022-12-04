@@ -78,6 +78,7 @@ urlpatterns = [
 
     # likes
     path('service/authors/<uuid:uuidOfAuthor>/posts/<uuid:uuidOfPost>/likes', post_view.PostLike.as_view()),
+    path('service/authors/<uuid:uuidOfAuthor>/posts/<uuid:uuidOfPost>/getalllikes', post_view.getAllPostLikes.as_view()),
 
     # Liked routes!
     path('service/authors/<uuid:uuidOfAuthor>/liked', post_view.getAllAuthorLiked),
