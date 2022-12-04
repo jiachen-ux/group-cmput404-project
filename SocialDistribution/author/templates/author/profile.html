@@ -2,6 +2,7 @@
 
 {% extends 'author/base.html' %}
 
+{% load static %}
 
 {% block content %}
 
@@ -73,43 +74,63 @@
 
 <div class="container">
     <div class="row justify-content-center">
-        <div class="card" style="width: 50rem">
+        <div class="card" style="width: 50rem; height: 20rem;">
             <div class="card-body">
 				{% if request.user.is_authenticated %}
 					<button class="btn-info float-right mr-2" id="{{request.user.id}}" type="submit"  name='{{host}}/service/authors/{{id}}/inbox' value = '{{host}}/service/authors/{{request.user.id}}/followrequest/{{ id }}' onclick=FollowFunction(value,name,id) >
 						Follow  
 					</button>     
                     
+                {% if is_self == False %}
+                <a  class="btn btn-info float-right mr-2" href="#">Follow</a>
+				<div class="d-flex flex-column mt-4">
+				</div>
+                    {% endif %}
                 <h2>Profile</h2>
                 <hr>
-                <h5 class="card-text">Username</h5>
+                <img src="{% static 'author/images/defaultProfile.png' %}" class="float-right mr-2" style="height: 16%; ">
+                <h5 class="card-text">Display Name</h5>
                 {{ displayName }}
+
                 <p class="card-text"></p>
                 <h5 class="card-text">Github</h5>
                 {{ github_url }}
                 <p class="card-text"></p>
+                {% if is_self %}
+		  		<a  class="btn btn-info float-right mr-2" href="{% url 'editProfile' %}">Update</a>
+				<div class="d-flex flex-column mt-4">
+				</div>
+		  		{% endif %}
+
+                </div>
+                </div>
+                <div>
+                    <hr>
+                </div>
+
+                <div class="card mt-5" style="width: 50rem; border-color: white;">
                 <h5 class="card-text">Posts</h5>
                 {% if posts %}
                 {% for post in posts %}
                 <div class="post_container">
-                    <div class="row justify-content-center">
-                        <div class="mt-0" >
-                            <div class="card" style="width: 50rem;">
+                    <div class="row justify-content-center" >
+                        <div class="mt-2" >
+                            <div class="ml-3" style="width: 50rem;">
                                 <div class="card-header text-black" style="background-color: #778899;">
                                     <div class="row">
                                         <div class="col">
                                             <h4 class="card-title"> 
                                                 <a href="{{ post.id }}" style="color: black;">{{ post.title }}</a>
                                             </h4>
-                                            <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white" href="{{host}}/service/authors/{{ post.author.id }}">{{ post.author.displayName }}</a></p>
+                                            <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white" href="{{host}}/authors/{{ post.author.id }}">{{ post.author.displayName }}</a></p>
                                         </div>
                                         <div class="col-3 pb-3">
                                             {% if userAuthor and userAuthor.id == post.author.id %}
                                             <div class="col pb-3">
-                                                <a href="{{host}}/service/editpost/{{post.id}}"><button class="btn btn-warning float-right" type="button" class="btn">Edit post</button></a>
+                                                <a href="{{host}}/editpost/{{post.id}}"><button class="btn btn-warning float-right" type="button" class="btn">Edit post</button></a>
                                             </div>
                                             <div class="col mt-4">
-                                                <a href="{{host}}/service/deletepost/{{post.id}}"><button class="btn btn-outline-light float-right" type="button" class="btn" onclick="return confirm('Are you sure?');">Delete post</button></a>
+                                                <a href="{{host}}/deletepost/{{post.id}}"><button class="btn btn-outline-light float-right" type="button" class="btn" onclick="return confirm('Are you sure?');">Delete post</button></a>
                                             </div>
                                             {% endif %}
                                         </div>
@@ -145,7 +166,7 @@
                                 <div id="comments-of-{{post.id}}">
                                     {% for comment in post.topComments %}
                                         <div class="comment">
-                                            <p><a class="author-link" href="{{host}}/service/authors/{{ comment.author.id }}">{{ comment.author.displayName }}</a>: {{comment.comment}}</p>
+                                            <p><a class="author-link" href="{{host}}/authors/{{ comment.author.id }}">{{ comment.author.displayName }}</a>: {{comment.comment}}</p>
                                         </div>
                                     {% endfor %}
                                 </div>
@@ -194,6 +215,7 @@
 				<div class="d-flex flex-column mt-4">
 				</div>
 		  		{% endif %}
+
                 
             </div>
             </div>
@@ -203,7 +225,6 @@
 
 		
 	</div>
-    </div>
 </div>
 
 

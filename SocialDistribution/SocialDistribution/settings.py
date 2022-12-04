@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'djoser',
     'crispy_forms',
     'whitenoise.runserver_nostatic',
-    
+    'markdownify.apps.MarkdownifyConfig',
 
 ]
 
@@ -150,6 +150,10 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'author/media')
 MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
 
 
 # Default primary key field type
