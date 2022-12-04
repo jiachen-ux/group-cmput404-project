@@ -83,14 +83,14 @@
                     {% endif %}
                 <h2>Profile</h2>
                 <hr>
-                <h5 class="card-text">Username</h5>
+                <h5 class="card-text">displayName</h5>
                 {{ displayName }}
                 <p class="card-text"></p>
                 <h5 class="card-text">Github</h5>
                 {{ github_url }}
                 <p class="card-text"></p>
                 {% if is_self %}
-		  		<a  class="btn btn-info float-right mr-2" href="#">Update</a>
+		  		<a  class="btn btn-info float-right mr-2" href="{% url 'editProfile' %}">Update</a>
 				<div class="d-flex flex-column mt-4">
 				</div>
 		  		{% endif %}
