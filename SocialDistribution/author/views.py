@@ -252,6 +252,7 @@ def profile(request, authorId):
     github_url = ''
     posts = []
     host = ''
+    id=''
 
     for author in authors:
         print(author)
@@ -260,6 +261,7 @@ def profile(request, authorId):
             display_name = author['displayName']
             github_url = author['github']
             host = author['host']
+            id= author['id']
             break
             
     if host in team8:
@@ -281,6 +283,7 @@ def profile(request, authorId):
         'displayName': display_name,
         'github_url': github_url,
         'posts': posts,
+        'id':id,
     }
 
     # print(context)

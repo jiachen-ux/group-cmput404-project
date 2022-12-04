@@ -76,9 +76,10 @@
         <div class="card" style="width: 50rem">
             <div class="card-body">
 				{% if request.user.is_authenticated %}
-					<button class="btn-info float-right mr-2">
-						Follow 
-					</button>
+					<button class="btn-info float-right mr-2" id="{{request.user.id}}" type="submit"  name='{{host}}/service/authors/{{id}}/inbox' value = '{{host}}/service/authors/{{request.user.id}}/followrequest/{{ id }}' onclick=FollowFunction(value,name,id) >
+						Follow  
+					</button>     
+                    
                 <h2>Profile</h2>
                 <hr>
                 <h5 class="card-text">Username</h5>
@@ -157,8 +158,37 @@
                     {% endif %}
                 <hr>
                 <div>
-
-                <!-- If Auth user is viewing their own profile -->
+                <script>
+                    function FollowFunction(value,name,id){
+                        fetch(value, {
+                            method: 'PUT',
+                            headers: {
+                                'X-CSRFToken': "{{ csrf_token }}",
+                                'Content-Type': 'application/json',
+                            },
+                        }).then(res => res.json())
+                          .then(item => {  
+                            item.id = id;
+                            item.title = id;
+                            item.author_id = name;
+                            let result = {
+                                type: "follow",
+                                data: item,
+                            };
+                            alert("yes");
+                            fetch(name,{
+                                method: 'POST',
+                                headers: {
+                                'X-CSRFToken' : "{{ csrf_token }}",
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(result)
+                           })
+                           })
+                    }
+                    
+                </script>
+            
 		  		{% if is_self %}
 		  		<a  class="btn btn-info float-right mr-2" href="#">Update</a>
 				<div class="d-flex flex-column mt-4">
