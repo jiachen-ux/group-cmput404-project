@@ -2,6 +2,7 @@
 
 {% extends 'author/base.html' %}
 
+{% load static %}
 
 {% block content %}
 
@@ -73,7 +74,7 @@
 
 <div class="container">
     <div class="row justify-content-center">
-        <div class="card" style="width: 50rem">
+        <div class="card" style="width: 50rem; height: 20rem;">
             <div class="card-body">
 				{% if request.user.is_authenticated %}
                 {% if is_self == False %}
@@ -83,8 +84,10 @@
                     {% endif %}
                 <h2>Profile</h2>
                 <hr>
+                <img src="{% static 'author/images/defaultProfile.png' %}" class="float-right mr-2" style="height: 16%; ">
                 <h5 class="card-text">displayName</h5>
                 {{ displayName }}
+
                 <p class="card-text"></p>
                 <h5 class="card-text">Github</h5>
                 {{ github_url }}

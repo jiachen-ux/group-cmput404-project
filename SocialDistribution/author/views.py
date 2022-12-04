@@ -320,6 +320,8 @@ def display_author(request):
 
 def profileEdit(request):
 
+    authorId = request.user.id
+    print(authorId)
 
     if request.method == "POST":
         form = EditAuthorForm(request.POST, instance=request.user)
@@ -345,14 +347,12 @@ def profileEdit(request):
         git_url = request.user.github
         displayName = request.user.displayName
         username = request.user.username
-        print("3")
-        print(username)
 
         gituser = git_url.replace("http://github.com/", "")
-        context = {'form':form, 'github_username':gituser, 'displayName':displayName, 'username':username}
+        context = {'form':form, 'github_username':gituser, 'displayName':displayName, 'username':username, 'id':authorId}
         
-        #return HttpResponse(render(request, 'author/editProfile.html', context),status=200)
-        return render(request, 'author/editProfile.html', context)
+        return HttpResponse(render(request, 'author/editProfile.html', context),status=200)
+        #return render(request, 'author/editProfile.html', context)
 
     
 
