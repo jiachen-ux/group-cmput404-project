@@ -44,20 +44,17 @@ class CommentPostView(generics.ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         queryset = Post.objects.filter(id=kwargs['uuidOfPost']).first()
-        print(kwargs)
         data = {'count': 1}
         # Inbox.objects.create(author_id=kwargs["uuidOfAuthor"],
         #                      object_type='comment', object_id=kwargs['uuidOfPost'])
         serializer = PostSerializer(queryset, data=data)
         if serializer.is_valid():
             serializer.save()
-            print(serializer.data)
         commentdatas=self.create(request, *args, **kwargs)
-        print(commentdatas.data.get("id"))
         authorID, postID, commentID = utils.getAuthorIDandPostIDFromLikeURL(
             commentdatas.data.get("id"))
-        message = f'{request.user.username} leaves a comment on your post {commentID}'
-        Inbox.objects.create(author_id=authorID,message=message,
+        message = f'{request.user.username} liked your comment {commentID}'
+        Inbox.objects.create(author_id=queryset.author_id,message=message,
                              object_type='comment', object_id=kwargs['uuidOfPost'])
         return self.create(request, *args, **kwargs)
 

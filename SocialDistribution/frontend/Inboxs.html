@@ -3,7 +3,7 @@
 {% block title %}List of Posts{% endblock %}
 
 {% block content %}
-<p style="text-align: center">通知中心</p>
+<p style="text-align: center">Inbox</p>
 {% if total %}
 {% for post in total %}
 <div class="container">
@@ -13,7 +13,7 @@
                 <div class="card-header text-black">
                     <div class="row">
                         <div class="col">
-                            <li> {{ post.posts.message }}</li><li style="text-align: right">{{ post.posts.published|date:"Y-m-d H:i:s"}}</li><li>(内容为:){{post.postinfo.title}}</li>
+                            <li> {{ post.posts.message }}</li><li style="text-align: right">{{ post.posts.published|date:"Y-m-d H:i:s"}}</li><li>(content is){{post.postinfo.title}}</li>
                         </div>
                     </div>
                 </div>
