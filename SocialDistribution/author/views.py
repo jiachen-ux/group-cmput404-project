@@ -6,14 +6,11 @@ from . import utils
 from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect, get_object_or_404
 from rest_framework import generics, mixins, response, status
 import requests
-from requests.auth import HTTPBasicAuth
-from follower.models import Follower
+
 from .serializers import *
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from base64 import b64encode
 from author.forms import CreateAuthorForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -180,7 +177,7 @@ def registerView(request):
         if form.is_valid():
             git_user = form.cleaned_data.get('github')
             github_url = f'http://github.com/{git_user}'
-            user = Author.objects.create_user(displayName=form.cleaned_data.get('displayName'), username=form.cleaned_data.get('username'), password=form.cleaned_data.get('password1'), github=github_url)
+            user = Author.objects.create_user(displayName=form.cleaned_data.get('displayName'), username=form.cleaned_data.get('username'), password=form.cleaned_data.get('password1'))
 
             return redirect(loginView)
             #return HttpResponseRedirect('/login')

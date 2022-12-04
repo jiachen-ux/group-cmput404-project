@@ -37,6 +37,7 @@ class PostLike(ListCreateAPIView):
         context["object_id"] = self.kwargs['uuidOfPost']
         return context
     def post(self, request,  *args, **kwargs):
+        print(request)
         return self.create(request)
         
     def get(self, request, *args, **kwargs):
@@ -204,6 +205,7 @@ def handleInboxRequests(request, author_id):
             setOfIds = set([o.object_id for o in allPostIDsInThisAuthorsInbox])
             allPosts = Post.objects.filter(id__in=setOfIds)
             items = PostSerializer(allPosts, many=True)
+            print(items)
             resp = {
                 "type": "inbox",
                 "author": request.user.url(),
@@ -227,7 +229,7 @@ def handleInboxRequests(request, author_id):
                         "author": request.data["data"]["author"],
                         "object_id": request.data["data"]["id"],
                     }
-                    print(request.data["data"]["author_id"])
+                    print(request.data["data"]["object_id"])
                     serializer = LikeSerializer(
                         data=data, partial=True)
                  
@@ -242,7 +244,8 @@ def handleInboxRequests(request, author_id):
                         l = Like.objects.get_or_create(
                             author_id=request.user.id, object_type="comment", object_id=commentID)
                     elif authorID != None and postID != None:
-                        message = f'{request.user.username} liked your post {request.data["data"]["title"]}'
+                        print(request.data)
+                        message = f'{request.user.username} liked your post {request.data["data"]["object_id"]}'
                         l = Like.objects.get_or_create(
                             author_id=request.user.id, object_type="post", object_id=postID)
                     else:
@@ -390,13 +393,36 @@ def Inboxs(request: HttpRequest):
         return render(request,'index.html')
     author = Author.objects.get(id=request.user.id)
     posts = Inbox.objects.filter(author=author)
+    total=[]
     host = request.scheme + "://" + request.get_host()
-    context = {
-        'posts': posts,
-        'host': host,
+    finalPost={}
+    try:
+        for item in posts:
+            context = {}
+            if ' ' in item.message and 'like' in item.object_type:
+                postId=item.message.split(' ')[-1]
+                postinfo = Post.objects.get(id=postId)
+                context['host']=host
+                context['postinfo']=postinfo
+                context['posts']=item
+                total.append(context)
+            elif ' ' in item.message and 'comment' in item.object_type:
+                CommentId = item.message.split(' ')[-1]
+                Commentinfo = Comment.objects.get(id=CommentId)
+                context['host'] = host
+                context['postinfo'] = Commentinfo.comment
+                context['posts'] = item
+                total.append(context)
+            else:
+                context['host'] = host
+                context['posts'] = posts
+                total.append(context)
+        finalPost={
+            "total":total
         }
-    print(context)
-    return render(request, 'Inboxs.html', context)
+    except:
+        pass
+    return render(request, 'Inboxs.html', finalPost)
 
 def editpost(request: HttpRequest, post_id: str):
     if request.user.is_anonymous or not (request.user.is_authenticated):

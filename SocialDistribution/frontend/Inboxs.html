@@ -3,9 +3,9 @@
 {% block title %}List of Posts{% endblock %}
 
 {% block content %}
-<p style="text-align: center">My Notifications</p>
-{% if posts %}
-{% for post in posts %}
+<p style="text-align: center">通知中心</p>
+{% if total %}
+{% for post in total %}
 <div class="container">
     <div class="row justify-content-center">
         <div class="mt-0">
@@ -13,7 +13,7 @@
                 <div class="card-header text-black">
                     <div class="row">
                         <div class="col">
-                                <li> {{ post.message }}</li><li style="text-align: right">{{ post.published|date:"Y-m-d H:i:s"}}</li>
+                            <li> {{ post.posts.message }}</li><li style="text-align: right">{{ post.posts.published|date:"Y-m-d H:i:s"}}</li><li>(内容为:){{post.postinfo.title}}</li>
                         </div>
                     </div>
                 </div>
