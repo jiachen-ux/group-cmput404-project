@@ -346,15 +346,12 @@ def getEntireInboxRequests(request, author_id):
 
 def postIndex(request: HttpRequest):
     host = request.scheme + "://" + request.get_host()
-    posts = Post.objects.filter(visibility="PUBLIC", unlisted=False)
-
-    for post in posts:
-        post.numberOfLikes =  0 #len(get_post_likes(post.id)) 
-        #post.topComments = get_latest_comments(post.id)
+    posts = Post.objects.filter()
     context = {
         'posts': posts,
         'host' : host,
         }
+    print(context)
     return render(request, 'index.html', context)
 
 def myPosts(request: HttpRequest):
@@ -381,6 +378,19 @@ def createpost(request: HttpRequest):
             'host': host,
         }
     return render(request,'create.html',context)
+
+def Inboxs(request: HttpRequest):
+    if request.user.is_anonymous or not (request.user.is_authenticated):
+        return render(request,'index.html')
+    author = Author.objects.get(id=request.user.id)
+    posts = Inbox.objects.filter(author=author)
+    host = request.scheme + "://" + request.get_host()
+    context = {
+        'posts': posts,
+        'host': host,
+        }
+    print(context)
+    return render(request, 'Inboxs.html', context)
 
 def editpost(request: HttpRequest, post_id: str):
     if request.user.is_anonymous or not (request.user.is_authenticated):

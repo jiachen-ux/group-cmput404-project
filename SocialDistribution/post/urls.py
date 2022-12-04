@@ -26,6 +26,7 @@ urlpatterns = [
 
     path('site/posts', views.postIndex, name='index'),
     path('site/my_posts', views.myPosts, name='myPosts'),
+    path('site/inboxs', views.Inboxs, name='inboxs'),
     path('site/foreign_posts', views.getForeignPosts, name='foreignPosts'),
     path('createpost',views.createpost,name='createpost'),
     path('editpost/<str:post_id>',views.editpost, name='editpost'),
