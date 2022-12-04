@@ -4,28 +4,45 @@
 
 
 {% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-6">
+        <div class="card">
+            <div class="card-body">
 {% if author.id == post.author.id %}
-    <p>Editing the post {{post.id}}</p>
+    
+    <h5>Change the following information of the current post</h5><br>
 
-
-    <p>Change the following information of the current post</p><br>
-
-    <form>
-        Title: <input type="text" id="title" value=""> <br>
-        Description: <input type="text" id="description" value=""> <br>
-        categories: <input id="postcat" name="postcategories" value=""> <br>
-    <form>
-
-    <p>Choose if you want to list your post or not:</p>
+    <div class="form-group">
 
     <form>
+        <label for="exampleInputEmail1">Title</label><br/>
+        <div class="input-group-prepend">
+            <input type="text" id="title" value="" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+        </div>
+        <label for="exampleInputEmail1">Description</label><br/>
+                <div class="input-group-prepend">
+                    <input type="text" id="description" value="" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"> <br>
+                </div>
+        <label for="exampleInputEmail1">Categories</label><br/>
+                <div class="input-group-prepend">
+                <input id="postcat" name="postcategories" value="" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"> <br>
+                </div>
+    <form>
+
+    </div>
+
+    <label for="exampleInputEmail1">Choose if you want to list your post or not:</label>
+
+    <div class="form-group">
         <input type="radio" id="listed" name="listedstatus" value="listed">
         <label for="listed">LISTED</label><br>
         <input type="radio" id="notlisted" name="listedstatus" value="notlisted">
         <label for="notlisted">NOT LISTED</label><br>
-    </form>
+    </div>
 
-    <p>Choose the visibility of your post:</p>
+    <label>Choose the visibility of your post:</label>
+    <div class="form-group">
 
     <form>
         <input type="radio" id="public" name="visibility" value="PUBLIC">
@@ -33,9 +50,10 @@
         <input type="radio" id="friends" name="visibility" value="FRIENDS">
         <label for="friends">FRIENDS</label><br>
     </form>
+    </div>
 
-    <p>Choose if content will be text or file:</p>
-
+    <label>Choose if content will be text or file:</label>
+    <div class="form-group">
     <form>
         <input type="radio" id="textchoice" name="textorfile" value="text">
         <label for="text">Text</label><br>
@@ -44,18 +62,25 @@
         <input type="radio" id="filechoice" name="textorfile" value="file">
         <label for="file">File</label><br>
     </form>
+    </div>
 
+    <div class="form-group">
     <p id="choosefiletext" hidden>Choose your file:</p>
-
     <input type="file" id="filecontent" hidden/>
 
 
 
     <p id="inputcontenttext" hidden>Input your post content:</p>
+    <input type="text" id="textcontent" hidden class="form-control" >
 
-    <input type="text" id="textcontent" hidden>
+    </div>
 
-    <button id="submitbutton" >Submit</button>
+
+    <div class="form-group">
+        <a href="{% url 'post:myPosts' %}" class="btn btn-outline-danger btn-med float-right">Cancel</a>
+        <input  type="submit" class = "btn btn-info btn-med float-right mr-2" id="submitbutton"></input>
+        
+        </div>
 
     <script>
         var post;
@@ -253,6 +278,10 @@
     </script>
 {% else %}
 <p>Invalid credentials. Must be the original author to edit this post.</p>
+
+</div>
+</div>
+</div>
 
 {% endif %}
 {% endblock %}

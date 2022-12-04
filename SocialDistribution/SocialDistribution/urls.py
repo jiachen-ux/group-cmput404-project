@@ -41,6 +41,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('authors/<authorId>/', author_view.profile, name="author_profile"),
     path('authors/', author_view.display_author, name="allForeignAuthors"),
+    path('edit/', author_view.profileEdit, name="editProfile"),
     path("logout", author_view.logoutView, name="logout_url"),
 
     # path("", include("author.urls")),

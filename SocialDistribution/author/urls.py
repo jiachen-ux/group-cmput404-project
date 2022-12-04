@@ -14,6 +14,10 @@ urlpatterns = [
 
     # path('authors/', views.getAllAuthors), # TODO add pagination
     path('authors/<authorId>/', views.profile, name="author_profile"),
+
+
+    path('authors/edit/', views.profileEdit, name="editProfile"),
+
     path('authors/', views.display_author, name="allForeignAuthors"),
 
     path('author/search/', views.AuthorSearchView.as_view()), 

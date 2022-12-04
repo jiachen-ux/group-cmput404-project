@@ -21,6 +21,7 @@ from author.serializers import *
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from post.models import Post
+from author.forms import EditAuthorForm
 
 # from connect.views import *
 # from connect.models import *
@@ -251,6 +252,13 @@ def profile(request, authorId):
     github_url = ''
     posts = []
     host = ''
+    is_self = True
+    user = request.user
+
+    try:
+        current_author = get_object_or_404(Author, id = authorId)
+    except Author.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     for author in authors:
         print(author)
@@ -276,11 +284,21 @@ def profile(request, authorId):
             posts = response.json()['items']
     else:
         posts = Post.objects.filter(author__id=authorId, visibility="PUBLIC", unlisted=False)
+
+
+    if user.is_authenticated and user != current_author:
+            is_self = False
+    
+
     context = {
         'displayName': display_name,
         'github_url': github_url,
         'posts': posts,
+        'is_self': is_self,
     }
+
+
+    print(context['is_self'])
 
     # print(context)
     return render(request, 'author/profile.html', context)
@@ -298,3 +316,43 @@ def display_author(request):
     # print(context['items'])
     # return response.Response(context,status=status.HTTP_200_OK)
     return HttpResponse(render(request, 'author/listUsers.html', context),status=200)
+
+
+def profileEdit(request):
+
+    authorId = request.user.id
+    print(authorId)
+
+    if request.method == "POST":
+        form = EditAuthorForm(request.POST, instance=request.user)
+
+        if form.is_valid():
+            github_username = form.cleaned_data['github']
+            displayName = form.cleaned_data['displayName']
+            username = form.cleaned_data['username']
+            
+            request.user.github = "http://github.com/" + github_username
+            request.user.displayName = displayName
+            request.user.username = username
+            
+
+            form.save()
+            messages.success(request, 'Profile updated successfully.', extra_tags='success')
+            return redirect(display_author)
+        else:
+            messages.success(request, 'Profile could not be updated.', extra_tags='failure')
+            return redirect(display_author)
+    else:
+        form = EditAuthorForm(instance=request.user)
+        git_url = request.user.github
+        displayName = request.user.displayName
+        username = request.user.username
+
+        gituser = git_url.replace("http://github.com/", "")
+        context = {'form':form, 'github_username':gituser, 'displayName':displayName, 'username':username, 'id':authorId}
+        
+        return HttpResponse(render(request, 'author/editProfile.html', context),status=200)
+        #return render(request, 'author/editProfile.html', context)
+
+    
+
