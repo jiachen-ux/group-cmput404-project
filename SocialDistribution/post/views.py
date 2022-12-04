@@ -221,14 +221,16 @@ def handleInboxRequests(request, author_id):
                 if not postType in {"post", "comment", "like", "follow", "share"}:
                     raise KeyError("Invalid post type!")
                 if postType == "like":
-
+                    print(request.data)
                     data = {
                         "object_type": request.data["data"]["type"],
                         "author": request.data["data"]["author"],
                         "object_id": request.data["data"]["id"],
                     }
+                    print(request.data["data"]["author_id"])
                     serializer = LikeSerializer(
                         data=data, partial=True)
+                 
                     if not serializer.is_valid(raise_exception=True):
                         raise KeyError("like object not valid!")
 
@@ -246,9 +248,13 @@ def handleInboxRequests(request, author_id):
                     else:
                         raise KeyError("like object not valid!")
                     idOfItem = l[0].id
+                 
+                    Inbox.objects.create(author_id=request.data["data"]["title"],
+                                     object_type=postType, object_id=idOfItem, message=message)
 
                 else:
                     idOfItem = utils.getUUID(request.data["id"])
+                
                     type = request.data["type"].lower()
 
                     if type == "comment":
@@ -261,7 +267,7 @@ def handleInboxRequests(request, author_id):
                     elif type == "follow":
                         message = f'{request.data["username"]} send you a follow request.'
                         print(idOfItem)
-                Inbox.objects.create(author_id=author_id,
+                    Inbox.objects.create(author_id=author_id,
                                      object_type=postType, object_id=idOfItem, message=message)
                 return response.Response({"message": message}, status.HTTP_201_CREATED)
             except Exception as e:

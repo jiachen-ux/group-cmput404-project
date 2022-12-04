@@ -52,7 +52,7 @@
 
                 <div class="card-footer">
                     <div>
-                        <button id="{{post.title}}" type="submit" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes' name='{{host}}/service/authors/{{request.user.id}}/inbox' onclick="LikeFunction(value,name,id)" class="btn">Like</button>
+                        <button id="{{post.author.id}}" type="submit"  value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes' name='{{host}}/service/authors/{{request.user.id}}/inbox'  onclick="LikeFunction(value,name,id)" class="btn">Like</button>
                         <div class="comment-input-div">
                             <form id= "form-{{post.id}}" class="form">
                                 <input type="text" name="comment" class="comment-input"
@@ -99,6 +99,7 @@
                     })
             }
             function LikeFunction(value,inbox,title){
+               
                 fetch(value, {
                     method: 'GET',
                     headers: {
@@ -117,13 +118,15 @@
                         },
                     }).then(res =>  res.json())
                     .then(item => {
-                        console.log(data);
+                         
                         item.id = value;
                         item.title = title;
+                        item.author_id = inbox;
                         let result = {
                             type: "like",
                             data: item,
                         };
+                         
                         alert("yes");
                         fetch(inbox,{
                             method: 'POST',
