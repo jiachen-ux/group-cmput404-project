@@ -76,13 +76,12 @@
     <div class="row justify-content-center">
         <div class="card" style="width: 50rem; height: 20rem;">
             <div class="card-body">
-				{% if request.user.is_authenticated %}
-					<button class="btn-info float-right mr-2" id="{{request.user.id}}" type="submit"  name='{{host}}/service/authors/{{id}}/inbox' value = '{{host}}/service/authors/{{request.user.id}}/followrequest/{{ id }}' onclick=FollowFunction(value,name,id) >
-						Follow  
-					</button>     
+				{% if request.user.is_authenticated %}  
                     
                 {% if is_self == False %}
-                <a  class="btn btn-info float-right mr-2" href="#">Follow</a>
+                <button class="btn-info float-right mr-2" id="{{request.user.id}}" type="submit"  name='{{host}}/service/authors/{{id}}/inbox' value = '{{host}}/service/authors/{{request.user.id}}/followrequest/{{ id }}' onclick=FollowFunction(value,name,id) >
+                    Follow  
+                </button>   
 				<div class="d-flex flex-column mt-4">
 				</div>
                     {% endif %}
