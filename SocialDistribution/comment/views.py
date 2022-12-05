@@ -53,7 +53,7 @@ class CommentPostView(generics.ListCreateAPIView):
         commentdatas=self.create(request, *args, **kwargs)
         authorID, postID, commentID = utils.getAuthorIDandPostIDFromLikeURL(
             commentdatas.data.get("id"))
-        message = f'{request.user.username} liked your comment {commentID}'
+        message = f'{request.user.username} commented on your post {commentID}'
         Inbox.objects.create(author_id=queryset.author_id,message=message,
                              object_type='comment', object_id=kwargs['uuidOfPost'])
         return self.create(request, *args, **kwargs)
