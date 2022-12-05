@@ -216,13 +216,13 @@ def get_local_remote_author(request):
     combined_author.extend(local_authors_data)
 
     if team8_remote_response.status_code == 200: 
-        print('connect to team 8')
+        # print('connect to team 8')
         team8_data = team8_remote_response.json()
         team8_Authors = team8_data['items']
         combined_author.extend(team8_Authors)
     
     if team7_remote_response.status_code == 200:
-        print('connect to team 7')
+        # print('connect to team 7')
         team7_data = team7_remote_response.json()
         team7_Authors = team7_data['items']
         combined_author.extend(team7_Authors)
@@ -253,33 +253,35 @@ def profile(request, authorId):
     posts = []
     host = ''
     id=''
+    profile_image = ''
     is_self = True
     user = request.user
 
-    try:
-        current_author = get_object_or_404(Author, id = authorId)
-    except Author.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    # try:
+    #     current_author = get_object_or_404(Author, id = authorId)
+    # except Author.DoesNotExist:
+    #     return Response(status=status.HTTP_404_NOT_FOUND)
 
     for author in authors:
-        print(author)
+        # print(author)
         if authorId == author['id']: #or authorId== author['id'].split('/')[-1]:
             print('found it')
             display_name = author['displayName']
             github_url = author['github']
             host = author['host']
             id= author['id']
+            profile_image = author['profileImage']
             break
             
     if host in team8:
-        print('connect tean 8')
+        # print('connect tean 8')
         response = requests.get(f"{team8}authors/{authorId}/posts/",
                                 params=request.GET)
         if response.status_code == 200:
             posts = response.json()['items']
 
     elif host in team7:
-        print('connect tean 7')
+        # print('connect tean 7')
         response = requests.get(f"{team7}authors/{authorId}/posts/",
                                 params=request.GET)
         if response.status_code == 200:
@@ -287,8 +289,7 @@ def profile(request, authorId):
     else:
         posts = Post.objects.filter(author__id=authorId, visibility="PUBLIC", unlisted=False)
 
-
-    if user.is_authenticated and user != current_author:
+    if user.is_authenticated and str(user.id) != authorId:
             is_self = False
     
 
@@ -298,6 +299,7 @@ def profile(request, authorId):
         'posts': posts,
         'id':id,
         'is_self': is_self,
+        'profileImage': profile_image
     }
 
 
