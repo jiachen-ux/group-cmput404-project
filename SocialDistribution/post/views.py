@@ -260,9 +260,13 @@ def handleInboxRequests(request, author_id):
                     type = request.data["type"].lower()
                     
                     if type == "comment":
+                        idOfItem = utils.getUUID(request.data["id"])
                         message = f'{request.data["author"]["username"]}  commented on your post'
+                        Inbox.objects.create(author_id=author_id, object_type=postType, object_id=idOfItem, message=message)
                     elif type == "post":
+                        idOfItem = utils.getUUID(request.data["id"])
                         message = f'{request.data["author"]["username"]} added a new post {request.data["title"]}'
+                        Inbox.objects.create(author_id=author_id, object_type=postType, object_id=idOfItem, message=message)
                     elif type == "share":
                         message = f'{request.GET.get("username")} shared a post with you.'
                         postType = 'post'
@@ -272,8 +276,7 @@ def handleInboxRequests(request, author_id):
                         message = f'{request.data["data"]["sender"]["displayName"]} send you a follow request.'
                         postType = "follow"
                      
-                    Inbox.objects.create(author_id=author_id,
-                                     object_type=postType, object_id=request.data["data"]["id"], message=message)
+                        Inbox.objects.create(author_id=author_id, object_type=postType, object_id=request.data["data"]["id"], message=message)
                 return response.Response({"message": message}, status.HTTP_201_CREATED)
             except Exception as e:
                 return response.Response({"message": str(e)}, status.HTTP_400_BAD_REQUEST)
