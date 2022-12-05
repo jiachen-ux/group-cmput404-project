@@ -11,9 +11,10 @@ urlpatterns = [
     # path("authors/<uuid:uuidOfAuthor>/posts/getallpublicpost", views.PostAllPublicPost.as_view()),
  
 
-    # # Like routes!
+    # Like routes!
     # path('authors/<uuid:uuidOfAuthor>/posts/<uuid:uuidOfPost>/likes', views.PostLike.as_view()),
     # path('authors/<uuid:uuidOfAuthor>/posts/<uuid:uuidOfPost>/comments/<uuid:uuidOfComment>/likes', views.getAllCommentLikes),
+    # path('authors/<uuid:uuidOfAuthor>/posts/<uuid:uuidOfPost>/getalllikes', views.getAllPostLikes.as_view()),
 
     # # Liked routes!
     # path('authors/<uuid:uuidOfAuthor>/liked', views.getAllAuthorLiked),
@@ -26,6 +27,7 @@ urlpatterns = [
 
     path('site/posts', views.postIndex, name='index'),
     path('site/my_posts', views.myPosts, name='myPosts'),
+    path('site/inboxs', views.Inboxs, name='inboxs'),
     path('site/foreign_posts', views.getForeignPosts, name='foreignPosts'),
     path('createpost',views.createpost,name='createpost'),
     path('editpost/<str:post_id>',views.editpost, name='editpost'),
