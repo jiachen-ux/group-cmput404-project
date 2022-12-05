@@ -153,6 +153,69 @@
             })
         })
         .then(function(){
+            var urlofFollowers = '{{host}}'+'/service' + '/authors/'+ '{{ author.id }}' + '/followers';
+            return fetch(urlofFollowers,{
+            method: 'GET',
+            headers: {
+                'Content-Type' : 'application/json',
+                'X-CSRFToken' : "{{ csrf_token }}"
+            } 
+            })
+        })
+        .then(function(response){
+            return response.json();
+        })
+        .then(function(data){
+            if(post.unlisted===false){
+                followersInJson = data["items"]["data"];
+                if(post.visibility === "FRIENDS"){
+                    for(let follower of followersInJson){
+                        var urlofFriend = '{{host}}'+'/service'+"/authors/" + follower.id +'/followers/'+'{{ author.id }}';
+                        fetch(urlofFriend,{
+                            method: 'GET',
+                            headers: {
+                            'Content-Type' : 'application/json',
+                            'X-CSRFToken' : "{{ csrf_token }}"
+                            }, 
+                        })
+                        .then(function(response){
+                            return response.json();
+                        })
+                        .then(function(data){
+                            if(data.id==='{{ author.id }}'){
+                                var urlofInbox = '{{host}}'+'/service'+"/authors/" + follower.id +'/inbox';
+                                fetch(urlofInbox,{
+                                    method: 'POST',
+                                    headers: {
+                                    'Content-Type' : 'application/json',
+                                    'X-CSRFToken' : "{{ csrf_token }}"
+                                    },
+                                    body: postString 
+                                })
+                            }
+
+                        })
+                        .catch (function (error) {
+                            console.log('Request is failed', error);
+                        });
+                    } 
+                }
+                else{
+                    for(let follower of followersInJson){
+                        var urlofInbox = '{{host}}'+'/service'+"/authors/" + follower.id +'/inbox';
+                        fetch(urlofInbox,{
+                            method: 'POST',
+                            headers: {
+                            'Content-Type' : 'application/json',
+                            'X-CSRFToken' : "{{ csrf_token }}"
+                            },
+                            body: postString 
+                        })
+                    } 
+                }
+            }
+        })
+        .then(function(){
             alert("A new post is successfully created! Redirecting you to post-list page...");
             location.href = '{{host}}'+'/site/posts';
         })
