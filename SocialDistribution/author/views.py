@@ -270,7 +270,7 @@ def profile(request, authorId):
             github_url = author['github']
             host = author['host']
             id= author['id']
-            profile_image = author['profileImage']
+            # profile_image = author['profileImage']
             break
             
     if host in team8:
@@ -299,7 +299,7 @@ def profile(request, authorId):
         'posts': posts,
         'id':id,
         'is_self': is_self,
-        'profileImage': profile_image
+        # 'profileImage': profile_image
     }
 
 
