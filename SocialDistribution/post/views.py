@@ -2,6 +2,7 @@ from functools import partial
 import json
 from re import A
 import re
+from django.core.exceptions import MultipleObjectsReturned
 
 import requests
 from . import utils
@@ -352,19 +353,12 @@ def getEntireInboxRequests(request, author_id):
         except:
             return response.Response({"message": "Something went wrong!"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# def get_post_likes(post_id):
-#     likes = Like.objects.filter(post=post_id)
-#     return likes
-
-
-
 def postIndex(request: HttpRequest):
     host = request.scheme + "://" + request.get_host()
     posts = Post.objects.filter(visibility="PUBLIC", unlisted=False)
 
     for post in posts:
-        post.numberOfLikes =  0 #len(get_post_likes(post.id)) 
-        #post.topComments = get_latest_comments(post.id)
+        post.numberOfLikes =  0
     context = {
         'posts': posts,
         'host' : host,
@@ -378,13 +372,57 @@ def myPosts(request: HttpRequest):
     posts = Post.objects.filter(author=author)
     host = request.scheme + "://" + request.get_host()
     for post in posts:
-        post.numberOfLikes = 0 #len(get_post_likes(post.id)) 
-        #post.topComments = get_latest_comments(post.id)
+        post.numberOfLikes = 0
     context = {
         'posts': posts,
         'userAuthor': author,
         'host': host,
         }
+    return render(request, 'index.html', context)
+
+def get_published(element):
+    print("element", element.published)
+    return element.published
+
+def friendPosts(request: HttpRequest):
+    if request.user.is_anonymous or not (request.user.is_authenticated):
+        return render(request,'index.html')
+
+    currentAuthor = Author.objects.get(id=request.user.id)
+
+    # Get followers
+    friends = []
+    followersQuerySet = Follower.objects.filter(following__id=currentAuthor.id)
+    for follower in followersQuerySet:
+        # Check we are not following this follower
+        try:
+            follow = Follower.objects.get(follower__id=currentAuthor.id, following__id=follower.follower.id)
+        except Follower.DoesNotExist:
+            follow = None
+        except MultipleObjectsReturned:
+            follow = Follower.objects.filter(follower__id=currentAuthor.id, following__id=follower.follower.id)[0]
+
+        if (follow):
+            friends.append(follower.follower)
+    friends = list(dict.fromkeys(friends))
+
+    friends_posts = []
+    for friend in friends:
+        print("friend", friend.displayName)
+        friend_posts = Post.objects.filter(unlisted=False, visibility="FRIENDS", author=friend)
+        for friend_post in friend_posts:
+            friends_posts.append(friend_post)
+    # Remove duplicates from friend posts
+    friends_posts = list(dict.fromkeys(friends_posts))
+    # Sort based on time
+    friends_posts.sort(key=get_published, reverse=True)
+
+    host = request.scheme + "://" + request.get_host()
+    context = {
+        'posts': friends_posts,
+        'host': host,
+        }
+
     return render(request, 'index.html', context)
 
 def createpost(request: HttpRequest):
