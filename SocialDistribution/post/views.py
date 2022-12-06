@@ -449,6 +449,7 @@ def getForeignPosts(request):
     #local_Authors = Author.objects.all()
     
     t8_remote_response = requests.get(f'{team8}authors/')
+    print(t8_remote_response)
     team7_remote_response = requests.get(f'{team7}authors/')
 
     #serializer = GetAuthorSerializer(local_Authors, many=True)
