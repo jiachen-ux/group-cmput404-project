@@ -194,6 +194,13 @@ def logoutView(request):
     messages.success(request, ("You were logged out"))
     return redirect(loginView)
 
+def id_cleaner(author):
+    for a in author:
+        id = a['id'].split('/')[-1]
+        if id == '':
+            id = a['id'].split('/')[-2]
+        a['id'] = id
+    return author
 
 def get_local_remote_author(request):
     '''
@@ -201,6 +208,7 @@ def get_local_remote_author(request):
     '''
     team8 = 'https://c404-team8.herokuapp.com/api/'
     team7 = 'https://cmput404-social.herokuapp.com/service/'
+    team17 = 'https://cmput404f22t17.herokuapp.com/'
 
     local_Authors = Author.objects.all()
     serializer = GetAuthorSerializer(local_Authors, many=True)
@@ -209,6 +217,7 @@ def get_local_remote_author(request):
     # print(local_authors_data)
     team8_remote_response = requests.get(f'{team8}authors/')
     team7_remote_response = requests.get(f'{team7}authors/')
+    team17_remote_response = requests.get(f'{team17}authors/')
     combined_author = []
 
     for author in local_authors_data:
@@ -219,6 +228,7 @@ def get_local_remote_author(request):
         # print('connect to team 8')
         team8_data = team8_remote_response.json()
         team8_Authors = team8_data['items']
+        team8_Authors = id_cleaner(team8_Authors)
         combined_author.extend(team8_Authors)
     
     if team7_remote_response.status_code == 200:
@@ -226,6 +236,13 @@ def get_local_remote_author(request):
         team7_data = team7_remote_response.json()
         team7_Authors = team7_data['items']
         combined_author.extend(team7_Authors)
+
+    if team17_remote_response.status_code == 200:
+        # print('connect to team 17')
+        team17_data = team17_remote_response.json()
+        team17_Authors = team17_data['items']
+        team17_Authors = id_cleaner(team17_Authors)
+        combined_author.extend(team17_Authors)
     return combined_author
 
 
@@ -248,6 +265,7 @@ def profile(request, authorId):
     authors = get_local_remote_author(request)
     team8 = 'https://c404-team8.herokuapp.com/api/'
     team7 = 'https://cmput404-social.herokuapp.com/service/'
+    team17 = 'https://cmput404f22t17.herokuapp.com/'
     display_name = ''
     github_url = ''
     posts = []
@@ -283,6 +301,13 @@ def profile(request, authorId):
     elif host in team7:
         # print('connect tean 7')
         response = requests.get(f"{team7}authors/{authorId}/posts/",
+                                params=request.GET)
+        if response.status_code == 200:
+            posts = response.json()['items']
+
+    elif host in team17:
+        # print('connect tean 17')
+        response = requests.get(f"{team17}authors/{authorId}/posts/",
                                 params=request.GET)
         if response.status_code == 200:
             posts = response.json()['items']
