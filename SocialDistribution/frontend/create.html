@@ -86,17 +86,24 @@
     var post;
     var content;
     var formdata;
+    var postTitle;
+    var postDesc;
+    var listedStatus;
+    var visibility;
+    var unlisted;
     function createPost(){
         formdata = new FormData();
-        var postTitle = document.getElementById("title").value;
-        var postDesc = document.getElementById("description").value;
-        var listedStatus = document.querySelector('input[name = "listedstatus"]:checked').value;
-        var visibility = document.querySelector('input[name = "visibility"]:checked').value;
+        postTitle = document.getElementById("title").value;
+        postDesc = document.getElementById("description").value;
+        listedStatus = document.querySelector('input[name = "listedstatus"]:checked').value;
+        visibility = document.querySelector('input[name = "visibility"]:checked').value;
         if(listedStatus==="listed"){
             formdata.append("unlisted", false);
+            unlisted = false;
         }
         else{
             formdata.append("unlisted", true);
+            unlisted = true;
         }
         if(content_isText===true){
             encode_Content = document.getElementById("textcontent").value;
@@ -141,6 +148,7 @@
             return response.json();
         })
         .then(function(data){
+            post = data;
             formdata.append("id", data.id);
             formdata.append("comments", data.id + '/comments');
             let uri = '{{host}}'+'/service'+'/authors/'+'{{author.id}}' + '/posts/' + data.id+'/';
@@ -152,7 +160,7 @@
                 body: formdata
             })
         })
-        .then(function(){
+        .then(function(response){
             var urlofFollowers = '{{host}}'+'/service' + '/authors/'+ '{{ author.id }}' + '/followers';
             return fetch(urlofFollowers,{
             method: 'GET',
@@ -166,11 +174,15 @@
             return response.json();
         })
         .then(function(data){
-            if(post.unlisted===false){
-                followersInJson = data["items"]["data"];
-                if(post.visibility === "FRIENDS"){
+            if(unlisted===false){
+                followersInJson = data["items"];
+                if(visibility === "FRIENDS"){
                     for(let follower of followersInJson){
-                        var urlofFriend = '{{host}}'+'/service'+"/authors/" + follower.id +'/followers/'+'{{ author.id }}';
+                        let furl = follower.id;
+                        let farray = furl.split("/");
+                        let fid = farray[4];
+                        let fhost = farray[2];
+                        let urlofFriend = '{{host}}'+'/service'+"/authors/" + fid +'/followers/'+'{{ author.id }}';
                         fetch(urlofFriend,{
                             method: 'GET',
                             headers: {
@@ -179,21 +191,21 @@
                             }, 
                         })
                         .then(function(response){
-                            return response.json();
-                        })
-                        .then(function(data){
-                            if(data.id==='{{ author.id }}'){
-                                var urlofInbox = '{{host}}'+'/service'+"/authors/" + follower.id +'/inbox';
-                                fetch(urlofInbox,{
-                                    method: 'POST',
-                                    headers: {
-                                    'Content-Type' : 'application/json',
-                                    'X-CSRFToken' : "{{ csrf_token }}"
-                                    },
-                                    body: postString 
-                                })
+                            // var data = response.json();
+                            if( response.status === 200){
+                                if(fhost = "team9-socialdistribution.herokuapp.com"){
+                                    console.log(fid);
+                                    var urlofInbox = '{{host}}'+'/service'+"/authors/" + fid +'/inbox';
+                                    fetch(urlofInbox,{
+                                        method: 'POST',
+                                        headers: {
+                                        'Content-Type' : 'application/json',
+                                        'X-CSRFToken' : "{{ csrf_token }}"
+                                        },
+                                        body: JSON.stringify(post)
+                                    })
+                                }
                             }
-
                         })
                         .catch (function (error) {
                             console.log('Request is failed', error);
@@ -202,15 +214,21 @@
                 }
                 else{
                     for(let follower of followersInJson){
-                        var urlofInbox = '{{host}}'+'/service'+"/authors/" + follower.id +'/inbox';
-                        fetch(urlofInbox,{
-                            method: 'POST',
-                            headers: {
-                            'Content-Type' : 'application/json',
-                            'X-CSRFToken' : "{{ csrf_token }}"
-                            },
-                            body: postString 
+                        let furl = follower.id;
+                        let farray = furl.split("/");
+                        let fid = farray[4];
+                        let fhost = farray[2];
+                        if(fhost = "team9-socialdistribution.herokuapp.com"){
+                            var urlofInbox = '{{host}}'+'/service'+"/authors/" + fid +'/inbox';
+                            fetch(urlofInbox,{
+                                method: 'POST',
+                                headers: {
+                                'Content-Type' : 'application/json',
+                                'X-CSRFToken' : "{{ csrf_token }}"
+                                },
+                                body: JSON.stringify(post)
                         })
+                        }
                     } 
                 }
             }
@@ -249,7 +267,7 @@
             document.getElementById("filecontent").removeAttribute("hidden");
             document.getElementById("inputcontenttext").hidden=true;
             document.getElementById("textcontent").hidden=true;
-            content_isFile=True;
+            content_isFile=true;
             content = document.getElementById("filecontent");
             
         }
