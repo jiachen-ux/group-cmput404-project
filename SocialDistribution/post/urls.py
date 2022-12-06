@@ -27,6 +27,7 @@ urlpatterns = [
 
     path('site/posts', views.postIndex, name='index'),
     path('site/my_posts', views.myPosts, name='myPosts'),
+    path('site/friend_posts', views.friendPosts, name='friendPosts'),
     path('site/inboxs', views.Inboxs, name='inboxs'),
     path('site/foreign_posts', views.getForeignPosts, name='foreignPosts'),
     path('createpost',views.createpost,name='createpost'),

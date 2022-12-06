@@ -64,8 +64,8 @@
                             <form id= "form-{{post.id}}" class="form">
                                 <input type="text" name="comment" class="comment-input"
                                     placeholder="Write a comment..." >
-                                <button type="submit" id= "form-{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/comments' name='{{host}}/service/authors/{{request.user.id}}/inbox' class="btn btn-primary" onclick="CommentFunction(value,id,name)">Submit</button>
                             </form>
+                            <button type="submit" id= "form-{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/comments' name='{{host}}/service/authors/{{request.user.id}}/inbox' class="btn btn-primary" onclick="CommentFunction(value,id,name)">Submit</button>
                         </div>
                         <button name = "demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, name)">Show Comments</button>
                         <p id="demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, id)"></p>
@@ -78,6 +78,7 @@
                 var forml = document.getElementById(id)
                 const newform = new FormData(forml)
                 const data = Object.fromEntries(newform)
+                var response;
                 fetch(value, {
                     method: 'POST',
                     headers: {
