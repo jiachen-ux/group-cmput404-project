@@ -37,7 +37,6 @@ class PostLike(ListCreateAPIView):
         context["object_id"] = self.kwargs['uuidOfPost']
         return context
     def post(self, request,  *args, **kwargs):
-        print(request)
         return self.create(request)
         
     def get(self, request, *args, **kwargs):
@@ -47,6 +46,7 @@ class PostLike(ListCreateAPIView):
             return Response(serializers.data, 200)
         except:
             return Response(404)
+
 @api_view(["GET"])
 def getAllCommentLikes(request, uuidOfAuthor, uuidOfPost, uuidOfComment):
     # Get all likes of that comment
@@ -205,7 +205,6 @@ def handleInboxRequests(request, author_id):
             setOfIds = set([o.object_id for o in allPostIDsInThisAuthorsInbox])
             allPosts = Post.objects.filter(id__in=setOfIds)
             items = PostSerializer(allPosts, many=True)
-            print(items)
             resp = {
                 "type": "inbox",
                 "author": request.user.url(),
@@ -222,6 +221,7 @@ def handleInboxRequests(request, author_id):
                 postType = str(request.data["type"]).lower()
                 if not postType in {"post", "comment", "like", "follow", "share"}:
                     raise KeyError("Invalid post type!")
+ 
                 if postType == "like":
                     print(request.data)
                     data = {
@@ -229,7 +229,7 @@ def handleInboxRequests(request, author_id):
                         "author": request.data["data"]["author"],
                         "object_id": request.data["data"]["id"],
                     }
-                    print(request.data["data"]["object_id"])
+                    print(request.data["data"]["author_id"])
                     serializer = LikeSerializer(
                         data=data, partial=True)
                  
@@ -244,8 +244,7 @@ def handleInboxRequests(request, author_id):
                         l = Like.objects.get_or_create(
                             author_id=request.user.id, object_type="comment", object_id=commentID)
                     elif authorID != None and postID != None:
-                        print(request.data)
-                        message = f'{request.user.username} liked your post {request.data["data"]["object_id"]}'
+                        message = f'{request.user.username} liked your post {request.data["data"]["title"]}'
                         l = Like.objects.get_or_create(
                             author_id=request.user.id, object_type="post", object_id=postID)
                     else:
@@ -256,10 +255,10 @@ def handleInboxRequests(request, author_id):
                                      object_type=postType, object_id=idOfItem, message=message)
 
                 else:
-                    idOfItem = utils.getUUID(request.data["id"])
-                
+                    
+             
                     type = request.data["type"].lower()
-
+                    
                     if type == "comment":
                         message = f'{request.data["author"]["username"]}  commented on your post'
                     elif type == "post":
@@ -268,10 +267,13 @@ def handleInboxRequests(request, author_id):
                         message = f'{request.GET.get("username")} shared a post with you.'
                         postType = 'post'
                     elif type == "follow":
-                        message = f'{request.data["username"]} send you a follow request.'
-                        print(idOfItem)
+ 
+                        print(author_id)
+                        message = f'{request.data["data"]["sender"]["displayName"]} send you a follow request.'
+                        postType = "follow"
+                     
                     Inbox.objects.create(author_id=author_id,
-                                     object_type=postType, object_id=idOfItem, message=message)
+                                     object_type=postType, object_id=request.data["data"]["id"], message=message)
                 return response.Response({"message": message}, status.HTTP_201_CREATED)
             except Exception as e:
                 return response.Response({"message": str(e)}, status.HTTP_400_BAD_REQUEST)
@@ -355,12 +357,15 @@ def getEntireInboxRequests(request, author_id):
 
 def postIndex(request: HttpRequest):
     host = request.scheme + "://" + request.get_host()
-    posts = Post.objects.filter()
+    posts = Post.objects.filter(visibility="PUBLIC", unlisted=False)
+
+    for post in posts:
+        post.numberOfLikes =  0 #len(get_post_likes(post.id)) 
+        #post.topComments = get_latest_comments(post.id)
     context = {
         'posts': posts,
         'host' : host,
         }
-    print(context)
     return render(request, 'index.html', context)
 
 def myPosts(request: HttpRequest):
@@ -388,6 +393,7 @@ def createpost(request: HttpRequest):
         }
     return render(request,'create.html',context)
 
+
 def Inboxs(request: HttpRequest):
     if request.user.is_anonymous or not (request.user.is_authenticated):
         return render(request,'index.html')
@@ -399,14 +405,14 @@ def Inboxs(request: HttpRequest):
     try:
         for item in posts:
             context = {}
-            if ' ' in item.message and 'like' in item.object_type:
+            if 'like' in item.object_type:
                 postId=item.message.split(' ')[-1]
                 postinfo = Post.objects.get(id=postId)
                 context['host']=host
                 context['postinfo']=postinfo
                 context['posts']=item
                 total.append(context)
-            elif ' ' in item.message and 'comment' in item.object_type:
+            elif 'comment' in item.object_type:
                 CommentId = item.message.split(' ')[-1]
                 Commentinfo = Comment.objects.get(id=CommentId)
                 context['host'] = host
@@ -441,6 +447,16 @@ def deletepost(request: HttpRequest, post_id: str):
     if post.author.id == author.id:
         post.delete()
     return redirect('post:index')
+
+class getAllPostLikes(generics.ListAPIView):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.queryset.filter(object_id = kwargs.get('uuidOfPost'))
+        serializers = self.serializer_class(queryset, many= True)
+
+        return Response(serializers.data, 200)
 
 
 @api_view(["GET"])

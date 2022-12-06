@@ -54,12 +54,13 @@ INSTALLED_APPS = [
     'djoser',
     'crispy_forms',
     'whitenoise.runserver_nostatic',
-    
+    'markdownify.apps.MarkdownifyConfig',
 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -151,6 +152,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'author/media')
 MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -160,3 +165,4 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # Configure Django App for Heroku.
 import django_on_heroku
 django_on_heroku.settings(locals())
+CORS_ALLOW_ALL_ORIGINS = True

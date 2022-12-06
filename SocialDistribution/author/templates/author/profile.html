@@ -2,6 +2,7 @@
 
 {% extends 'author/base.html' %}
 
+{% load static %}
 
 {% block content %}
 
@@ -73,27 +74,47 @@
 
 <div class="container">
     <div class="row justify-content-center">
-        <div class="card" style="width: 50rem">
+        <div class="card" style="width: 50rem; height: 20rem;">
             <div class="card-body">
-				{% if request.user.is_authenticated %}
-					<button class="btn-info float-right mr-2">
-						Follow 
-					</button>
+				{% if request.user.is_authenticated %}  
+                    
+                {% if is_self == False %}
+                <button class="btn-info float-right mr-2" id="{{request.user.id}}" type="submit"  name='{{host}}/service/authors/{{id}}/inbox' value = '{{host}}/service/authors/{{request.user.id}}/followrequest/{{ id }}' onclick=FollowFunction(value,name,id) >
+                    Follow  
+                </button>   
+				<div class="d-flex flex-column mt-4">
+				</div>
+                    {% endif %}
                 <h2>Profile</h2>
                 <hr>
-                <h5 class="card-text">Username</h5>
+                <img src="{% static 'author/images/defaultProfile.png' %}" class="float-right mr-2" style="height: 16%; ">
+                <h5 class="card-text">Display Name</h5>
                 {{ displayName }}
+
                 <p class="card-text"></p>
                 <h5 class="card-text">Github</h5>
                 {{ github_url }}
                 <p class="card-text"></p>
+                {% if is_self %}
+		  		<a  class="btn btn-info float-right mr-2" href="{% url 'editProfile' %}">Update</a>
+				<div class="d-flex flex-column mt-4">
+				</div>
+		  		{% endif %}
+
+                </div>
+                </div>
+                <div>
+                    <hr>
+                </div>
+
+                <div class="card mt-5" style="width: 50rem; border-color: white;">
                 <h5 class="card-text">Posts</h5>
                 {% if posts %}
                 {% for post in posts %}
                 <div class="post_container">
-                    <div class="row justify-content-center">
-                        <div class="mt-0" >
-                            <div class="card" style="width: 50rem;">
+                    <div class="row justify-content-center" >
+                        <div class="mt-2" >
+                            <div class="ml-3" style="width: 50rem;">
                                 <div class="card-header text-black" style="background-color: #778899;">
                                     <div class="row">
                                         <div class="col">
@@ -157,13 +178,43 @@
                     {% endif %}
                 <hr>
                 <div>
-
-                <!-- If Auth user is viewing their own profile -->
+                <script>
+                    function FollowFunction(value,name,id){
+                        fetch(value, {
+                            method: 'PUT',
+                            headers: {
+                                'X-CSRFToken': "{{ csrf_token }}",
+                                'Content-Type': 'application/json',
+                            },
+                        }).then(res => res.json())
+                          .then(item => {  
+                            item.id = id;
+                            item.title = id;
+                            item.author_id = name;
+                            let result = {
+                                type: "follow",
+                                data: item,
+                            };
+                            alert("yes");
+                            fetch(name,{
+                                method: 'POST',
+                                headers: {
+                                'X-CSRFToken' : "{{ csrf_token }}",
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(result)
+                           })
+                           })
+                    }
+                    
+                </script>
+            
 		  		{% if is_self %}
 		  		<a  class="btn btn-info float-right mr-2" href="#">Update</a>
 				<div class="d-flex flex-column mt-4">
 				</div>
 		  		{% endif %}
+
                 
             </div>
             </div>
@@ -173,7 +224,6 @@
 
 		
 	</div>
-    </div>
 </div>
 
 

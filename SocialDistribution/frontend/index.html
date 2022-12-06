@@ -3,7 +3,7 @@
 {% block title %}List of Posts{% endblock %}
 
 {% block content %}
-
+{% load markdownify %}
 {% if posts %}
 {% for post in posts %}
 <div class="container">
@@ -20,6 +20,7 @@
                         </div>
                         <div class="col-3 pb-3">
                             {% if userAuthor and userAuthor.id == post.author.id %}
+            
                             <div class="col pb-3">
                                 <a href="{{host}}/editpost/{{post.id}}"><button
                                         class="btn btn-warning float-right" type="button" class="btn">Edit
@@ -38,13 +39,15 @@
 
                 <div class="card-body">
                     <p class="field-label"><strong>Description: </strong>{{post.description}}</p>
-                    {% if post.contentType != "text/plain" %}
+                    {% if post.contentType == "text/plain" %}
+                    <p class="field-label"></p>
+                    <p>{{post.content}}</p>
+                    {% elif post.contentType == "text/markdown" %}
+                    <div class="postBody">{{ post.content | markdownify}}</div>
+                    {% else %}
                     <div class="post-image">
                         <img src='{{host}}/service{{ post.image.url }}' alt="Post image" style = "height: 290px; width: 290px; border-radius: 15px; margin-top: 10px;" />
                     </div>
-                    {% else %}
-                    <p class="field-label"></p>
-                    <p>{{post.content}}</p>
                     {% endif %}
                 </div>
 
@@ -52,7 +55,11 @@
 
                 <div class="card-footer">
                     <div>
-                        <button id="{{post.author.id}}" type="submit"  value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes' name='{{host}}/service/authors/{{request.user.id}}/inbox'  onclick="LikeFunction(value,name,id)" class="btn">Like</button>
+                        <button id="{{post.author.id}}" type="submit"  value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes' name='{{host}}/service/authors/{{request.user.id}}/inbox'  
+                        onclick="LikeFunction(value,name,id)" class="btn">Like</button>
+                        
+                        <button id="count-{{post.id}}" type="submit" name="{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/getalllikes'
+                        onclick="LikeCount(value,id)" class="btn">Like: Count</button>
                         <div class="comment-input-div">
                             <form id= "form-{{post.id}}" class="form">
                                 <input type="text" name="comment" class="comment-input"
@@ -100,48 +107,67 @@
             }
             function LikeFunction(value,inbox,title){
                
+               fetch(value, {
+                   method: 'GET',
+                   headers: {
+                       'X-CSRFToken': "{{ csrf_token }}",
+                       'Content-Type': 'application/json',
+                   },
+                    
+               }).then(res =>  res.json())
+               .then(data =>  {
+                   if(data == 404){
+                      fetch(value, {
+                           method: 'POST',
+                           headers: {
+                       'X-CSRFToken': "{{ csrf_token }}",
+                       'Content-Type': 'application/json',
+                       },
+                   }).then(res =>  res.json())
+                   .then(item => {
+                        
+                       item.id = value;
+                       item.title = title;
+                       item.author_id = inbox;
+                       let result = {
+                           type: "like",
+                           data: item,
+                       };
+                        
+                       alert("yes");
+                       fetch(inbox,{
+                           method: 'POST',
+                           headers: {
+                           'X-CSRFToken' : "{{ csrf_token }}",
+                           'Content-Type': 'application/json',
+                       },
+                       body: JSON.stringify(result)
+                   })
+                   })
+               }
+               })
+     
+                
+           }
+
+            function LikeCount(value,id){     
                 fetch(value, {
                     method: 'GET',
                     headers: {
                         'X-CSRFToken': "{{ csrf_token }}",
                         'Content-Type': 'application/json',
                     },
-                     
                 }).then(res =>  res.json())
-                .then(data =>  {
-                    if(data == 404){
-                       fetch(value, {
-                            method: 'POST',
-                            headers: {
-                        'X-CSRFToken': "{{ csrf_token }}",
-                        'Content-Type': 'application/json',
-                        },
-                    }).then(res =>  res.json())
-                    .then(item => {
-                         
-                        item.id = value;
-                        item.title = title;
-                        item.author_id = inbox;
-                        let result = {
-                            type: "like",
-                            data: item,
-                        };
-                         
-                        alert("yes");
-                        fetch(inbox,{
-                            method: 'POST',
-                            headers: {
-                            'X-CSRFToken' : "{{ csrf_token }}",
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(result)
-                    })
-                    })
+                .then(data => {
+                    appendData(data);
+                });
+                function appendData(data){
+                    document.getElementById(id).innerHTML = data.length;
                 }
-                })
-      
+               
                  
-            }
+                }
+            
         
             function showComment(value, id) {
                 fetch(value)
@@ -160,7 +186,7 @@
                     var mainContainer = document.getElementById(id);
                     for (var i = 0; i < data.length; i++) {
                         var div = document.createElement("div");
-                        div.innerHTML =  'Comment :' + data[i].comment + ' -by: ' + data[i].author.displayName 
+                        div.innerHTML =  'Comment :' + data[i].comment + ' -by: ' + data[i].author.displayName + '<p><button onclick="myFunction()">Like</button>' 
                         mainContainer.appendChild(div);
                     }
                 }
