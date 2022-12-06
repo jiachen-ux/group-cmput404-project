@@ -194,6 +194,13 @@ def logoutView(request):
     messages.success(request, ("You were logged out"))
     return redirect(loginView)
 
+def id_cleaner(author):
+    for a in author:
+        id = a['id'].split('/')[-1]
+        if id == '':
+            id = a['id'].split('/')[-2]
+        a['id'] = id
+    return author
 
 def get_local_remote_author(request):
     '''
@@ -201,6 +208,7 @@ def get_local_remote_author(request):
     '''
     team8 = 'https://c404-team8.herokuapp.com/api/'
     team7 = 'https://cmput404-social.herokuapp.com/service/'
+    team17 = 'https://cmput404f22t17.herokuapp.com/'
 
     local_Authors = Author.objects.all()
     serializer = GetAuthorSerializer(local_Authors, many=True)
@@ -209,6 +217,7 @@ def get_local_remote_author(request):
     # print(local_authors_data)
     team8_remote_response = requests.get(f'{team8}authors/')
     team7_remote_response = requests.get(f'{team7}authors/')
+    team17_remote_response = requests.get(f'{team17}authors/')
     combined_author = []
 
     for author in local_authors_data:
@@ -216,16 +225,24 @@ def get_local_remote_author(request):
     combined_author.extend(local_authors_data)
 
     if team8_remote_response.status_code == 200: 
-        print('connect to team 8')
+        # print('connect to team 8')
         team8_data = team8_remote_response.json()
         team8_Authors = team8_data['items']
+        team8_Authors = id_cleaner(team8_Authors)
         combined_author.extend(team8_Authors)
     
     if team7_remote_response.status_code == 200:
-        print('connect to team 7')
+        # print('connect to team 7')
         team7_data = team7_remote_response.json()
         team7_Authors = team7_data['items']
         combined_author.extend(team7_Authors)
+
+    if team17_remote_response.status_code == 200:
+        # print('connect to team 17')
+        team17_data = team17_remote_response.json()
+        team17_Authors = team17_data['items']
+        team17_Authors = id_cleaner(team17_Authors)
+        combined_author.extend(team17_Authors)
     return combined_author
 
 
@@ -248,47 +265,56 @@ def profile(request, authorId):
     authors = get_local_remote_author(request)
     team8 = 'https://c404-team8.herokuapp.com/api/'
     team7 = 'https://cmput404-social.herokuapp.com/service/'
+    team17 = 'https://cmput404f22t17.herokuapp.com/'
     display_name = ''
     github_url = ''
     posts = []
     host = ''
     id=''
+    profile_image = ''
     is_self = True
     user = request.user
 
-    try:
-        current_author = get_object_or_404(Author, id = authorId)
-    except Author.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    # try:
+    #     current_author = get_object_or_404(Author, id = authorId)
+    # except Author.DoesNotExist:
+    #     return Response(status=status.HTTP_404_NOT_FOUND)
 
     for author in authors:
-        print(author)
+        # print(author)
         if authorId == author['id']: #or authorId== author['id'].split('/')[-1]:
             print('found it')
             display_name = author['displayName']
             github_url = author['github']
             host = author['host']
             id= author['id']
+            # profile_image = author['profileImage']
             break
             
     if host in team8:
-        print('connect tean 8')
+        # print('connect tean 8')
         response = requests.get(f"{team8}authors/{authorId}/posts/",
                                 params=request.GET)
         if response.status_code == 200:
             posts = response.json()['items']
 
     elif host in team7:
-        print('connect tean 7')
+        # print('connect tean 7')
         response = requests.get(f"{team7}authors/{authorId}/posts/",
+                                params=request.GET)
+        if response.status_code == 200:
+            posts = response.json()['items']
+
+    elif host in team17:
+        # print('connect tean 17')
+        response = requests.get(f"{team17}authors/{authorId}/posts/",
                                 params=request.GET)
         if response.status_code == 200:
             posts = response.json()['items']
     else:
         posts = Post.objects.filter(author__id=authorId, visibility="PUBLIC", unlisted=False)
 
-
-    if user.is_authenticated and user != current_author:
+    if user.is_authenticated and str(user.id) != authorId:
             is_self = False
     
 
@@ -298,6 +324,7 @@ def profile(request, authorId):
         'posts': posts,
         'id':id,
         'is_self': is_self,
+        # 'profileImage': profile_image
     }
 
 
