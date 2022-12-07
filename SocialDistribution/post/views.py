@@ -471,7 +471,6 @@ def deletepost(request: HttpRequest, post_id: str):
 def postdetail(request: HttpRequest, post_id: str):
     if request.user.is_anonymous:
         return render(request,'index.html')
-    currentAuthor=Author.objects.filter(id=request.user.id).first()
     post = Post.objects.get(id=post_id)
     print(post.id)
     host = request.scheme + "://" + request.get_host()
@@ -480,6 +479,15 @@ def postdetail(request: HttpRequest, post_id: str):
         'host': host,
         }
     return render(request, 'detail.html', context)
+
+def github(request: HttpRequest):
+    if request.user.is_anonymous or not (request.user.is_authenticated):
+        return render(request,'github_feed.html')
+
+    currentAuthor=Author.objects.get(id = request.user.id)
+    host = request.scheme + "://" + request.get_host()
+    context = {'currentAuthor' : currentAuthor, 'host':host}
+    return render(request,'github_feed.html',context)
 
 class getAllPostLikes(generics.ListAPIView):
     queryset = Like.objects.all()
