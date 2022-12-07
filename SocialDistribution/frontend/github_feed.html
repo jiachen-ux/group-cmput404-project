@@ -1,0 +1,55 @@
+{% extends "author/base.html" %}
+
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="mt-0">
+                    <div class="row">
+                        <div class="col">
+            
+    {% if user.is_authenticated and currentAuthor and currentAuthor.github %}
+    
+    <ul id="githubposts"></ul>
+    <script>
+        githubField = '{{currentAuthor.github}}';
+        var user;
+        var list = document.getElementById("githubposts");
+        var garray = githubField.split("/");
+        var username = garray[3];
+        url = "https://api.github.com/users/" + username+"/events";
+        fetch(url,{method: 'GET'
+        })
+        .then(function(response){
+            return response.json();
+        })
+        .then(function(data){
+            console.log(data);
+            for(let post of data){
+                var div = document.createElement("div");
+
+                h4 = document.createElement("h4");
+                h4.textContent = "Type: " + post.type;
+                div.innerHTML = '<div class="card-header text-black" style="background-color: #a2afe23b;">' + 
+                    '<h5>GitHub Activity:'+ " "+ '<span style="color:rgb(14, 102, 174)">'+post.type+ +'</span>'+"</h5>"
+                  '</div>'
+                li = document.createElement("li");
+                var div2 = document.createElement("div");
+                div2.innerHTML = '<div class="card-body">' + "By " + "<strong>"+post.actor.login+"</strong>" + " at " +post.created_at + '<span> On the repo: </span>'+ 
+                    '<strong style="color:rgb(192, 11, 11)">'+post.repo.name; +"</strong>"+'</div>'
+                li.textContent = "By " + "<strong>"+post.actor.login+"</strong>" + " at " +post.created_at + '<span style="color:rgb(14, 102, 174)"> On the repo: </span>'+  '<span style="color:rgb(14, 102, 174)">'+post.repo.name +'</span>';
+                list.appendChild(div);
+                list.appendChild(div2);
+            }
+        })
+    </script>
+    {% else %}
+    <p>No github activities are available.</p>
+    {% endif %}
+            </div>
+          </div>
+        </div>
+            </div>
+
+</div>
+{% endblock %}

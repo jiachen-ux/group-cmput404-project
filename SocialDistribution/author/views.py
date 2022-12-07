@@ -182,7 +182,7 @@ def registerView(request):
         
         if form.is_valid():
             git_user = form.cleaned_data.get('github')
-            github_url = f'http://github.com/{git_user}'
+            github_url = f'{git_user}'
             user = Author.objects.create_user(displayName=form.cleaned_data.get('displayName'), username=form.cleaned_data.get('username'), password=form.cleaned_data.get('password1'), github=github_url)
 
             return redirect(loginView)
@@ -363,7 +363,7 @@ def profileEdit(request):
             displayName = form.cleaned_data['displayName']
             username = form.cleaned_data['username']
             
-            request.user.github = "http://github.com/" + github_username
+            request.user.github = github_username
             request.user.displayName = displayName
             request.user.username = username
             

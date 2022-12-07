@@ -1,0 +1,321 @@
+{% extends "author/base.html" %}
+
+{% block title %}Post Detail{% endblock %}
+
+{% block content %}
+{% load markdownify %}
+    {% if post %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="mt-0">
+                <div class="card" style="width: 50rem;">
+                    <div class="post" post-id="{{post.id}}" author-id="{{post.author.id}}">
+                        <div class="card-header text-black" style="background-color: #778899;">
+                            <div class="row">
+                                <div class="col">
+                                    <h4 class="card-title">
+                                        <h2>{{ post.title }}</h2>
+                                    </h4>
+                                    <p style="font-size:medium"><strong>By: </strong><a class="author-link" style="color:white" href="{{host}}/authors/{{ post.author.id }}">{{ post.author.displayName }}</a></p>
+                                    <div class="row-3 row-btn float-right">
+                                        {% if userAuthor and userAuthor.id == post.author.id %}
+                                        <a href="{{host}}/editpost/{{post.id}}"><button type="button" class="btn">Edit post</button></a>
+                                        <a href="{{host}}/deletepost/{{post.id}}"><button type="button" class="btn" onclick="return confirm('Are you sure?');">Delete post</button></a>
+                                        {% endif %}
+                                        <select id="shareropdown" class="float-right">
+                                            <option value="" selected disabled hidden>Choose here</option>
+                                        </select>
+                                        <button type="button" class="btn btn-outline-light mr-2 btn-sm" id="sharepostbtn">Share Post</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <script>
+                            var authorDropDown = document.getElementById("shareropdown");
+                            var author;
+                            var url;
+                            var post;
+                            var map = new Map();
+                            if('{{post.visibility}}'==='FRIENDS'){
+                                url = '{{host}}' + '/service/authors/'+ '{{ request.user.id }}' + '/followers';
+                                fetch(url,{
+                                    method: 'GET',
+                                    headers: {
+                                        'Content-Type' : 'application/json',
+                                        'X-CSRFToken' : "{{ csrf_token }}"
+                                    } 
+                                })
+                                .then(function(response){
+                                    return response.json();
+                                })
+                                .then(function(data){
+                                    followersInJson = data["items"];
+                                    for(let follower of followersInJson){
+                                        let furl = follower.id;
+                                        let farray = furl.split("/");
+                                        let fid = farray[4];
+                                        let fhost = farray[2];
+                                        var urlToCheckIfFollowsBack = '{{host}}'+"/service/authors/" + fid +'/followers/'+'{{ request.user.id }}';
+                                        fetch(urlToCheckIfFollowsBack,{
+                                            method: 'GET',
+                                            headers: {
+                                            'Content-Type' : 'application/json',
+                                            'X-CSRFToken' : "{{ csrf_token }}"
+                                            }, 
+                                        })
+                                        .then(function(response){
+                                            if(response.status === 200){
+                                                option = document.createElement("option");
+                                                option.value = follower.displayName;
+                                                option.innerHTML = follower.displayName;
+                                                map.set(option.value,follower);
+                                                authorDropDown.appendChild(option);
+                                            }
+                                        })
+                                    }
+                                })
+                                .catch(function(e){
+                                    
+                                })
+                        }
+                        else{
+                            url = '{{host}}'+'/service/authors';
+                            fetch(url,{
+                                method: 'GET',
+                                headers: {
+                                'Content-Type' : 'application/json',
+                                'X-CSRFToken' : "{{ csrf_token }}"
+                                }, 
+                            })
+                            .then(function(response){
+                                return response.json();
+                            })
+                            .then(function(data){
+                                authorsInJson = data.items;
+                                for(let author of authorsInJson){
+                                    option = document.createElement("option");
+                                    option.value = author.displayName;
+                                    option.innerHTML=author.displayName;
+                                    map.set(option.value,author);
+                                    authorDropDown.appendChild(option); 
+                                }
+                            })
+                            .catch(function(e){
+
+                            })
+                        }
+                        document.getElementById("sharepostbtn").onclick = function(){
+                            author = map.get(authorDropDown.value);
+                            url = '{{ host }}'+'/service/authors/'+'{{post.author.id}}'+'/posts/'+'{{post.id}}/';
+                            fetch(url,{
+                                    method: 'GET',
+                                    headers: {
+                                    'Content-Type' : 'application/json',
+                                    'X-CSRFToken' : "{{ csrf_token }}"
+                                    },
+                            })
+                            .then(function(response){
+                                return response.json();
+                            })
+                            .then(function(data){
+                                post=data;
+                                post.type = "share";
+                                console.log(post);
+                                let aurl = author.id;
+                                let aarray = aurl.split("/");
+                                let aid = aarray[4];
+                                var urlToPostInboxItem = '{{ host }}' +"/service/authors/" + aid +'/inbox';
+                                fetch(urlToPostInboxItem,{
+                                    method: 'POST',
+                                    headers: {
+                                    'Content-Type' : 'application/json',
+                                    'X-CSRFToken' : "{{ csrf_token }}"
+                                    },
+                                    body: JSON.stringify(post) 
+                                })
+                            }).then(function(){
+                                alert("The post is successfully shared with the target user, and sent to his inbox!");
+                            })
+                        }
+                        </script>
+                        <script>
+                            function CommentFunction(value,id,name){
+                                var forml = document.getElementById(id)
+                                const newform = new FormData(forml)
+                                const data = Object.fromEntries(newform)
+                                var response;
+                                fetch(value, {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRFToken': "{{ csrf_token }}",
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify(data)
+                                }).then(res => res.json()) 
+                                .then(item => {
+                                console.log(item)
+                                fetch(name, {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRFToken': "{{ csrf_token }}",
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify(item)
+                                })
+                                }).then(function(){
+                                    alert("A new comment is successfully created! Redirecting you to post-list page...");
+                                    location.href = '{{host}}'+'/site/posts';
+                                })
+                            }
+                            function LikeFunction(value,inbox,title){
+                               
+                               fetch(value, {
+                                   method: 'GET',
+                                   headers: {
+                                       'X-CSRFToken': "{{ csrf_token }}",
+                                       'Content-Type': 'application/json',
+                                   },
+                                    
+                               }).then(res =>  res.json())
+                               .then(data =>  {
+                                   if(data == 404){
+                                      fetch(value, {
+                                           method: 'POST',
+                                           headers: {
+                                       'X-CSRFToken': "{{ csrf_token }}",
+                                       'Content-Type': 'application/json',
+                                       },
+                                   }).then(res =>  res.json())
+                                   .then(item => {
+                                        
+                                       item.id = value;
+                                       item.title = title;
+                                       item.author_id = inbox;
+                                       let result = {
+                                           type: "like",
+                                           data: item,
+                                       };
+                                        
+                                       alert("yes");
+                                       fetch(inbox,{
+                                           method: 'POST',
+                                           headers: {
+                                           'X-CSRFToken' : "{{ csrf_token }}",
+                                           'Content-Type': 'application/json',
+                                       },
+                                       body: JSON.stringify(result)
+                                   })
+                                   })
+                               }
+                               })
+                     
+                                
+                           }
+                
+                            function LikeCount(value,id){     
+                                fetch(value, {
+                                    method: 'GET',
+                                    headers: {
+                                        'X-CSRFToken': "{{ csrf_token }}",
+                                        'Content-Type': 'application/json',
+                                    },
+                                }).then(res =>  res.json())
+                                .then(data => {
+                                    appendData(data);
+                                });
+                                function appendData(data){
+                                    document.getElementById(id).innerHTML = data.length;
+                                }
+                               
+                                 
+                                }
+                            
+                        
+                            function showComment(value, id) {
+                                fetch(value)
+                                    .then(function (response) {
+                                        return response.json();
+                                    })
+                                    .then(function (data) {
+                                        console.log(data);
+                                        appendData(data);
+                                    })
+                                    .catch(function (err) {
+                                        console.log(err);
+                                    });
+                                function appendData(data) {
+                                    var main
+                                    var mainContainer = document.getElementById(id);
+                                    for (var i = 0; i < data.length; i++) {
+                                        var div = document.createElement("div");
+                                        div.innerHTML =  data[i].author.displayName +':'+" "+"  "+ data[i].comment + '<span><button onclick="myFunction()" class="btn">👍</button>' 
+                                        mainContainer.appendChild(div);
+                                    }
+                                }
+                            }
+                        </script>
+                    
+            
+            <div class="post-body mr-2">
+                <p class="field-label ml-3"><strong>Description: </strong>{{post.description}}</p>
+                {% if post.contentType == "text/plain" %}
+                <p class="ml-3">{{post.content}}</p>
+                {% elif post.contentType == "text/markdown" %}
+                <div class="postBody">{{ post.content | markdownify}}</div>
+                {% else %}
+                <div class="post-image">
+                    <img src='{{host}}/service{{ post.image.url }}' alt="Post image" style = "height: 290px; width: 290px; border-radius: 15px; margin-top: 10px;" />
+                </div>
+                {% endif %}
+            </div>
+
+            
+            <div class="card-footer">
+                <!-- Like Button -->
+                        <!-- TODO: Better CSS for Like Button -->
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+                <div>
+                    <button id="count-{{post.id}}" type="submit" name="{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/getalllikes'
+                    onclick="LikeCount(value,id)" class="btn" style="margin-right: 0%">Like |</button>
+
+                    <button id="{{post.author.id}}" type="submit"  value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes' name='{{host}}/service/authors/{{request.user.id}}/inbox'  
+                    onclick="LikeFunction(value,name,id)" class="btn" style="margin-right: 0%">👍</button> 
+                    
+                    
+                    
+                    <div class="comment-input-div">
+                        <div class="d-flex justify-content-between">
+                        <form id= "form-{{post.id}}" class="form" style="width: 70%;">
+                            <input type="text" name="comment"  class="form-control mr-0"
+                                placeholder="Write a comment..."  style="width: 100%;">
+                        </form>
+                        <br>
+                        <div class="d-flex justify-content-between ">
+                        <button type="submit" id= "form-{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/comments' name='{{host}}/service/authors/{{request.user.id}}/inbox' 
+                        class="btn btn-outline-dark btn-sm float-right" onclick="CommentFunction(value,id,name)"
+                        style="height: 80%;">Submit</button>
+                    
+                    <button name = "demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, name)" 
+                    class="btn btn-warning btn-sm float-right" style="height:80%; margin-left: 10px;">
+                    Show Comments</button>
+                    </div>
+                    </div>
+                    </div>
+                    <p id="demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, id)"></p>
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+            </div>
+       
+    {% else %}
+        <p>Post is not available.</p>
+
+    </div>
+</div>
+
+    {% endif %}
+{% endblock %}
