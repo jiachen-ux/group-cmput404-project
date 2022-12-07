@@ -26,7 +26,7 @@ from comment.serializer import CommentSerializer
 
 from comment.models import *
 from rest_framework.generics import  ListCreateAPIView
-from author.views import get_local_remote_author
+import author.views as author_views
 
 
 class PostLike(ListCreateAPIView):
@@ -489,7 +489,7 @@ def getForeignPosts(request):
     Used to get all the foreign posts
     connected with team 8 and team 7
     '''
-    combined_author = get_local_remote_author(request)
+    combined_author =author_views.get_local_remote_author(request)
 
     team8_url = 'https://c404-team8.herokuapp.com/api/'
     team8host_url = 'c404-team8.herokuapp.com'

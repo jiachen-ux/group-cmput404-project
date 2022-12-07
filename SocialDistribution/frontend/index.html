@@ -35,7 +35,7 @@
                         </div>
                     </div>
                 </div>
-                <hr>
+
 
                 <div class="card-body">
                     <p class="field-label"><strong>Description: </strong>{{post.description}}</p>
@@ -51,27 +51,49 @@
                     {% endif %}
                 </div>
 
-                <hr>
+            
 
                 <div class="card-footer">
-                    <div>
-                        <button id="{{post.author.id}}" type="submit"  value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes' name='{{host}}/service/authors/{{request.user.id}}/inbox'  
-                        onclick="LikeFunction(value,name,id)" class="btn">Like</button>
-                        
+                    <!-- Like Button -->
+                        <!-- TODO: Better CSS for Like Button -->
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+                    <div class="mr-0">
                         <button id="count-{{post.id}}" type="submit" name="{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/getalllikes'
-                        onclick="LikeCount(value,id)" class="btn">Like: Count</button>
+                        onclick="LikeCount(value,id)" class="btn" style="margin-right: 0%">Like |</button> 
+                       
+
+                        <button id="{{post.author.id}}" type="submit"  value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes' name='{{host}}/service/authors/{{request.user.id}}/inbox'  
+                        onclick="LikeFunction(value,name,id)" class="btn" style="margin-right: 0%">👍</button> 
+
+                    </div>
+                        
+                        
                         <div class="comment-input-div">
-                            <form id= "form-{{post.id}}" class="form">
-                                <input type="text" name="comment" class="comment-input"
-                                    placeholder="Write a comment..." >
+                            <div class="d-flex justify-content-between">
+                            <form id= "form-{{post.id}}" class="form" style="width: 70%;">
+                                <input type="text" name="comment"  class="form-control mr-0"
+                                    placeholder="Write a comment..."  style="width: 100%;">
                             </form>
-                            <button type="submit" id= "form-{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/comments' name='{{host}}/service/authors/{{request.user.id}}/inbox' class="btn btn-primary" onclick="CommentFunction(value,id,name)">Submit</button>
+                            <br>
+                            <div class="d-flex justify-content-between ">
+                            <button type="submit" id= "form-{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/comments' name='{{host}}/service/authors/{{request.user.id}}/inbox' 
+                            class="btn btn-outline-dark btn-sm float-right" onclick="CommentFunction(value,id,name)"
+                            style="height: 80%;">Submit</button>
+                        
+                        <button name = "demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, name)" 
+                        class="btn btn-warning btn-sm float-right" style="height:80%; margin-left: 10px;">
+                        Show Comments</button>
                         </div>
-                        <button name = "demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, name)">Show Comments</button>
+                        </div>
+                        </div>
                         <p id="demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, id)"></p>
                     </div>
                 </div>
+
+                <br>
             </div>
+           
         </div>
         <script>
             function CommentFunction(value,id,name){
@@ -131,7 +153,7 @@
                            data: item,
                        };
                         
-                       alert("yes");
+                       alert("You have liked the post");
                        fetch(inbox,{
                            method: 'POST',
                            headers: {
@@ -183,18 +205,27 @@
                     var mainContainer = document.getElementById(id);
                     for (var i = 0; i < data.length; i++) {
                         var div = document.createElement("div");
-                        div.innerHTML =  'Comment :' + data[i].comment + ' -by: ' + data[i].author.displayName + '<p><button onclick="myFunction()">Like</button>' 
+                        div.innerHTML =  data[i].author.displayName +':'+" "+"  "+ data[i].comment + '<span><button onclick="myFunction()" class="btn">👍</button>' 
                         mainContainer.appendChild(div);
                     }
                 }
             }
         </script>
-    </div>
-</div>
+ 
 {% endfor %}
+
 {% else %}
-<p>No posts are available.</p>
+<div class="row justify-content-center">
+    <div class="mt-0">
+        
+<h6>No posts are available.</h6>
+        </div>
+    
+</div>
 {% endif %}
+
+</div>
+</div>
 {% endblock %}
 
 

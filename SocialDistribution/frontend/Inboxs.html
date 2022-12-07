@@ -1,6 +1,7 @@
 {% extends "author/base.html" %}
 
-{% block title %}List of Posts{% endblock %}
+{% block title %}
+{% endblock %}
 
 {% block content %}
 <p style="text-align: center">My Notifications</p>
@@ -82,6 +83,13 @@ function DeclineFollowFunction(value,name,id){
 
 </script>
 {% else %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="mt-0">
 <p>No items are available.</p>
+
+</div>
+    </div>
+</div>
 {% endif %}
 {% endblock %}
