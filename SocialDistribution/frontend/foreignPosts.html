@@ -11,6 +11,10 @@
 
 {% if not data.unlisted %}
 
+{{ data.author.id }}
+
+<a href="{{data.author.id}}inbox">link</a>
+
 <div class="container">
     <div class="row justify-content-center">
         <div class="mt-3" >
@@ -55,7 +59,8 @@
                 
                 <div class="card-footer">
                 <div>
-                    <button id="{{post.id}}-like-button" type="submit" name="post_id" value="{{post.id}}" class="btn"><span id="like-count-{{post.id}}">{{data.numberOfLikes}}</span> | Like</button>
+                    <button id="{{post.author.id}}" type="submit"  value = '{{data.id}}likes' name='{{data.author.id}}inbox'  
+                    onclick="LikeFunction(value,name,id)" class="btn">Like</button>
                     <a href="{{post.id}}"><button type="button" class="btn">Comments</button></a>
                     <button type="button" class="btn" id="addcomment-{{post.id}}">Add comment</button>
                 </div>
@@ -85,6 +90,108 @@
 
     </div>
 </div>
+
+<script>
+    function CommentFunction(value,id){
+        var forml = document.getElementById(id)
+        const newform = new FormData(forml)
+        const data = Object.fromEntries(newform)
+        fetch(value, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': "{{ csrf_token }}",
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        }).then(res => res.json());
+    }
+    function LikeFunction(value,inbox,title){
+       
+       fetch(value, {
+           method: 'GET',
+           headers: {
+               'X-CSRFToken': "{{ csrf_token }}",
+               'Content-Type': 'application/json',
+           },
+            
+       }).then(res =>  res.json())
+       .then(data =>  {
+           if(data == 404){
+              fetch(value, {
+                   method: 'POST',
+                   headers: {
+               'X-CSRFToken': "{{ csrf_token }}",
+               'Content-Type': 'application/json',
+               },
+           }).then(res =>  res.json())
+           .then(item => {
+                
+               item.id = value;
+               item.title = title;
+               item.author_id = inbox;
+               let result = {
+                   type: "like",
+                   data: item,
+               };
+                
+               alert("Like has been send to the inbox of the post's author");
+               fetch(inbox,{
+                   method: 'POST',
+                   headers: {
+                   'X-CSRFToken' : "{{ csrf_token }}",
+                   'Content-Type': 'application/json',
+               },
+               body: JSON.stringify(result)
+           })
+           })
+       }
+       })
+
+        
+   }
+
+    function LikeCount(value,id){     
+        fetch(value, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': "{{ csrf_token }}",
+                'Content-Type': 'application/json',
+            },
+        }).then(res =>  res.json())
+        .then(data => {
+            appendData(data);
+        });
+        function appendData(data){
+            document.getElementById(id).innerHTML = data.length;
+        }
+       
+         
+        }
+    
+
+    function showComment(value, id) {
+        fetch(value)
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                console.log(data);
+                appendData(data);
+            })
+            .catch(function (err) {
+                console.log(err);
+            });
+        function appendData(data) {
+            var main
+            var mainContainer = document.getElementById(id);
+            for (var i = 0; i < data.length; i++) {
+                var div = document.createElement("div");
+                div.innerHTML =  'Comment :' + data[i].comment + ' -by: ' + data[i].author.displayName + '<p><button onclick="myFunction()">Like</button>' 
+                mainContainer.appendChild(div);
+            }
+        }
+    }
+</script>
 
     </div>
 </div>
