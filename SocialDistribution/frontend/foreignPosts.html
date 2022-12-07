@@ -9,9 +9,7 @@
 
 {% if not post.unlisted %}
 
-{{ post.author.id }}
-
-<a href="{{data.author.id}}inbox">link</a>
+{{post}}
 
 <div class="container">
     <div class="row justify-content-center">
@@ -57,7 +55,8 @@
                 
                 <div class="card-footer">
                 <div>
-                    <button id="{{post.author.id}}" type="submit"  value = '{{post.id}}likes' name='{{post.author.id}}inbox'  
+                    {{post.id}}
+                    <button id="{{post.author.id}}" type="submit"  value = 'https://team9-socialdistribution.herokuapp.com/service/authors/{{request.user.id}}/posts/{{post.id}}likes' name='{https://team9-socialdistribution.herokuapp.com/service/authors/{{request.user.id}}/inbox'  
                     onclick="LikeFunction(value,name,id)" class="btn">Like</button>
                     <a href="{{post.id}}"><button type="button" class="btn">Comments</button></a>
                     <button type="button" class="btn" id="addcomment-{{post.id}}">Add comment</button>
@@ -103,6 +102,16 @@
         }).then(res => res.json());
     }
     function LikeFunction(value,inbox,title){
+
+       
+        console.log("value")
+        console.log(value)
+        
+        console.log("title")
+        console.log(title)
+        
+        console.log("inbox")
+        console.log(inbox)
        
        fetch(value, {
            method: 'GET',
@@ -110,10 +119,12 @@
                'X-CSRFToken': "{{ csrf_token }}",
                'Content-Type': 'application/json',
            },
+
             
        }).then(res =>  res.json())
        .then(data =>  {
            if(data == 404){
+            console.log("if")
               fetch(value, {
                    method: 'POST',
                    headers: {

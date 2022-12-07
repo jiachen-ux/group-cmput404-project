@@ -55,6 +55,13 @@
 
                 <div class="card-footer">
                     <div>
+                        <p>request.user.id</p>
+                        {{request.user.id}}
+                        <p>value</p>
+                        {{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes
+                        <p>inbox</p>
+                        {{host}}/service/authors/{{request.user.id}}/inbox
+                        
                         <button id="{{post.author.id}}" type="submit"  value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes' name='{{host}}/service/authors/{{request.user.id}}/inbox'  
                         onclick="LikeFunction(value,name,id)" class="btn">Like</button>
                         

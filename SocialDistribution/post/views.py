@@ -510,11 +510,14 @@ def getForeignPosts(request):
     for author in combined_author:
         # print(author['host'])
         if team8host_url in author['host']:
-            response = requests.get(f"{team8_url}authors/{author['id']}/posts", params=request.GET)
+            print("team 8")
+            print({author['id']})
+
+            response = requests.get(f"{team8_url}authors/{author['id']}/posts")
             if response.status_code == 200:
                 posts = response.json()
                 # print('team8')
-                # print(posts)
+                print(posts)
                 if posts != []:
                     if posts['items']!=[]: 
                         data.extend(posts['items'])
@@ -534,10 +537,13 @@ def getForeignPosts(request):
     #     if len(post) == 0:
     #         data.remove(post)
     # print(data)
+
+    for i in data:
+        print(data[id])
+
     finalPost = {
         "posts": data
     }
-
 
     
     return render(request, 'foreignPosts.html', finalPost)
