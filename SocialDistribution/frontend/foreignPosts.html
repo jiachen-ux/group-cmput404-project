@@ -7,9 +7,7 @@
 
 {% for post in posts %}
 
-{% for data in post %}
-
-{% if not data.unlisted %}
+{% if not post.unlisted %}
 
 {{ data.author.id }}
 
@@ -23,9 +21,9 @@
                     <div class="row">
                         <div class="col">
                             <h4 class="card-title"> 
-                                <a href="{{ post.id }}" style="color: black;">{{ data.title }}</a>
+                                <a href="{{ post.id }}" style="color: black;">{{ post.title }}</a>
                             </h4>
-                            <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white" href="https://team9-socialdistribution.herokuapp.com/authors/{{ post.author.id }}">{{ data.author.displayName }}</a></p>
+                            <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white" href="{{ post.author.id }}">{{ post.author.displayName }}</a></p>
                         </div>
                         <div class="col-3 pb-3">
                             {% if userAuthor and userAuthor.id == post.author.id %}
@@ -41,26 +39,25 @@
                 </div>
                 
                 <div class="card-body">
-                    {% if data.contentType == "TXT" or  data.contentType == "TEXT" %}
+                    {% if post.contentType == "TXT" or  post.contentType == "TEXT" %}
                     <p class="field-label"></p>
-                    <p>{{ data.content }}</p>
+                    <p>{{ post.content }}</p>
 
-                    {% elif data.contentType != "text/plain" %}
+                    {% elif post.contentType != "text/plain" %}
                     <div class="post-image" style="background-image: url(/media/{{post.image}});"></div>
                     
                     {% elif post.contentType == "text/markdown" %}
                     <div class="postBody">{{ post.content | markdownify}}</div>
                     {% else %}
-                    <div class="post-image">
-                        <img src='{{host}}/service{{ post.image.url }}' alt="Post image" style = "height: 290px; width: 290px; border-radius: 15px; margin-top: 10px;" />
-                    </div>
+                    
+                    <p class="field-label"></p>
+                    <p>{{ post.content }}</p>
                     {% endif %}
                 </div>
                 
                 <div class="card-footer">
                 <div>
-                    <button id="{{post.author.id}}" type="submit"  value = '{{data.id}}likes' name='{{data.author.id}}inbox'  
-                    onclick="LikeFunction(value,name,id)" class="btn">Like</button>
+                    <button id="{{post.id}}-like-button" type="submit" name="post_id" value="{{post.id}}" class="btn"><span id="like-count-{{post.id}}">{{post.numberOfLikes}}</span> | Like</button>
                     <a href="{{post.id}}"><button type="button" class="btn">Comments</button></a>
                     <button type="button" class="btn" id="addcomment-{{post.id}}">Add comment</button>
                 </div>
@@ -68,7 +65,7 @@
                 
                 <p class="field-label"><b>Comments: </b></p>
                 <div id="comments-of-{{post.id}}">
-                    {% for i in data.commentsSrc.comments  %}
+                    {% for i in post.commentsSrc.comments  %}
                         <div class="comment">
                             {% if i %}
                             <p>
@@ -85,7 +82,6 @@
                 <hr>
             </div>
             {% endif %}
-        {% endfor %}
         {% endfor %}
 
     </div>
