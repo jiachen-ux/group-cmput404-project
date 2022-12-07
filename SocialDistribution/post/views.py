@@ -518,6 +518,24 @@ def getForeignPosts(request):
                 if posts != []:
                     if posts['items']!=[]: 
                         data.extend(posts['items'])
+
+    for b in range(len(data)):
+        d = data[b]
+        c = d["content"]
+
+        if "image" in d["contentType"]:
+                d["contentType"] = "image/png"
+                d["content"] =  "b'" + d["content"].split("base64,")[-1] + "'"
+
+        
+        if "visibility" not in d:
+            d["visibility"] = "Public"
+
+        if "categories" not in d or isinstance(d["categories"], str):
+                d["categories"] = ["Web"]
+        
+
+
             
         # team 7 end points for posts has problem, not connecting
         # elif team7host_url in author['host']:
