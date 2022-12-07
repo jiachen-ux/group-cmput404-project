@@ -248,7 +248,7 @@ def handleInboxRequests(request, author_id):
                     #         author_id=request.user.id, object_type="comment", object_id=commentID)
                     # elif authorID != None and postID != None:
                     #     message = f'{request.user.username} liked your post {request.data["data"]["title"]}'
-                        
+
                     #     l = Like.objects.get_or_create(
                     #         author_id=request.user.id, object_type="post", object_id=postID)
                     # else:
@@ -257,7 +257,7 @@ def handleInboxRequests(request, author_id):
                         message = f'{request.user.username} liked your comment {request.data["data"]["comment"]}'
                         idOfItem =  request.data["data"]["id"].split("comments/")[1].split("/likes")[0]
                     elif "post" in request.data["data"]["id"]:
-                        message = f'{request.user.username} liked your post {request.data["data"]["title"]}'
+                        message = f'{request.user.username} liked your post {request.data["data"]["object_id"]}'
                         idOfItem =  request.data["data"]["id"].split("posts/")[1].split("/likes")[0]
                  
                     Inbox.objects.create(author_id=request.data["data"]["title"],
@@ -446,13 +446,42 @@ def Inboxs(request: HttpRequest):
         return render(request,'index.html')
     author = Author.objects.get(id=request.user.id)
     posts = Inbox.objects.filter(author=author)
+    total=[]
     host = request.scheme + "://" + request.get_host()
-    context = {
-        'posts': posts,
-        'host': host,
+    finalPost={}
+    try:
+        for item in posts:
+            context = {}
+            if 'like' in item.object_type:
+                str=item.message
+                postId=str.split(' ')[-1]
+                postinfo = Post.objects.get(id=postId)
+                content = str.replace(str.split(' ')[-1],postinfo.title)
+                context['host']=host
+                context['postinfo']=content
+                context['posts']=item
+                total.append(context)
+            elif 'comment' in item.object_type:
+                str = item.message
+                CommentId = str.split(' ')[-1]
+                Commentinfo = Comment.objects.get(id=CommentId)
+                content = str.replace(str.split(' ')[-1],Commentinfo.comment)
+                context['host'] = host
+                context['postinfo'] = content
+                context['posts'] = item
+                total.append(context)
+            else:
+                context['host'] = host
+                context['posts'] = posts
+                total.append(context)
+        finalPost={
+            "total":total
         }
-    
-    return render(request, 'Inboxs.html', context)
+        print(finalPost)
+    except Exception as e:
+        print(e)
+        pass
+    return render(request, 'Inboxs.html', finalPost)
 
 def editpost(request: HttpRequest, post_id: str):
     if request.user.is_anonymous or not (request.user.is_authenticated):
@@ -506,7 +535,7 @@ def getForeignPosts(request):
         posts = response.json()
         data.extend(posts['items'])
 
-    
+
     for author in combined_author:
         # print(author['host'])
         if team8host_url in author['host']:
@@ -516,7 +545,7 @@ def getForeignPosts(request):
                 # print('team8')
                 # print(posts)
                 if posts != []:
-                    if posts['items']!=[]: 
+                    if posts['items']!=[]:
                         data.extend(posts['items'])
 
     for b in range(len(data)):
@@ -557,5 +586,5 @@ def getForeignPosts(request):
     }
 
 
-    
+
     return render(request, 'foreignPosts.html', finalPost)

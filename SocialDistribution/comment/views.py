@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from base64 import b64encode
 from post.models import Post
-
+from post.models import Inbox
 
 
 class CommentPostView(generics.ListCreateAPIView):
@@ -45,11 +45,29 @@ class CommentPostView(generics.ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         queryset = Post.objects.filter(id=kwargs['uuidOfPost']).first()
         data = {'count': 1}
+        # Inbox.objects.create(author_id=kwargs["uuidOfAuthor"],
+        #                      object_type='comment', object_id=kwargs['uuidOfPost'])
         serializer = PostSerializer(queryset, data=data)
         if serializer.is_valid():
             serializer.save()
+        type=request.data.get("type")
+        if type=='commnt like':
+            commentID=kwargs['uuidOfAuthor']
+            Commentinfo = Comment.objects.get(id=commentID)
+            message = f'{request.user.username}  liked your comment {commentID}'
+            Inbox.objects.create(author_id=Commentinfo.author_id, message=message,
+                                 object_type='comment', object_id=kwargs['uuidOfPost'])
+            return Response(serializer.data)
 
-        return self.create(request, *args, **kwargs)
+        else:
+            commentdatas=self.create(request, *args, **kwargs)
+            authorID, postID, commentID = utils.getAuthorIDandPostIDFromLikeURL(
+                commentdatas.data.get("id"))
+            Commentinfo = Comment.objects.get(id=commentID)
+            message = f'{request.user.username} commented on your post {commentID}'
+            Inbox.objects.create(author_id=queryset.author_id,message=message,
+                                 object_type='comment', object_id=kwargs['uuidOfPost'])
+            return Response(serializer.data)
 
     def list(self, request, *args, **kwargs):
         # edit

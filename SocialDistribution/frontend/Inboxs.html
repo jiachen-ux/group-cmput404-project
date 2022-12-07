@@ -4,9 +4,9 @@
 {% endblock %}
 
 {% block content %}
-<p style="text-align: center">My Notifications</p>
-{% if posts %}
-{% for post in posts %}
+<p style="text-align: center">Inbox</p>
+{% if total %}
+{% for post in total %}
 <div class="container">
     <div class="row justify-content-center">
         <div class="mt-0">
@@ -14,9 +14,9 @@
                 <div class="card-header text-black">
                     <div class="row">
                         <div class="col">
-                            <li> {{ post.message }}</li><li style="text-align: right">{{ post.published|date:"Y-m-d H:i:s"}}</li>
-                         </div>
-                    {% if post.object_type == "follow" %}
+                            <li> {{ post.postinfo }}</li><li style="text-align: right">{{ post.posts.published|date:"Y-m-d H:i:s"}}</li>
+                        </div>
+                        {% if post.object_type == "follow" %}
                         <div class="col">
                                 <button class="btn-info float-right mr-2" id="{{post.object_id}}" type="submit"  name='{{host}}/service/authors/{{post.object_id}}/inbox' value = '{{host}}/service/authors/{{request.user.id}}/followers/{{post.object_id}}' onclick=AcceptFollowFunction(value,name,id) >
                                     Accept  
@@ -34,54 +34,55 @@
 </div>
 {% endfor %}
 <script>
-function AcceptFollowFunction(value,name,id){
-    fetch(value, {
-        method: 'PUT',
-        headers: {
-            'X-CSRFToken': "{{ csrf_token }}",
-            'Content-Type': 'application/json',
-        },
-    }).then(res => res.json())
-      .then(item => {  
-        item.id = id;
-        item.title = id;
-        item.author_id = name;
-        let result = {
-            type: "follow",
-            data: item,
-        };
-       })
-}
-function DeclineFollowFunction(value,name,id){
-    fetch(value, {
-        method: 'DELETE',
-        headers: {
-            'X-CSRFToken': "{{ csrf_token }}",
-            'Content-Type': 'application/json',
-        },
-    })
-      .then(item => {  
-        item.id = id;
-        item.title = id;
-        item.author_id = name;
-        let result = {
-            type: "follow",
-            data: item,
-        };
-        alert("yes");
-        fetch(name,{
+    function AcceptFollowFunction(value,name,id){
+        fetch(value, {
+            method: 'PUT',
+            headers: {
+                'X-CSRFToken': "{{ csrf_token }}",
+                'Content-Type': 'application/json',
+            },
+        }).then(res => res.json())
+          .then(item => {  
+            item.id = id;
+            item.title = id;
+            item.author_id = name;
+            let result = {
+                type: "follow",
+                data: item,
+            };
+           })
+    }
+    function DeclineFollowFunction(value,name,id){
+        fetch(value, {
             method: 'DELETE',
             headers: {
-            'X-CSRFToken' : "{{ csrf_token }}",
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(result)
+                'X-CSRFToken': "{{ csrf_token }}",
+                'Content-Type': 'application/json',
+            },
         })
-      })
+          .then(item => {  
+            item.id = id;
+            item.title = id;
+            item.author_id = name;
+            let result = {
+                type: "follow",
+                data: item,
+            };
+            alert("yes");
+            fetch(name,{
+                method: 'DELETE',
+                headers: {
+                'X-CSRFToken' : "{{ csrf_token }}",
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(result)
+            })
+          })
+        
+    }
     
-}
-
-</script>
+    </script>
+    
 {% else %}
 <div class="container">
     <div class="row justify-content-center">
@@ -93,3 +94,9 @@ function DeclineFollowFunction(value,name,id){
 </div>
 {% endif %}
 {% endblock %}
+
+
+
+
+
+
