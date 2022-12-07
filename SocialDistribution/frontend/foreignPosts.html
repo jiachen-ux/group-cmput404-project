@@ -20,20 +20,11 @@
                             </h4>
                             <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white" href="{{ post.author.id }}">{{ post.author.displayName }}</a></p>
                         </div>
-                        <div class="col-3 pb-3">
-                            {% if userAuthor and userAuthor.id == post.author.id %}
-                            <div class="col pb-3">
-                                <a href="https://team9-socialdistribution.herokuapp.com/editpost/{{post.id}}"><button class="btn btn-warning float-right" type="button" class="btn">Edit post</button></a>
-                            </div>
-                            <div class="col mt-4">
-                                <a href="https://team9-socialdistribution.herokuapp.com/deletepost/{{post.id}}"><button class="btn btn-outline-light float-right" type="button" class="btn" onclick="return confirm('Are you sure?');">Delete post</button></a>
-                            </div>
-                            {% endif %}
-                        </div>
                     </div>
                 </div>
                 
                 <div class="card-body">
+                    <p class="field-label"><strong>Description: </strong>{{post.description}}</p>
                     {% if post.contentType == "TXT" or  post.contentType == "TEXT" %}
                     <p class="field-label"></p>
                     <p>{{ post.content }}</p>
@@ -48,16 +39,22 @@
                 </div>
                 
                 <div class="card-footer">
-                <div>
-                    <button id="{{post.id}}-like-button" type="submit" name="post_id" value="{{post.id}}" class="btn"><span id="like-count-{{post.id}}">{{post.numberOfLikes}}</span> | Like</button>
-                    <a href="{{post.id}}"><button type="button" class="btn">Comments</button></a>
-                    <button type="button" class="btn" id="addcomment-{{post.id}}">Add comment</button>
-                </div>
-                
-                
-                <p class="field-label"><b>Comments: </b></p>
-                <div id="comments-of-{{post.id}}">
-                    {% for i in post.commentsSrc.comments  %}
+                    <!-- Like Button -->
+                        <!-- TODO: Better CSS for Like Button -->
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+                    <div class="mr-0">
+                        <button id="count-{{post.id}}" type="submit" name="{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/getalllikes'
+                        onclick="LikeCount(value,id)" class="btn" style="margin-right: 0%">Like |</button> 
+                       
+
+                        <button id="{{post.author.id}}" type="submit"  value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes' name='{{host}}/service/authors/{{request.user.id}}/inbox'  
+                        onclick="LikeFunction(value,name,id)" class="btn" style="margin-right: 0%">👍</button> 
+                        
+                    </div>
+                    <p class="field-label"><b>Comments: </b></p>
+                    <div id="comments-of-{{post.id}}">
+                        {% for i in post.commentsSrc.comments  %}
                         <div class="comment">
                             {% if i %}
                             <p>
@@ -70,10 +67,10 @@
                         </div>
                     {% endfor %}
                 </div>
-                <hr>
-                <hr>
+                </div>
             </div>
             {% endif %}
+            <br>
         {% endfor %}
 
     </div>

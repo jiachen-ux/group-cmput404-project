@@ -26,7 +26,7 @@ from comment.serializer import CommentSerializer
 
 from comment.models import *
 from rest_framework.generics import  ListCreateAPIView
-from author.views import get_local_remote_author
+import author.views as author_views
 
 
 class PostLike(ListCreateAPIView):
@@ -512,7 +512,7 @@ def getForeignPosts(request):
     Used to get all the foreign posts
     connected with team 8 and team 7
     '''
-    combined_author = get_local_remote_author(request)
+    combined_author =author_views.get_local_remote_author(request)
 
     team8_url = 'https://c404-team8.herokuapp.com/api/'
     team8host_url = 'c404-team8.herokuapp.com'
@@ -541,6 +541,24 @@ def getForeignPosts(request):
                 if posts != []:
                     if posts['items']!=[]: 
                         data.extend(posts['items'])
+
+    for b in range(len(data)):
+        d = data[b]
+        c = d["content"]
+
+        if "image" in d["contentType"]:
+                d["contentType"] = "image/png"
+                d["content"] =  "b'" + d["content"].split("base64,")[-1] + "'"
+
+        
+        if "visibility" not in d:
+            d["visibility"] = "Public"
+
+        if "categories" not in d or isinstance(d["categories"], str):
+                d["categories"] = ["Web"]
+        
+
+
             
         # team 7 end points for posts has problem, not connecting
         # elif team7host_url in author['host']:
