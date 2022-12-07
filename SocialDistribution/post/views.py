@@ -248,7 +248,7 @@ def handleInboxRequests(request, author_id):
                     #         author_id=request.user.id, object_type="comment", object_id=commentID)
                     # elif authorID != None and postID != None:
                     #     message = f'{request.user.username} liked your post {request.data["data"]["title"]}'
-                        
+
                     #     l = Like.objects.get_or_create(
                     #         author_id=request.user.id, object_type="post", object_id=postID)
                     # else:
@@ -535,7 +535,7 @@ def getForeignPosts(request):
         posts = response.json()
         data.extend(posts['items'])
 
-    
+
     for author in combined_author:
         # print(author['host'])
         if team8host_url in author['host']:
@@ -545,9 +545,9 @@ def getForeignPosts(request):
                 # print('team8')
                 # print(posts)
                 if posts != []:
-                    if posts['items']!=[]: 
+                    if posts['items']!=[]:
                         data.extend(posts['items'])
-            
+
         # team 7 end points for posts has problem, not connecting
         # elif team7host_url in author['host']:
         #     response = requests.get(f"{team7_url}authors/{author['id']}/posts", params=request.GET)
@@ -568,5 +568,5 @@ def getForeignPosts(request):
     }
 
 
-    
+
     return render(request, 'foreignPosts.html', finalPost)

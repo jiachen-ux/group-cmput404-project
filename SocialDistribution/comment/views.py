@@ -50,14 +50,24 @@ class CommentPostView(generics.ListCreateAPIView):
         serializer = PostSerializer(queryset, data=data)
         if serializer.is_valid():
             serializer.save()
-        commentdatas=self.create(request, *args, **kwargs)
-        authorID, postID, commentID = utils.getAuthorIDandPostIDFromLikeURL(
-            commentdatas.data.get("id"))
-        Commentinfo = Comment.objects.get(id=commentID)
-        message = f'{request.user.username} commented on your post {commentID}'
-        Inbox.objects.create(author_id=queryset.author_id,message=message,
-                             object_type='comment', object_id=kwargs['uuidOfPost'])
-        return self.create(request, *args, **kwargs)
+        type=request.data.get("type")
+        if type=='commnt like':
+            commentID=kwargs['uuidOfAuthor']
+            Commentinfo = Comment.objects.get(id=commentID)
+            message = f'{request.user.username}  liked your comment {commentID}'
+            Inbox.objects.create(author_id=Commentinfo.author_id, message=message,
+                                 object_type='comment', object_id=kwargs['uuidOfPost'])
+            return Response(serializer.data)
+
+        else:
+            commentdatas=self.create(request, *args, **kwargs)
+            authorID, postID, commentID = utils.getAuthorIDandPostIDFromLikeURL(
+                commentdatas.data.get("id"))
+            Commentinfo = Comment.objects.get(id=commentID)
+            message = f'{request.user.username} commented on your post {commentID}'
+            Inbox.objects.create(author_id=queryset.author_id,message=message,
+                                 object_type='comment', object_id=kwargs['uuidOfPost'])
+            return Response(serializer.data)
 
     def list(self, request, *args, **kwargs):
         # edit
