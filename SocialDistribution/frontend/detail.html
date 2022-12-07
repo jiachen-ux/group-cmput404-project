@@ -5,22 +5,32 @@
 {% block content %}
 {% load markdownify %}
     {% if post %}
-        <div class="post" post-id="{{post.id}}" author-id="{{post.author.id}}">
-            <div class="post-header">
-                <div class="row">
-                    <div class="col">
-                        <h2>Post title: {{ post.title }}</h2>
-                        <p class="field-label"><strong>By: </strong><a class="author-link" href="{{host}}/authors/{{ post.author.id }}">{{ post.author.displayName }}</a></p>
-                    </div>
-                    <div class="col-3 col-btn">
-                        {% if userAuthor and userAuthor.id == post.author.id %}
-                            <a href="{{host}}/editpost/{{post.id}}"><button type="button" class="btn">Edit post</button></a>
-                            <a href="{{host}}/deletepost/{{post.id}}"><button type="button" class="btn" onclick="return confirm('Are you sure?');">Delete post</button></a>
-                        {% endif %}
-                        <select id="shareropdown">
-                            <option value="" selected disabled hidden>Choose here</option>
-                        </select>
-                        <button type="button" class="btn" id="sharepostbtn">Share Post</button>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="mt-0">
+                <div class="card" style="width: 50rem;">
+                    <div class="post" post-id="{{post.id}}" author-id="{{post.author.id}}">
+                        <div class="card-header text-black" style="background-color: #778899;">
+                            <div class="row">
+                                <div class="col">
+                                    <h4 class="card-title">
+                                        <h2>{{ post.title }}</h2>
+                                    </h4>
+                                    <p style="font-size:medium"><strong>By: </strong><a class="author-link" style="color:white" href="{{host}}/authors/{{ post.author.id }}">{{ post.author.displayName }}</a></p>
+                                    <div class="row-3 row-btn float-right">
+                                        {% if userAuthor and userAuthor.id == post.author.id %}
+                                        <a href="{{host}}/editpost/{{post.id}}"><button type="button" class="btn">Edit post</button></a>
+                                        <a href="{{host}}/deletepost/{{post.id}}"><button type="button" class="btn" onclick="return confirm('Are you sure?');">Delete post</button></a>
+                                        {% endif %}
+                                        <select id="shareropdown" class="float-right">
+                                            <option value="" selected disabled hidden>Choose here</option>
+                                        </select>
+                                        <button type="button" class="btn btn-outline-light mr-2 btn-sm" id="sharepostbtn">Share Post</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <script>
                             var authorDropDown = document.getElementById("shareropdown");
                             var author;
@@ -239,23 +249,18 @@
                                     var mainContainer = document.getElementById(id);
                                     for (var i = 0; i < data.length; i++) {
                                         var div = document.createElement("div");
-                                        div.innerHTML =  'Comment :' + data[i].comment + ' -by: ' + data[i].author.displayName + '<p><button onclick="myFunction()">Like</button>' 
+                                        div.innerHTML =  data[i].author.displayName +':'+" "+"  "+ data[i].comment + '<span><button onclick="myFunction()" class="btn">👍</button>' 
                                         mainContainer.appendChild(div);
                                     }
                                 }
                             }
                         </script>
-                    </div>
-                </div>
-            </div>
-
-            <hr>
+                    
             
-            <div class="post-body">
-                <p class="field-label"><strong>Post description: </strong>{{post.description}}</p>
+            <div class="post-body mr-2">
+                <p class="field-label ml-3"><strong>Description: </strong>{{post.description}}</p>
                 {% if post.contentType == "text/plain" %}
-                <p class="field-label"><strong>Post Content: </strong></p>
-                <p>{{post.content}}</p>
+                <p class="ml-3">{{post.content}}</p>
                 {% elif post.contentType == "text/markdown" %}
                 <div class="postBody">{{ post.content | markdownify}}</div>
                 {% else %}
@@ -265,28 +270,52 @@
                 {% endif %}
             </div>
 
-            <hr>
             
             <div class="card-footer">
+                <!-- Like Button -->
+                        <!-- TODO: Better CSS for Like Button -->
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
                 <div>
-                    <button id="{{post.author.id}}" type="submit"  value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes' name='{{host}}/service/authors/{{request.user.id}}/inbox'  
-                    onclick="LikeFunction(value,name,id)" class="btn">Like</button>
-                    
                     <button id="count-{{post.id}}" type="submit" name="{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/getalllikes'
-                    onclick="LikeCount(value,id)" class="btn">Like: Count</button>
+                    onclick="LikeCount(value,id)" class="btn" style="margin-right: 0%">Like |</button>
+
+                    <button id="{{post.author.id}}" type="submit"  value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes' name='{{host}}/service/authors/{{request.user.id}}/inbox'  
+                    onclick="LikeFunction(value,name,id)" class="btn" style="margin-right: 0%">👍</button> 
+                    
+                    
+                    
                     <div class="comment-input-div">
-                        <form id= "form-{{post.id}}" class="form">
-                            <input type="text" name="comment" class="comment-input"
-                                placeholder="Write a comment..." >
+                        <div class="d-flex justify-content-between">
+                        <form id= "form-{{post.id}}" class="form" style="width: 70%;">
+                            <input type="text" name="comment"  class="form-control mr-0"
+                                placeholder="Write a comment..."  style="width: 100%;">
                         </form>
-                        <button type="submit" id= "form-{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/comments' name='{{host}}/service/authors/{{request.user.id}}/inbox' class="btn btn-primary" onclick="CommentFunction(value,id,name)">Submit</button>
+                        <br>
+                        <div class="d-flex justify-content-between ">
+                        <button type="submit" id= "form-{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/comments' name='{{host}}/service/authors/{{request.user.id}}/inbox' 
+                        class="btn btn-outline-dark btn-sm float-right" onclick="CommentFunction(value,id,name)"
+                        style="height: 80%;">Submit</button>
+                    
+                    <button name = "demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, name)" 
+                    class="btn btn-warning btn-sm float-right" style="height:80%; margin-left: 10px;">
+                    Show Comments</button>
                     </div>
-                    <button name = "demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, name)">Show Comments</button>
+                    </div>
+                    </div>
                     <p id="demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, id)"></p>
+                    </div>
+                </div>
                 </div>
             </div>
-        </div>
+            </div>
+            </div>
+       
     {% else %}
         <p>Post is not available.</p>
+
+    </div>
+</div>
+
     {% endif %}
 {% endblock %}
