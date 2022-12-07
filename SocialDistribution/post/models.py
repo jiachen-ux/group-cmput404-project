@@ -45,7 +45,7 @@ class Post(models.Model):
     published = models.DateTimeField(auto_now=True)
     visibility = models.CharField(max_length=15, choices=VISIBILITY_CHOICES, default="PUBLIC")
     unlisted = models.BooleanField(default=False)
-    url = models.URLField(max_length=500, editable=False)
+    url = models.URLField(max_length=500, blank=True)
     comments = models.URLField(max_length=500,editable=False,default=str(url) + '/comments')
 
     def get_id(self):
@@ -58,6 +58,9 @@ class Post(models.Model):
     def get_origin(self):
         return str(self.origin) + "posts/" + str(self.id)
 
+    def get_url(self):
+        return self.origin + "service/authors/" + str(self.author.id) + "/posts/" + str(self.id)
+
     class Meta:
         ordering = ['-published']
 
@@ -67,9 +70,6 @@ class Post(models.Model):
     @property
     def type(self):
         return 'post'
-
-    def url(self):
-        return self.origin + "service/authors/" + str(self.author.id) + "/posts/" + str(self.id)
 
 # from comment.models import Comment
 
