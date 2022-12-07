@@ -271,6 +271,7 @@ def handleInboxRequests(request, author_id):
                     elif type == "share":
                         message = f'{request.GET.get("username")} shared a post with you.'
                         postType = 'post'
+                        Inbox.objects.create(author_id=author_id, object_type=postType, object_id=idOfItem, message=message)
                     elif type == "follow":
  
                         print(author_id)
@@ -465,6 +466,18 @@ def deletepost(request: HttpRequest, post_id: str):
     if post.author.id == author.id:
         post.delete()
     return redirect('post:index')
+
+def postdetail(request: HttpRequest, post_id):
+    if request.user.is_anonymous:
+        return render(request,'index.html')
+    currentAuthor=Author.objects.filter(id=request.user.id).first()
+    post = Post.objects.filter(id=post_id)
+    host = request.scheme + "://" + request.get_host()
+    context = {
+        'posts': post,
+        'host': host
+        }
+    return render(request, 'detail.html', context)
 
 class getAllPostLikes(generics.ListAPIView):
     queryset = Like.objects.all()

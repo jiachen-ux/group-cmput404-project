@@ -33,5 +33,6 @@ urlpatterns = [
     path('createpost',views.createpost,name='createpost'),
     path('editpost/<str:post_id>',views.editpost, name='editpost'),
     path('deletepost/<str:post_id>',views.deletepost, name='deletepost'),
+    path('site/<str:post_id>',views.postdetail, name='postdetail'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
