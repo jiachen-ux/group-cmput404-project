@@ -43,7 +43,7 @@
                         </div>
                     </div>
                 </div>
-                <hr>
+
 
                 <div class="card-body">
                     <p class="field-label"><strong>Description: </strong>{{post.description}}</p>
@@ -60,7 +60,7 @@
                     {% endif %}
                 </div>
 
-                <hr>
+            
 
                 <div class="card-footer">
                     <div>
@@ -93,7 +93,10 @@
                            value='{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments'></p>
                     </div>
                 </div>
+
+                <br>
             </div>
+           
         </div>
         <script>
             function CommentFunction(value, id, inbox) {
@@ -237,12 +240,21 @@
                 }).then(res => res.json())
             }
         </script>
-    </div>
-</div>
+ 
 {% endfor %}
+
 {% else %}
-<p>No posts are available.</p>
+<div class="row justify-content-center">
+    <div class="mt-0">
+        
+<h6>No posts are available.</h6>
+        </div>
+    
+</div>
 {% endif %}
+
+</div>
+</div>
 {% endblock %}
 
 
