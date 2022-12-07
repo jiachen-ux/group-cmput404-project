@@ -225,20 +225,20 @@ def get_local_remote_author(request):
     combined_author.extend(local_authors_data)
 
     if team8_remote_response.status_code == 200: 
-        # print('connect to team 8')
+        print('connect to team 8')
         team8_data = team8_remote_response.json()
         team8_Authors = team8_data['items']
         team8_Authors = id_cleaner(team8_Authors)
         combined_author.extend(team8_Authors)
     
     if team7_remote_response.status_code == 200:
-        # print('connect to team 7')
+        print('connect to team 7')
         team7_data = team7_remote_response.json()
         team7_Authors = team7_data['items']
         combined_author.extend(team7_Authors)
 
     if team17_remote_response.status_code == 200:
-        # print('connect to team 17')
+        print('connect to team 17')
         team17_data = team17_remote_response.json()
         team17_Authors = team17_data['items']
         team17_Authors = id_cleaner(team17_Authors)

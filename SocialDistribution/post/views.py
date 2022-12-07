@@ -25,6 +25,7 @@ from comment.serializer import CommentSerializer
 
 from comment.models import *
 from rest_framework.generics import  ListCreateAPIView
+from author.views import id_cleaner
 
 
 class PostLike(ListCreateAPIView):
@@ -445,12 +446,14 @@ def getForeignPosts(request):
     combined_author = []
 
     team8 = 'https://c404-team8.herokuapp.com/api/'
-    team7 = 'https://cmput404-social.herokuapp.com/service/'    
+    team7 = 'https://cmput404-social.herokuapp.com/service/' 
+    team17 = 'https://cmput404f22t17.herokuapp.com/'   
     #local_Authors = Author.objects.all()
     
     t8_remote_response = requests.get(f'{team8}authors/')
     print(t8_remote_response)
     team7_remote_response = requests.get(f'{team7}authors/')
+    team17_remote_response = requests.get(f'{team17}authors/')
 
     #serializer = GetAuthorSerializer(local_Authors, many=True)
     #combined_author = serializer.data
@@ -459,6 +462,7 @@ def getForeignPosts(request):
         print('connect to team 8')
         team8_data = t8_remote_response.json()
         team8_Authors = team8_data['items']
+        team8_Authors = id_cleaner(team8_Authors)
         combined_author.extend(team8_Authors)
 
     if team7_remote_response.status_code == 200:
@@ -466,9 +470,14 @@ def getForeignPosts(request):
         team7_data = team7_remote_response.json()
         team7_Authors = team7_data['items']
         combined_author.extend(team7_Authors)
+
+    if team17_remote_response.status_code == 200:
+        print('connect to team 17')
+        team17_data = team17_remote_response.json()
+        team17_Authors = team17_data['items']
+        team17_Authors = id_cleaner(team17_Authors)
+        combined_author.extend(team17_Authors)
     
-
-
     context = {
         "type": "authors",
         "items": combined_author
@@ -497,10 +506,11 @@ def getForeignPosts(request):
             data.remove(post)
     
     
-
     finalPost = {
         "posts": data
     }
+
+    print(finalPost["posts"])
 
     
     return render(request, 'foreignPosts.html', finalPost)
