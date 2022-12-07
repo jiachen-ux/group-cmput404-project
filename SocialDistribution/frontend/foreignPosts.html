@@ -3,6 +3,7 @@
 {% block title %}List of Posts{% endblock %}
 
 {% block content %}
+{% load markdownify %}
 
 {% for post in posts %}
 
@@ -43,9 +44,12 @@
                     {% elif data.contentType != "text/plain" %}
                     <div class="post-image" style="background-image: url(/media/{{post.image}});"></div>
                     
+                    {% elif post.contentType == "text/markdown" %}
+                    <div class="postBody">{{ post.content | markdownify}}</div>
                     {% else %}
-                    <p class="field-label"></p>
-                    <p>{{ data.content }}</p>
+                    <div class="post-image">
+                        <img src='{{host}}/service{{ post.image.url }}' alt="Post image" style = "height: 290px; width: 290px; border-radius: 15px; margin-top: 10px;" />
+                    </div>
                     {% endif %}
                 </div>
                 
