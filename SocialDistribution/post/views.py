@@ -219,6 +219,7 @@ def handleInboxRequests(request, author_id):
         try:
             try:
                 message = "None"
+                idOfItem = "None"
                 postType = str(request.data["type"]).lower()
                 if not postType in {"post", "comment", "like", "follow", "share"}:
                     raise KeyError("Invalid post type!")
@@ -240,17 +241,23 @@ def handleInboxRequests(request, author_id):
                     authorID, postID, commentID = utils.getAuthorIDandPostIDFromLikeURL(
                         serializer.data["object_id"])
 
-                    if authorID != None and postID != None and commentID != None:
+                    # if authorID != None and postID != None and commentID != None:
+                    #     message = f'{request.user.username} liked your comment {request.data["data"]["comment"]}'
+                    #     l = Like.objects.get_or_create(
+                    #         author_id=request.user.id, object_type="comment", object_id=commentID)
+                    # elif authorID != None and postID != None:
+                    #     message = f'{request.user.username} liked your post {request.data["data"]["title"]}'
+                        
+                    #     l = Like.objects.get_or_create(
+                    #         author_id=request.user.id, object_type="post", object_id=postID)
+                    # else:
+                    #     raise KeyError("like object not valid!")
+                    if "comment" in request.data["data"]["id"]:
                         message = f'{request.user.username} liked your comment {request.data["data"]["comment"]}'
-                        l = Like.objects.get_or_create(
-                            author_id=request.user.id, object_type="comment", object_id=commentID)
-                    elif authorID != None and postID != None:
+                        idOfItem =  request.data["data"]["id"].split("comments/")[1].split("/likes")[0]
+                    elif "post" in request.data["data"]["id"]:
                         message = f'{request.user.username} liked your post {request.data["data"]["title"]}'
-                        l = Like.objects.get_or_create(
-                            author_id=request.user.id, object_type="post", object_id=postID)
-                    else:
-                        raise KeyError("like object not valid!")
-                    idOfItem = l[0].id
+                        idOfItem =  request.data["data"]["id"].split("posts/")[1].split("/likes")[0]
                  
                     Inbox.objects.create(author_id=request.data["data"]["title"],
                                      object_type=postType, object_id=idOfItem, message=message)
@@ -272,8 +279,6 @@ def handleInboxRequests(request, author_id):
                         message = f'{request.GET.get("username")} shared a post with you.'
                         postType = 'post'
                     elif type == "follow":
- 
-                        print(author_id)
                         message = f'{request.data["data"]["sender"]["displayName"]} send you a follow request.'
                         postType = "follow"
                      
