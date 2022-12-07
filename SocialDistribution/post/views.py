@@ -277,10 +277,8 @@ def handleInboxRequests(request, author_id):
                         message = f'{request.data["author"]["username"]} added a new post {request.data["title"]}'
                         Inbox.objects.create(author_id=author_id, object_type=postType, object_id=idOfItem, message=message)
                     elif type == "share":
-                        message = f'{request.user.username} shared a post with you called: {request.data["title"]}.'
+                        message = f'{request.GET.get("username")} shared a post with you.'
                         postType = 'post'
-                        idOfItem = utils.getUUID(request.data["id"])
-                        Inbox.objects.create(author_id=author_id, object_type=postType, object_id=idOfItem, message=message)
                     elif type == "follow":
                         message = f'{request.data["data"]["sender"]["displayName"]} send you a follow request.'
                         postType = "follow"
@@ -473,27 +471,6 @@ def deletepost(request: HttpRequest, post_id: str):
     if post.author.id == author.id:
         post.delete()
     return redirect('post:index')
-
-def postdetail(request: HttpRequest, post_id: str):
-    if request.user.is_anonymous:
-        return render(request,'index.html')
-    post = Post.objects.get(id=post_id)
-    print(post.id)
-    host = request.scheme + "://" + request.get_host()
-    context = {
-        'post': post,
-        'host': host,
-        }
-    return render(request, 'detail.html', context)
-
-def github_feed(request: HttpRequest):
-    if request.user.is_anonymous or not (request.user.is_authenticated):
-        return render(request,'github_feed.html')
-
-    currentAuthor=Author.objects.get(id = request.user.id)
-    host = request.scheme + "://" + request.get_host()
-    context = {'currentAuthor' : currentAuthor, 'host':host}
-    return render(request,'github_feed.html',context)
 
 class getAllPostLikes(generics.ListAPIView):
     queryset = Like.objects.all()
