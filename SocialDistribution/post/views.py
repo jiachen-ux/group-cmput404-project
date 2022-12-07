@@ -480,7 +480,7 @@ def postdetail(request: HttpRequest, post_id: str):
         }
     return render(request, 'detail.html', context)
 
-def github(request: HttpRequest):
+def github_feed(request: HttpRequest):
     if request.user.is_anonymous or not (request.user.is_authenticated):
         return render(request,'github_feed.html')
 

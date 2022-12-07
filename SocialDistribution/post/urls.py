@@ -34,5 +34,6 @@ urlpatterns = [
     path('editpost/<str:post_id>',views.editpost, name='editpost'),
     path('deletepost/<str:post_id>',views.deletepost, name='deletepost'),
     path('site/<str:post_id>',views.postdetail, name='postdetail'),
+    path('github_feed/',views.github_feed,name="github_feed"),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

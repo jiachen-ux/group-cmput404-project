@@ -8,8 +8,8 @@
         githubField = '{{currentAuthor.github}}';
         var user;
         var list = document.getElementById("githubposts");
-        var i=githubField.length-1;
-        
+        var garray = githubField.split("/");
+        var username = garray[3];
         url = "https://api.github.com/users/" + username+"/events";
         fetch(url,{method: 'GET'
         })
