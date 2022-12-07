@@ -59,7 +59,7 @@ class Post(models.Model):
         return str(self.origin) + "posts/" + str(self.id)
 
     def get_url(self):
-        return self.origin + "service/authors/" + str(self.author.id) + "/posts/" + str(self.id)
+        return str(self.origin) + "service/authors/" + str(self.author.id) + "/posts/" + str(self.id)
 
     class Meta:
         ordering = ['-published']
