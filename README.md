@@ -1,6 +1,8 @@
 
 # CMPUT404-Project-Social-Distribution
 
+## [Video Demo](https://drive.google.com/file/d/1_8j8gW5j1JVIow-7twdNGBxgNnWY4o2s/view?usp=sharing/)
+
 ## [Application Website](https://team9-socialdistribution.herokuapp.com/)
 
 ## [API Documentation](https://team9-socialdistribution.herokuapp.com/swagger/schema/)
