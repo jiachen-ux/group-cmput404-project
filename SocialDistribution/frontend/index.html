@@ -46,7 +46,7 @@
                     <div class="postBody">{{ post.content | markdownify}}</div>
                     {% else %}
                     <div class="post-image">
-                        <img src='{{host}}/service{{ post.image.url }}' alt="Post image" style = "height: 290px; width: 290px; border-radius: 15px; margin-top: 10px;" />
+                        <img src='{{host}}{{ post.image.url }}' alt="Post image" style = "height: 290px; width: 290px; border-radius: 15px; margin-top: 10px;" />
                     </div>
                     {% endif %}
                 </div>
