@@ -26,6 +26,7 @@ from comment.serializer import CommentSerializer
 
 from comment.models import *
 from rest_framework.generics import  ListCreateAPIView
+from author.views import get_local_remote_author
 
 
 class PostLike(ListCreateAPIView):
@@ -219,6 +220,7 @@ def handleInboxRequests(request, author_id):
         try:
             try:
                 message = "None"
+                idOfItem = "None"
                 postType = str(request.data["type"]).lower()
                 if not postType in {"post", "comment", "like", "follow", "share"}:
                     raise KeyError("Invalid post type!")
@@ -240,17 +242,23 @@ def handleInboxRequests(request, author_id):
                     authorID, postID, commentID = utils.getAuthorIDandPostIDFromLikeURL(
                         serializer.data["object_id"])
 
-                    if authorID != None and postID != None and commentID != None:
+                    # if authorID != None and postID != None and commentID != None:
+                    #     message = f'{request.user.username} liked your comment {request.data["data"]["comment"]}'
+                    #     l = Like.objects.get_or_create(
+                    #         author_id=request.user.id, object_type="comment", object_id=commentID)
+                    # elif authorID != None and postID != None:
+                    #     message = f'{request.user.username} liked your post {request.data["data"]["title"]}'
+                        
+                    #     l = Like.objects.get_or_create(
+                    #         author_id=request.user.id, object_type="post", object_id=postID)
+                    # else:
+                    #     raise KeyError("like object not valid!")
+                    if "comment" in request.data["data"]["id"]:
                         message = f'{request.user.username} liked your comment {request.data["data"]["comment"]}'
-                        l = Like.objects.get_or_create(
-                            author_id=request.user.id, object_type="comment", object_id=commentID)
-                    elif authorID != None and postID != None:
+                        idOfItem =  request.data["data"]["id"].split("comments/")[1].split("/likes")[0]
+                    elif "post" in request.data["data"]["id"]:
                         message = f'{request.user.username} liked your post {request.data["data"]["title"]}'
-                        l = Like.objects.get_or_create(
-                            author_id=request.user.id, object_type="post", object_id=postID)
-                    else:
-                        raise KeyError("like object not valid!")
-                    idOfItem = l[0].id
+                        idOfItem =  request.data["data"]["id"].split("posts/")[1].split("/likes")[0]
                  
                     Inbox.objects.create(author_id=request.data["data"]["title"],
                                      object_type=postType, object_id=idOfItem, message=message)
@@ -274,8 +282,6 @@ def handleInboxRequests(request, author_id):
                         idOfItem = utils.getUUID(request.data["id"])
                         Inbox.objects.create(author_id=author_id, object_type=postType, object_id=idOfItem, message=message)
                     elif type == "follow":
- 
-                        print(author_id)
                         message = f'{request.data["data"]["sender"]["displayName"]} send you a follow request.'
                         postType = "follow"
                      
@@ -506,64 +512,55 @@ def getForeignPosts(request):
     Used to get all the foreign posts
     connected with team 8 and team 7
     '''
-    combined_author = []
+    combined_author = get_local_remote_author(request)
 
-    team8 = 'https://c404-team8.herokuapp.com/api/'
-    team7 = 'https://cmput404-social.herokuapp.com/service/'    
-    #local_Authors = Author.objects.all()
-    
-    t8_remote_response = requests.get(f'{team8}authors/')
-    team7_remote_response = requests.get(f'{team7}authors/')
-
-    #serializer = GetAuthorSerializer(local_Authors, many=True)
-    #combined_author = serializer.data
-
-    if t8_remote_response.status_code == 200:
-        print('connect to team 8')
-        team8_data = t8_remote_response.json()
-        team8_Authors = team8_data['items']
-        combined_author.extend(team8_Authors)
-
-    if team7_remote_response.status_code == 200:
-        print('connect to team 7')
-        team7_data = team7_remote_response.json()
-        team7_Authors = team7_data['items']
-        combined_author.extend(team7_Authors)
-    
-
-
-    context = {
-        "type": "authors",
-        "items": combined_author
-    }
+    team8_url = 'https://c404-team8.herokuapp.com/api/'
+    team8host_url = 'c404-team8.herokuapp.com'
+    team7_url = 'https://cmput404-social.herokuapp.com/service/'
+    team7host_url = 'http://127.0.0.1:8000/'
+    team17_url = 'https://cmput404f22t17.herokuapp.com/'
+    team17host_url = 'cmput404f22t17.herokuapp.com'
 
     data = []
-    authorId=[]
-    posts = []
 
-    finalPost = {}
+    response = requests.get(f"{team17_url}posts", params=request.GET)
+    if response.status_code == 200:
+        # print(posts)
+        posts = response.json()
+        data.extend(posts['items'])
 
-
-    for result in context['items']:
-        authorId.append(result['id'])
-
-    for i in authorId:
-        response = requests.get(f"{team8}authors/{i}/posts", params=request.GET)
-        
-        if response.status_code == 200:
-            posts = response.json()['items']
-            data.append(posts)
-
-
-    for post in data:
-        if len(post) == 0:
-            data.remove(post)
     
-    
+    for author in combined_author:
+        # print(author['host'])
+        if team8host_url in author['host']:
+            response = requests.get(f"{team8_url}authors/{author['id']}/posts", params=request.GET)
+            if response.status_code == 200:
+                posts = response.json()
+                # print('team8')
+                # print(posts)
+                if posts != []:
+                    if posts['items']!=[]: 
+                        data.extend(posts['items'])
+            
+        # team 7 end points for posts has problem, not connecting
+        # elif team7host_url in author['host']:
+        #     response = requests.get(f"{team7_url}authors/{author['id']}/posts", params=request.GET)
+        #     if response.status_code == 200:
+        #         # print('team7')
+        #         # print(author['id'])
+        #         posts = response.json()
+        #         print(posts)
+        #         if author['id'] in list(posts.keys()):
+        #             data.append(posts[author['id']])
 
+    # for post in data:
+    #     if len(post) == 0:
+    #         data.remove(post)
+    # print(data)
     finalPost = {
         "posts": data
     }
+
 
     
     return render(request, 'foreignPosts.html', finalPost)
