@@ -1,6 +1,7 @@
 {% extends "author/base.html" %}
 
-{% block title %}List of Posts{% endblock %}
+{% block title %}
+{% endblock %}
 
 {% block content %}
 <p style="text-align: center">My Notifications</p>
@@ -11,9 +12,10 @@
         <div class="mt-0">
             <div class="card" style="width: 50rem;">
                 <div class="card-header text-black">
-                    <div class="row">
-                        <div class="col">
-                            <li> {{ post.message }}</li><li style="text-align: right">{{ post.published|date:"Y-m-d H:i:s"}}</li>
+                    <div class="row d-flex justify-content-between">
+                        <div class="col d-flex justify-content-between">
+                            <h7> {{ post.message }}</h7><p class="text-muted small float-right style="text-align: right">{{ post.published|date:"Y-m-d H:i:s"}}</p>
+                            
                          </div>
                     {% if post.object_type == "follow" %}
                         <div class="col">
@@ -27,7 +29,9 @@
                     {%endif%}
                     </div>
                 </div>
+            
             </div>
+            <br>
         </div>
     </div>
 </div>
@@ -82,6 +86,13 @@ function DeclineFollowFunction(value,name,id){
 
 </script>
 {% else %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="mt-0">
 <p>No items are available.</p>
+
+</div>
+    </div>
+</div>
 {% endif %}
 {% endblock %}

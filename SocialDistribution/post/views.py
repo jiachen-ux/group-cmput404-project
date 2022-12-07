@@ -26,6 +26,7 @@ from comment.serializer import CommentSerializer
 
 from comment.models import *
 from rest_framework.generics import  ListCreateAPIView
+import author.views as author_views
 
 
 class PostLike(ListCreateAPIView):
@@ -276,8 +277,10 @@ def handleInboxRequests(request, author_id):
                         message = f'{request.data["author"]["username"]} added a new post {request.data["title"]}'
                         Inbox.objects.create(author_id=author_id, object_type=postType, object_id=idOfItem, message=message)
                     elif type == "share":
-                        message = f'{request.GET.get("username")} shared a post with you.'
+                        message = f'{request.user.username} shared a post with you called: {request.data["title"]}.'
                         postType = 'post'
+                        idOfItem = utils.getUUID(request.data["id"])
+                        Inbox.objects.create(author_id=author_id, object_type=postType, object_id=idOfItem, message=message)
                     elif type == "follow":
                         message = f'{request.data["data"]["sender"]["displayName"]} send you a follow request.'
                         postType = "follow"
@@ -471,6 +474,27 @@ def deletepost(request: HttpRequest, post_id: str):
         post.delete()
     return redirect('post:index')
 
+def postdetail(request: HttpRequest, post_id: str):
+    if request.user.is_anonymous:
+        return render(request,'index.html')
+    post = Post.objects.get(id=post_id)
+    print(post.id)
+    host = request.scheme + "://" + request.get_host()
+    context = {
+        'post': post,
+        'host': host,
+        }
+    return render(request, 'detail.html', context)
+
+def github_feed(request: HttpRequest):
+    if request.user.is_anonymous or not (request.user.is_authenticated):
+        return render(request,'github_feed.html')
+
+    currentAuthor=Author.objects.get(id = request.user.id)
+    host = request.scheme + "://" + request.get_host()
+    context = {'currentAuthor' : currentAuthor, 'host':host}
+    return render(request,'github_feed.html',context)
+
 class getAllPostLikes(generics.ListAPIView):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
@@ -488,64 +512,73 @@ def getForeignPosts(request):
     Used to get all the foreign posts
     connected with team 8 and team 7
     '''
-    combined_author = []
+    combined_author =author_views.get_local_remote_author(request)
 
-    team8 = 'https://c404-team8.herokuapp.com/api/'
-    team7 = 'https://cmput404-social.herokuapp.com/service/'    
-    #local_Authors = Author.objects.all()
-    
-    t8_remote_response = requests.get(f'{team8}authors/')
-    team7_remote_response = requests.get(f'{team7}authors/')
-
-    #serializer = GetAuthorSerializer(local_Authors, many=True)
-    #combined_author = serializer.data
-
-    if t8_remote_response.status_code == 200:
-        print('connect to team 8')
-        team8_data = t8_remote_response.json()
-        team8_Authors = team8_data['items']
-        combined_author.extend(team8_Authors)
-
-    if team7_remote_response.status_code == 200:
-        print('connect to team 7')
-        team7_data = team7_remote_response.json()
-        team7_Authors = team7_data['items']
-        combined_author.extend(team7_Authors)
-    
-
-
-    context = {
-        "type": "authors",
-        "items": combined_author
-    }
+    team8_url = 'https://c404-team8.herokuapp.com/api/'
+    team8host_url = 'c404-team8.herokuapp.com'
+    team7_url = 'https://cmput404-social.herokuapp.com/service/'
+    team7host_url = 'http://127.0.0.1:8000/'
+    team17_url = 'https://cmput404f22t17.herokuapp.com/'
+    team17host_url = 'cmput404f22t17.herokuapp.com'
 
     data = []
-    authorId=[]
-    posts = []
 
-    finalPost = {}
+    response = requests.get(f"{team17_url}posts", params=request.GET)
+    if response.status_code == 200:
+        # print(posts)
+        posts = response.json()
+        data.extend(posts['items'])
 
+    
+    for author in combined_author:
+        # print(author['host'])
+        if team8host_url in author['host']:
+            response = requests.get(f"{team8_url}authors/{author['id']}/posts", params=request.GET)
+            if response.status_code == 200:
+                posts = response.json()
+                # print('team8')
+                # print(posts)
+                if posts != []:
+                    if posts['items']!=[]: 
+                        data.extend(posts['items'])
 
-    for result in context['items']:
-        authorId.append(result['id'])
+    for b in range(len(data)):
+        d = data[b]
+        c = d["content"]
 
-    for i in authorId:
-        response = requests.get(f"{team8}authors/{i}/posts", params=request.GET)
+        if "image" in d["contentType"]:
+                d["contentType"] = "image/png"
+                d["content"] =  "b'" + d["content"].split("base64,")[-1] + "'"
+
         
-        if response.status_code == 200:
-            posts = response.json()['items']
-            data.append(posts)
+        if "visibility" not in d:
+            d["visibility"] = "Public"
+
+        if "categories" not in d or isinstance(d["categories"], str):
+                d["categories"] = ["Web"]
+        
 
 
-    for post in data:
-        if len(post) == 0:
-            data.remove(post)
-    
-    
+            
+        # team 7 end points for posts has problem, not connecting
+        # elif team7host_url in author['host']:
+        #     response = requests.get(f"{team7_url}authors/{author['id']}/posts", params=request.GET)
+        #     if response.status_code == 200:
+        #         # print('team7')
+        #         # print(author['id'])
+        #         posts = response.json()
+        #         print(posts)
+        #         if author['id'] in list(posts.keys()):
+        #             data.append(posts[author['id']])
 
+    # for post in data:
+    #     if len(post) == 0:
+    #         data.remove(post)
+    # print(data)
     finalPost = {
         "posts": data
     }
+
 
     
     return render(request, 'foreignPosts.html', finalPost)
