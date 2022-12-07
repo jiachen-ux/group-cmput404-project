@@ -52,6 +52,26 @@
                         onclick="LikeFunction(value,name,id)" class="btn" style="margin-right: 0%">👍</button> 
                         
                     </div>
+                                  
+                    <div class="comment-input-div">
+                        <div class="d-flex justify-content-between">
+                        <form id= "form-{{post.id}}" class="form" style="width: 70%;">
+                            <input type="text" name="comment"  class="form-control mr-0"
+                                placeholder="Write a comment..."  style="width: 100%;">
+                        </form>
+                        <br>
+                        <div class="d-flex justify-content-between ">
+                        <button type="submit" id= "form-{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/comments' name='{{host}}/service/authors/{{request.user.id}}/inbox' 
+                        class="btn btn-outline-dark btn-sm float-right" onclick="CommentFunction(value,id,name)"
+                        style="height: 80%;">Submit</button>
+                    
+                    <button name = "demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, name)" 
+                    class="btn btn-warning btn-sm float-right" style="height:80%; margin-left: 10px;">
+                    Show Comments</button>
+                    </div>
+                    </div>
+                    </div>
+                    <p id="demo-{{post.id}}" value = '{{host}}/service/authors/{{post.author.id}}/posts/{{post.id}}/comments' onclick="showComment(value, id)"></p>
                     <p class="field-label"><b>Comments: </b></p>
                     <div id="comments-of-{{post.id}}">
                         {% for i in post.commentsSrc.comments  %}
