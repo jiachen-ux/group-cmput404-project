@@ -2,9 +2,9 @@ name: Django CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "gitAction" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "gitAction" ]
 
 jobs:
   build:
@@ -27,4 +27,4 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        python manage.py test
+        python SocialDistribution/manage.py test
