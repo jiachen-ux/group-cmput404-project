@@ -22,6 +22,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from post.models import Post
 from author.forms import EditAuthorForm
+import post.views as post_view
 
 # from connect.views import *
 # from connect.models import *
@@ -156,7 +157,8 @@ def loginView(request):
             else:
                 login(request, user)
             # return redirect(homeView)
-            return HttpResponse(render(request, 'author/home.html'),status=200)
+            return redirect(reverse('post:myPosts'))
+
 
         else:
             messages.error(request, 'Please enter a valid username and password. Note that both fields are case sensitive.', extra_tags='invalid')
