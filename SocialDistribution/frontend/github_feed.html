@@ -26,12 +26,13 @@
         .then(function(data){
             console.log(data);
             for(let post of data){
+                console.log(post.type)
                 var div = document.createElement("div");
 
                 h4 = document.createElement("h4");
                 h4.textContent = "Type: " + post.type;
                 div.innerHTML = '<div class="card-header text-black" style="background-color: #a2afe23b;">' + 
-                    '<h5>GitHub Activity:'+ " "+ '<span style="color:rgb(14, 102, 174)">'+post.type+ +'</span>'+"</h5>"
+                    '<h5>GitHub Activity:'+ " "+ '<span style="color:rgb(14, 102, 174)">'+ post.type +'</span>'+"</h5>"
                   '</div>'
                 li = document.createElement("li");
                 var div2 = document.createElement("div");
