@@ -9,7 +9,7 @@
 
 {% if not post.unlisted %}
 
-{{ data.author.id }}
+{{ post.author.id }}
 
 <a href="{{data.author.id}}inbox">link</a>
 
@@ -57,7 +57,8 @@
                 
                 <div class="card-footer">
                 <div>
-                    <button id="{{post.id}}-like-button" type="submit" name="post_id" value="{{post.id}}" class="btn"><span id="like-count-{{post.id}}">{{post.numberOfLikes}}</span> | Like</button>
+                    <button id="{{post.author.id}}" type="submit"  value = '{{post.id}}likes' name='{{post.author.id}}inbox'  
+                    onclick="LikeFunction(value,name,id)" class="btn">Like</button>
                     <a href="{{post.id}}"><button type="button" class="btn">Comments</button></a>
                     <button type="button" class="btn" id="addcomment-{{post.id}}">Add comment</button>
                 </div>
@@ -123,8 +124,14 @@
            .then(item => {
                 
                item.id = value;
+               console.log("value")
+               console.log(value)
                item.title = title;
+               console.log("title")
+               console.log(title)
                item.author_id = inbox;
+               console.log("inbox")
+               console.log(inbox)
                let result = {
                    type: "like",
                    data: item,
