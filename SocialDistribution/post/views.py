@@ -513,23 +513,26 @@ def getForeignPosts(request):
             response = requests.get(f"{team8_url}authors/{author['id']}/posts", params=request.GET)
             if response.status_code == 200:
                 posts = response.json()
-                # print('team8')
-                # print(posts)
+                print('team8')
+                print(posts)
                 if posts != []:
                     if posts['items']!=[]: 
                         data.extend(posts['items'])
             
         # team 7 end points for posts has problem, not connecting
-        # elif team7host_url in author['host']:
-        #     response = requests.get(f"{team7_url}authors/{author['id']}/posts", params=request.GET)
-        #     if response.status_code == 200:
-        #         # print('team7')
-        #         # print(author['id'])
-        #         posts = response.json()
-        #         print(posts)
-        #         if author['id'] in list(posts.keys()):
-        #             data.append(posts[author['id']])
+        elif team7host_url in author['host']:
+            response = requests.get(f"{team7_url}authors/{author['id']}/posts", params=request.GET)
+            if response.status_code == 200:
+                print('team7')
+                # print(author['id'])
+                posts = response.json()
+                if posts != []:
+                    keys = list(posts.keys())
+                    for key in keys:
+                        print(posts[key])
+                        data.append(posts[key])
 
+    print()
     # for post in data:
     #     if len(post) == 0:
     #         data.remove(post)
@@ -538,6 +541,6 @@ def getForeignPosts(request):
         "posts": data
     }
 
-
+    
     
     return render(request, 'foreignPosts.html', finalPost)
