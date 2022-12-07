@@ -192,6 +192,17 @@
                     }
                 }
             }
+            function myFunction(value){
+                console.log(value)
+                console.log(5555555555555)
+                fetch(value, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': "{{ csrf_token }}",
+                        'Content-Type': 'application/json',
+                    },
+                }).then(res =>  res.json())
+            }
         </script>
     </div>
 </div>

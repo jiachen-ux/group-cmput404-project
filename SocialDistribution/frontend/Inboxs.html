@@ -13,7 +13,7 @@
                 <div class="card-header text-black">
                     <div class="row">
                         <div class="col">
-                            <li> {{ post.posts.message }}</li><li style="text-align: right">{{ post.posts.published|date:"Y-m-d H:i:s"}}</li><li>(content is){{post.postinfo.title}}</li>
+                            <li> {{ post.postinfo }}</li><li style="text-align: right">{{ post.posts.published|date:"Y-m-d H:i:s"}}</li>
                         </div>
                         {% if post.object_type == "follow" %}
                         <div class="col">

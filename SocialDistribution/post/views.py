@@ -257,7 +257,7 @@ def handleInboxRequests(request, author_id):
                         message = f'{request.user.username} liked your comment {request.data["data"]["comment"]}'
                         idOfItem =  request.data["data"]["id"].split("comments/")[1].split("/likes")[0]
                     elif "post" in request.data["data"]["id"]:
-                        message = f'{request.user.username} liked your post {request.data["data"]["title"]}'
+                        message = f'{request.user.username} liked your post {request.data["data"]["object_id"]}'
                         idOfItem =  request.data["data"]["id"].split("posts/")[1].split("/likes")[0]
                  
                     Inbox.objects.create(author_id=request.data["data"]["title"],
@@ -453,17 +453,21 @@ def Inboxs(request: HttpRequest):
         for item in posts:
             context = {}
             if 'like' in item.object_type:
-                postId=item.message.split(' ')[-1]
+                str=item.message
+                postId=str.split(' ')[-1]
                 postinfo = Post.objects.get(id=postId)
+                content = str.replace(str.split(' ')[-1],postinfo.title)
                 context['host']=host
-                context['postinfo']=postinfo
+                context['postinfo']=content
                 context['posts']=item
                 total.append(context)
             elif 'comment' in item.object_type:
-                CommentId = item.message.split(' ')[-1]
+                str = item.message
+                CommentId = str.split(' ')[-1]
                 Commentinfo = Comment.objects.get(id=CommentId)
+                content = str.replace(str.split(' ')[-1],Commentinfo.comment)
                 context['host'] = host
-                context['postinfo'] = Commentinfo.comment
+                context['postinfo'] = content
                 context['posts'] = item
                 total.append(context)
             else:
@@ -473,7 +477,9 @@ def Inboxs(request: HttpRequest):
         finalPost={
             "total":total
         }
-    except:
+        print(finalPost)
+    except Exception as e:
+        print(e)
         pass
     return render(request, 'Inboxs.html', finalPost)
 
