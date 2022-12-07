@@ -269,8 +269,9 @@ def handleInboxRequests(request, author_id):
                         message = f'{request.data["author"]["username"]} added a new post {request.data["title"]}'
                         Inbox.objects.create(author_id=author_id, object_type=postType, object_id=idOfItem, message=message)
                     elif type == "share":
-                        message = f'{request.GET.get("username")} shared a post with you.'
+                        message = f'{request.user.username} shared a post with you called: {request.data["title"]}.'
                         postType = 'post'
+                        idOfItem = utils.getUUID(request.data["id"])
                         Inbox.objects.create(author_id=author_id, object_type=postType, object_id=idOfItem, message=message)
                     elif type == "follow":
  
@@ -467,15 +468,16 @@ def deletepost(request: HttpRequest, post_id: str):
         post.delete()
     return redirect('post:index')
 
-def postdetail(request: HttpRequest, post_id):
+def postdetail(request: HttpRequest, post_id: str):
     if request.user.is_anonymous:
         return render(request,'index.html')
     currentAuthor=Author.objects.filter(id=request.user.id).first()
-    post = Post.objects.filter(id=post_id)
+    post = Post.objects.get(id=post_id)
+    print(post.id)
     host = request.scheme + "://" + request.get_host()
     context = {
-        'posts': post,
-        'host': host
+        'post': post,
+        'host': host,
         }
     return render(request, 'detail.html', context)
 

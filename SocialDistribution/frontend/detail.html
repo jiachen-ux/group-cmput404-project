@@ -3,7 +3,7 @@
 {% block title %}Post Detail{% endblock %}
 
 {% block content %}
-
+{% load markdownify %}
     {% if post %}
         <div class="post" post-id="{{post.id}}" author-id="{{post.author.id}}">
             <div class="post-header">
@@ -17,7 +17,6 @@
                             <a href="{{host}}/editpost/{{post.id}}"><button type="button" class="btn">Edit post</button></a>
                             <a href="{{host}}/deletepost/{{post.id}}"><button type="button" class="btn" onclick="return confirm('Are you sure?');">Delete post</button></a>
                         {% endif %}
-                        {% if userAuthor %}
                         <select id="shareropdown">
                             <option value="" selected disabled hidden>Choose here</option>
                         </select>
@@ -29,7 +28,7 @@
                             var post;
                             var map = new Map();
                             if('{{post.visibility}}'==='FRIENDS'){
-                                url = '{{host}}' + '/author/'+ '{{ request.user.id }}' + '/followers';
+                                url = '{{host}}' + '/service/authors/'+ '{{ request.user.id }}' + '/followers';
                                 fetch(url,{
                                     method: 'GET',
                                     headers: {
@@ -41,9 +40,13 @@
                                     return response.json();
                                 })
                                 .then(function(data){
-                                    followersInJson = data["data"];
+                                    followersInJson = data["items"];
                                     for(let follower of followersInJson){
-                                        var urlToCheckIfFollowsBack = '{{host}}'+"/author/" + follower.id +'/followers/'+'{{ request.user.id }}';
+                                        let furl = follower.id;
+                                        let farray = furl.split("/");
+                                        let fid = farray[4];
+                                        let fhost = farray[2];
+                                        var urlToCheckIfFollowsBack = '{{host}}'+"/service/authors/" + fid +'/followers/'+'{{ request.user.id }}';
                                         fetch(urlToCheckIfFollowsBack,{
                                             method: 'GET',
                                             headers: {
@@ -52,10 +55,7 @@
                                             }, 
                                         })
                                         .then(function(response){
-                                            return response.json();
-                                        })
-                                        .then(function(data){
-                                            if(data.id==='{{ request.user.id }}'){
+                                            if(response.status === 200){
                                                 option = document.createElement("option");
                                                 option.value = follower.displayName;
                                                 option.innerHTML = follower.displayName;
@@ -70,7 +70,7 @@
                                 })
                         }
                         else{
-                            url = '{{host}}'+'/authors';
+                            url = '{{host}}'+'/service/authors';
                             fetch(url,{
                                 method: 'GET',
                                 headers: {
@@ -82,7 +82,7 @@
                                 return response.json();
                             })
                             .then(function(data){
-                                authorsInJson = data.data;
+                                authorsInJson = data.items;
                                 for(let author of authorsInJson){
                                     option = document.createElement("option");
                                     option.value = author.displayName;
@@ -97,7 +97,7 @@
                         }
                         document.getElementById("sharepostbtn").onclick = function(){
                             author = map.get(authorDropDown.value);
-                            url = '{{post.host}}'+'/author/'+'{{post.author.id}}'+'/posts/'+'{{post.id}}/';
+                            url = '{{ host }}'+'/service/authors/'+'{{post.author.id}}'+'/posts/'+'{{post.id}}/';
                             fetch(url,{
                                     method: 'GET',
                                     headers: {
@@ -109,39 +109,26 @@
                                 return response.json();
                             })
                             .then(function(data){
-                                post=data.data;
-                                postString = JSON.stringify(post);
-                                var urlToPostInboxItem = author.host +"/author/" + author.id +'/inbox';
-                                if(author.host === '{{host}}'){
-                                    fetch(urlToPostInboxItem,{
-                                        method: 'POST',
-                                        headers: {
-                                        'Content-Type' : 'application/json',
-                                        'X-CSRFToken' : "{{ csrf_token }}"
-                                        },
-                                        body: postString 
-                                    })
-                                }
-                                else{
-                                    if(author.host==="https://glowing-palm-tree1.herokuapp.com/"){
-                                        urlToPostInboxItem = author.host +"/service/author/" + author.id +'/inbox/';
-                                    } 
-                                    else {
-                                        urlToPostInboxItem = author.host +"/author/" + author.id +'/inbox/';
-                                    }
-                                    fetch(urlToPostInboxItem,{
-                                        method: 'POST',
-                                        headers: {
-                                        'Content-Type' : 'application/json',
-                                        'X-CSRFToken' : "{{ csrf_token }}"
-                                        },
-                                        body: postString 
-                                    })
-                                }
+                                post=data;
+                                post.type = "share";
+                                console.log(post);
+                                let aurl = author.id;
+                                let aarray = aurl.split("/");
+                                let aid = aarray[4];
+                                var urlToPostInboxItem = '{{ host }}' +"/service/authors/" + aid +'/inbox';
+                                fetch(urlToPostInboxItem,{
+                                    method: 'POST',
+                                    headers: {
+                                    'Content-Type' : 'application/json',
+                                    'X-CSRFToken' : "{{ csrf_token }}"
+                                    },
+                                    body: JSON.stringify(post) 
+                                })
+                            }).then(function(){
+                                alert("The post is successfully shared with the target user, and sent to his inbox!");
                             })
                         }
                         </script>
-                        {% endif %}
                         <script>
                             function CommentFunction(value,id,name){
                                 var forml = document.getElementById(id)
