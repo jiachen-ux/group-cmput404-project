@@ -68,6 +68,9 @@ class Post(models.Model):
     def type(self):
         return 'post'
 
+    def url(self):
+        return self.origin + "service/authors/" + str(self.author.id) + "/posts/" + str(self.id)
+
 # from comment.models import Comment
 
 class Inbox(models.Model):
