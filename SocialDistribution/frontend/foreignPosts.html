@@ -69,8 +69,73 @@
                 </div>
                 </div>
             </div>
+
+            {% elif post.unlisted == 'false' %}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="mt-3" >
+            <div class="card" style="width: 50rem;">
+                <div class="card-header text-black" style="background-color: #778899;">
+                    <div class="row">
+                        <div class="col">
+                            <h4 class="card-title"> 
+                                <a href="{{ post.id }}" style="color: black;">{{ post.title }}</a>
+                            </h4>
+                            <p style="font-size:medium"><strong>By </strong><a class="author-link" style="color:white" href="{{ post.author.id }}">{{ post.author.displayName }}</a></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <p class="field-label"><strong>Description: </strong>{{post.description}}</p>
+                    {% if post.contentType == "TXT" or  post.contentType == "TEXT" %}
+                    <p class="field-label"></p>
+                    <p>{{ post.content }}</p>
+
+                    {% elif post.contentType != "text/plain" %}
+                    <div class="post-image" style="background-image: url(/media/{{post.image}});"></div>
+                    
+                    {% else %}
+                    <p class="field-label"></p>
+                    <p>{{ post.content }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="card-footer">
+                    <!-- Like Button -->
+                        <!-- TODO: Better CSS for Like Button -->
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+                    <div class="mr-0">
+                        <button id="count-{{post.id}}" type="submit" name="{{post.id}}" value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/getalllikes'
+                        onclick="LikeCount(value,id)" class="btn" style="margin-right: 0%">Like |</button> 
+                       
+
+                        <button id="{{post.author.id}}" type="submit"  value = '{{host}}/service/authors/{{request.user.id}}/posts/{{post.id}}/likes' name='{{host}}/service/authors/{{request.user.id}}/inbox'  
+                        onclick="LikeFunction(value,name,id)" class="btn" style="margin-right: 0%">👍</button> 
+                        
+                    </div>
+                    <p class="field-label"><b>Comments: </b></p>
+                    <div id="comments-of-{{post.id}}">
+                        {% for i in post.commentsSrc.comments  %}
+                        <div class="comment">
+                            {% if i %}
+                            <p>
+                                <a class="author-link" href="https://team9-socialdistribution.herokuapp.com/service/authors/{{ comment.author.id }}">{{ i.author.displayName }}</a>: {{i.comment}}
+                            <span class="text-muted small float-right">Published: {{ i.published }}</span>
+                            </p>
+                            {% else %}
+                            <p>No Comments</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                </div>
+            </div>
             {% endif %}
             <br>
+
         {% endfor %}
 
     </div>
