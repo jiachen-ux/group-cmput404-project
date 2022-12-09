@@ -17,7 +17,8 @@
 ## Things after demo
   * inbox (like post inbox, comment post inbox, like comment, like comment inbox) Reimplenmented. 
     It was working before Wed, but accidently covered by old version of code when merging conflicted.
-  * several tests added
+  * added more unit-tests 
+  * share posts with other authors
 
 ## Installation and local deployment instructions:
 
@@ -38,7 +39,7 @@
 
 ## Architecture
 
-* Backend: Postgres and Django
+* Backend: PostgreSQL and Django
 * Frontend: Bootstrapped CSS & HTML
 
 ## Deployment
