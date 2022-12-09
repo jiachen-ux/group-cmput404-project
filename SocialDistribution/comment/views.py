@@ -13,6 +13,8 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from base64 import b64encode
 from post.models import Post
+from post.models import Inbox
+from post.models import Author
 
 
 
@@ -43,13 +45,34 @@ class CommentPostView(generics.ListCreateAPIView):
     '''
 
     def post(self, request, *args, **kwargs):
+        print(kwargs['uuidOfPost'])
         queryset = Post.objects.filter(id=kwargs['uuidOfPost']).first()
         data = {'count': 1}
+        # Inbox.objects.create(author_id=kwargs["uuidOfAuthor"],
+        #                      object_type='comment', object_id=kwargs['uuidOfPost'])
         serializer = PostSerializer(queryset, data=data)
         if serializer.is_valid():
             serializer.save()
+        type = request.data.get("type")
+        if type == 'comment like':
+            commentID = kwargs['uuidOfAuthor']
+            Commentinfo = Comment.objects.get(id=commentID)
+            user_info = Author.objects.get(id=Commentinfo.author_id)
+            message = f'{request.user.displayName}  liked your comment  in the post {commentID}'
+            Inbox.objects.create(author_id=user_info.id, message=message,
+                                 object_type='comment', object_id=kwargs['uuidOfPost'])
+            return Response(serializer.data)
 
-        return self.create(request, *args, **kwargs)
+        else:
+            user_info = Author.objects.get(id=kwargs["uuidOfAuthor"])
+            commentdatas = self.create(request, *args, **kwargs)
+            authorID, postID, commentID = utils.getAuthorIDandPostIDFromLikeURL(
+                commentdatas.data.get("id"))
+            Commentinfo = Comment.objects.get(id=commentID)
+            message = f'{user_info.displayName} commented on your post {commentID}'
+            Inbox.objects.create(author_id=queryset.author_id, message=message,
+                                 object_type='comment', object_id=kwargs['uuidOfPost'])
+            return Response(serializer.data)
 
     def list(self, request, *args, **kwargs):
         # edit
