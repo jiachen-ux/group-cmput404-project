@@ -1,7 +1,7 @@
 
 # CMPUT404-Project-Social-Distribution
 
-## [Video Demo](https://drive.google.com/file/d/1dmNcI3cjsAOWmWqkfNUevbSbOvSon8tU/view?usp=sharing)
+## [Video Demo](https://drive.google.com/file/d/10UlG2uvopCsO1mmIKiY-ee4PQu1XCb-B/view?usp=sharing)
 
 ## [Application Website](https://team9-socialdistribution.herokuapp.com/)
 
