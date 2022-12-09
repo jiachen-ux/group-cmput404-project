@@ -1,7 +1,7 @@
 
 # CMPUT404-Project-Social-Distribution
 
-## [Video Demo](https://drive.google.com/file/d/1_8j8gW5j1JVIow-7twdNGBxgNnWY4o2s/view?usp=sharing/)
+## [Video Demo](https://drive.google.com/file/d/1dmNcI3cjsAOWmWqkfNUevbSbOvSon8tU/view?usp=sharing)
 
 ## [Application Website](https://team9-socialdistribution.herokuapp.com/)
 
@@ -19,6 +19,7 @@
     It was working before Wed, but accidently covered by old version of code when merging conflicted.
   * added more unit-tests 
   * share posts with other authors
+  * update our demo video with subtitles and some features. 
 
 ## Installation and local deployment instructions:
 
