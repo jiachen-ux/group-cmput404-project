@@ -477,6 +477,9 @@ def Inboxs(request: HttpRequest):
             else:
                 context['host'] = host
                 context['posts'] = posts
+                context['postinfo'] = item.message
+                context["object_type"] = item.object_type
+                context['object_id'] = item.object_id
                 total.append(context)
         finalPost={
             "total":total
