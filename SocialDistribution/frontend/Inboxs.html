@@ -5,8 +5,8 @@
 
 {% block content %}
 <p style="text-align: center">My Notifications</p>
-{% if posts %}
-{% for post in posts %}
+{% if total %}
+{% for post in total %}
 <div class="container">
     <div class="row justify-content-center">
         <div class="mt-0">
@@ -14,8 +14,7 @@
                 <div class="card-header text-black">
                     <div class="row d-flex justify-content-between">
                         <div class="col d-flex justify-content-between">
-                            <h7> {{ post.message }}</h7><p class="text-muted small float-right style="text-align: right">{{ post.published|date:"Y-m-d H:i:s"}}</p>
-                            
+                            <li> {{ post.postinfo }}</li><li style="text-align: right">{{ post.posts.published|date:"Y-m-d H:i:s"}}</li>
                          </div>
                     {% if post.object_type == "follow" %}
                         <div class="col">

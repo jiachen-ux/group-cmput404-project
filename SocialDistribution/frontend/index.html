@@ -205,11 +205,28 @@
                     var mainContainer = document.getElementById(id);
                     for (var i = 0; i < data.length; i++) {
                         var div = document.createElement("div");
-                        div.innerHTML =  data[i].author.displayName +':'+" "+"  "+ data[i].comment + '<span><button onclick="myFunction()" class="btn">👍</button>' 
+                        id = data[i].id
+                        tmpList = id.split("/")
+                        linkId = tmpList[tmpList.length - 1]
+                        postID =data[i].post.id
+                        // alert(postID)
+                        div.innerHTML = data[i].author.displayName +':'+" "+"  "+ data[i].comment + '<span><button name = "demo-{{post.id}}" value = \'{{host}}/service/authors/'+ linkId +'/posts/' + postID + '/comments\' name=\'{{host}}/service/authors/{{request.user.id}}/inbox\' onclick="myFunction(value,name)" class="btn">👍</button>'
                         mainContainer.appendChild(div);
                     }
                 }
             }
+            function myFunction(value) {
+            var bodydata = {"type":"comment like"};
+            fetch(value, {
+                method: 'POST',
+                body: JSON.stringify(bodydata),
+                headers: {
+                    'X-CSRFToken': "{{ csrf_token }}",
+                    'Content-Type': 'application/json',
+                },
+            }).then(res => res.json())
+
+        }
         </script>
  
 {% endfor %}
