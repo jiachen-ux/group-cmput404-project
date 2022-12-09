@@ -17,7 +17,8 @@
 ## Things after demo
   *inbox (like post inbox, comment post inbox, like comment, like comment inbox) Reimplenmented. 
     It was working before Wed, but accidently covered by old version of vode when merging conflicted.
-  *several tests added
+  *added more unit tests
+  *sharing posts with other authors
 
 ## Installation and local deployment instructions:
 
@@ -38,8 +39,9 @@
 
 ## Architecture
 
-* Backend: SQLite3 and Django
+* Backend: Django and PostgreSQL
 * Frontend: Bootstrapped CSS & HTML
+
 
 ## Deployment
 Push to heroku using 
