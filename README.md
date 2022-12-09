@@ -14,6 +14,11 @@
 * hb2
 * nusaibah
 
+## Things after demo
+  *inbox (like post inbox, comment post inbox, like comment, like comment inbox) Reimplenmented. 
+    It was working before Wed, but accidently covered by old version of vode when merging conflicted.
+  *several tests added
+
 ## Installation and local deployment instructions:
 
 1. Clone repository `git clone https://github.com/jiachen-ux/group-cmput404-project.git
