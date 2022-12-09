@@ -14,7 +14,7 @@
                 <div class="card-header text-black">
                     <div class="row d-flex justify-content-between">
                         <div class="col d-flex justify-content-between">
-                            <li> {{ post.postinfo }}</li><li style="text-align: right">{{ post.posts.published|date:"Y-m-d H:i:s"}}</li>
+                            <p> {{ post.postinfo }}</p><p class="text-muted float-right" style="text-align: right">{{ post.posts.published|date:"Y-m-d H:i:s"}}</p>
                          </div>
                     {% if post.object_type == "follow" %}
                         <div class="col">
@@ -24,9 +24,12 @@
                                 <button class="btn-info float-right mr-2" id="{{request.user.id}}" type="submit"  name='{{host}}/service/authors/{{request.user.id}}/inbox' value = '{{host}}/service/authors/{{request.user.id}}/followrequest/{{post.object_id}}' onclick=DeclineFollowFunction(value,name,id) >
                                     Remove  
                                 </button>
+                            
                         </div>
                     {%endif%}
+                    <br>
                     </div>
+                    
                 </div>
             
             </div>
