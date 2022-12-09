@@ -523,6 +523,8 @@ def getForeignPosts(request):
 
     data = []
 
+    team7_posts = []
+
     response = requests.get(f"{team17_url}posts", params=request.GET)
     if response.status_code == 200:
         # print(posts)
@@ -531,32 +533,28 @@ def getForeignPosts(request):
 
     
     for author in combined_author:
-        # print(author['host'])
+        print(author['host'])
         if team8host_url in author['host']:
+
             response = requests.get(f"{team8_url}authors/{author['id']}/posts", params=request.GET)
             if response.status_code == 200:
                 posts = response.json()
                 # print('team8')
-                # print(posts)
+                #print(posts)
                 if posts != []:
                     if posts['items']!=[]: 
                         data.extend(posts['items'])
 
-    for b in range(len(data)):
-        d = data[b]
-        c = d["content"]
 
-        if "image" in d["contentType"]:
-                d["contentType"] = "image/png"
-                d["content"] =  "b'" + d["content"].split("base64,")[-1] + "'"
-
-        
-        if "visibility" not in d:
-            d["visibility"] = "Public"
-
-        if "categories" not in d or isinstance(d["categories"], str):
-                d["categories"] = ["Web"]
-        
+        elif team7host_url in author['host']:
+            response = requests.get(f"{team7_url}authors/{author['id']}/posts/", params=request.GET)
+            if response.status_code == 200:
+                posts = response.json()
+                
+                print(posts)
+                if posts != []:
+                    #team7_posts.append(posts)
+                    data.append(posts.values())
 
 
             
@@ -575,6 +573,7 @@ def getForeignPosts(request):
     #     if len(post) == 0:
     #         data.remove(post)
     # print(data)
+
     finalPost = {
         "posts": data
     }
