@@ -233,6 +233,7 @@ def handleInboxRequests(request, author_id):
                         "object_id": request.data["data"]["id"],
                     }
                     print(request.data["data"]["author_id"])
+                    displayName=request.data["data"]["author"]['displayName']
                     serializer = LikeSerializer(
                         data=data, partial=True)
                  
@@ -254,10 +255,10 @@ def handleInboxRequests(request, author_id):
                     # else:
                     #     raise KeyError("like object not valid!")
                     if "comment" in request.data["data"]["id"]:
-                        message = f'{request.user.username} liked your comment {request.data["data"]["comment"]}'
+                        message = f'{displayName} liked your comment {request.data["data"]["comment"]}'
                         idOfItem =  request.data["data"]["id"].split("comments/")[1].split("/likes")[0]
                     elif "post" in request.data["data"]["id"]:
-                        message = f'{request.user.username} liked your post {request.data["data"]["title"]}'
+                        message = f'{displayName} liked your post {request.data["data"]["object_id"]}'
                         idOfItem =  request.data["data"]["id"].split("posts/")[1].split("/likes")[0]
                  
                     Inbox.objects.create(author_id=request.data["data"]["title"],
@@ -274,7 +275,7 @@ def handleInboxRequests(request, author_id):
                         Inbox.objects.create(author_id=author_id, object_type=postType, object_id=idOfItem, message=message)
                     elif type == "post":
                         idOfItem = utils.getUUID(request.data["id"])
-                        message = f'{request.data["author"]["username"]} added a new post {request.data["title"]}'
+                        message = f'{request.data["author"]["username"]} added a new post {request.data["object_id"]}'
                         Inbox.objects.create(author_id=author_id, object_type=postType, object_id=idOfItem, message=message)
                     elif type == "share":
                         message = f'{request.user.username} shared a post with you called: {request.data["title"]}.'
@@ -448,13 +449,43 @@ def Inboxs(request: HttpRequest):
         return render(request,'index.html')
     author = Author.objects.get(id=request.user.id)
     posts = Inbox.objects.filter(author=author)
+    total=[]
     host = request.scheme + "://" + request.get_host()
-    context = {
-        'posts': posts,
-        'host': host,
+    finalPost={}
+    try:
+        for item in posts:
+            context = {}
+            if 'like' in item.object_type:
+                str=item.message
+                postId=str.split(' ')[-1]
+                postinfo = Post.objects.get(id=postId)
+                content = str.replace(str.split(' ')[-1],postinfo.title)
+                context['host']=host
+                context['postinfo']=content
+                context['posts']=item
+                total.append(context)
+            elif 'comment' in item.object_type:
+                str = item.message
+                CommentId = str.split(' ')[-1]
+                Commentinfo = Comment.objects.get(id=CommentId)
+                postinfo = Post.objects.get(id=Commentinfo.post_id)
+                content = str.replace(str.split(' ')[-1],postinfo.title)
+                context['host'] = host
+                context['postinfo'] = content
+                context['posts'] = item
+                total.append(context)
+            else:
+                context['host'] = host
+                context['posts'] = posts
+                total.append(context)
+        finalPost={
+            "total":total
         }
-    
-    return render(request, 'Inboxs.html', context)
+        print(finalPost)
+    except Exception as e:
+        print(e)
+        pass
+    return render(request, 'Inboxs.html', finalPost)
 
 def editpost(request: HttpRequest, post_id: str):
     if request.user.is_anonymous or not (request.user.is_authenticated):
