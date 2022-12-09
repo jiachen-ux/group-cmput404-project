@@ -1,5 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.test import TestCase, Client
+from author.models import Author
+from django.urls import reverse
+
 from rest_framework import status
 from rest_framework.test import APITestCase
 from .models import *
@@ -55,6 +59,52 @@ class FollowersRoutesTests(TestCase):
         )
 
 
+class TestViews(TestCase):
+
+    def setUp(self):
+        self.c = Client()
+
+        self.user_info = {
+            'displayName': 'Test',
+            'username' : 'test',
+            'password1': 'Newtest123',
+            'password2': 'Newtest123',
+            'github': 'https://github.com/Bushratun-Nusaibah',
+
+        }
+
+        self.login_info = {
+            'username' : 'test',
+            'password1': 'Newtest123',
+        }
+
+        url_signup = "register/"
+        login_url = ""
+        self.c.post(url_signup, self.user_info)
+        self.c.post(login_url, self.login_info)
+        self.url_allAuthors = reverse('allForeignAuthors')
+
+    def profile_page(self):
+        response = self.c.get(reverse('author_profile', kwargd = {'authorId':'test'}))
+
+        self.assertEquals(response.status_code, 200)
+
+        self.assertTemplateUsed(response, "profile.html")
+
+class AuthorTest(TestCase):
+    def test_author(self):
+        Author.objects.all().delete()
+        author = Author.objects.create_user(username="Test", password="testpassword")
+        self.assertTrue(Author.objects.filter(username=author.username))
+
+        return
+
+
+    def test_superuser(self):
+        Author.objects.all().delete()
+        author = Author.objects.create_user(username='Test Author', password='testpassw0rd')
+        self.assertFalse(author.is_staff)
+        self.assertFalse(author.is_superuser)
 
 class PostRoutesTests(TestCase):
     @classmethod
